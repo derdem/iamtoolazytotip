@@ -1,21 +1,21 @@
 package api
 
 import (
-	"fmt"
 	"net/http"
 
+	"github.com/derdem/iamtoolazytotip/simulator"
 	"github.com/gorilla/mux"
 )
 
 func Start() *mux.Router {
 	r := mux.NewRouter()
-	r.HandleFunc("/", rootLogger())
+	r.HandleFunc("/", runTournament())
 	http.ListenAndServe(":8080", r)
 	return r
 }
 
-func rootLogger() http.HandlerFunc {
+func runTournament() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		fmt.Print("root address called")
+		simulator.TournamentSimulator()
 	}
 }
