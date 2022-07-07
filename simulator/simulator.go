@@ -2,6 +2,7 @@ package simulator
 
 import (
 	"fmt"
+	"math"
 	"math/rand"
 	"time"
 
@@ -14,28 +15,40 @@ type OutcomeProbabilities struct {
 	remis float64
 }
 
+const lambda = 1.3
+
 func TournamentSimulator() {
-	// teams := GetAllCountries()
-	// groups := GetGroups(teams)
-	// playdays := GetPlaydays(groups)
+	teams := GetAllCountries()
+	groups := GetGroups(teams)
+	playdays := GetPlaydays(groups)
+	//var playdayOutcomes = make()
 
-	randomResult()
-
-	// for i := range playdays {
-	// 	fmt.Printf("Day %d \n", i+1)
-	// 	for i, teampair := range playdays[i] {
-	// 		_ = i
-	// 		fmt.Printf("%s vs. %s \n", teampair[0].name, teampair[1].name)
-	// 	}
-	// }
+	for i := range playdays {
+		fmt.Printf("Day %d \n", i+1)
+		for i, teampair := range playdays[i] {
+			_ = i
+			playGroupMatch(teampair[0], teampair[1])
+		}
+	}
 }
 
 func playGroupMatch(team1 Country, team2 Country) {
 	outcomeProbabilies := assignProbabilities(team1.strength, team2.strength)
 	winnerCode := determineWinner(outcomeProbabilies)
-	if winnerCode == 0 {
+	var team1Score int
+	var team2Score int
 
+	if winnerCode == 0 {
+		team1Score, team2Score = setRemisScore()
+	} else if winnerCode == 1 {
+		team1Score = randomResult()
+		team2Score = randomResultLoser(team1Score, team1.strength-team2.strength)
+	} else if winnerCode == 2 {
+		team2Score = randomResult()
+		team1Score = randomResultLoser(team2Score, team2.strength-team1.strength)
 	}
+
+	fmt.Printf("%s vs. %s: (%d: %d)\n", team1.name, team2.name, team1Score, team2Score)
 
 }
 
@@ -79,11 +92,74 @@ func determineWinner(outcomeChanges OutcomeProbabilities) int {
 	}
 }
 
-func randomResult() {
-	var p distuv.Poisson = distuv.Poisson{Lambda: 3.4}
-	x := distuv.Poisson.CDF(p, 3.4)
+func setRemisScore() (int, int) {
+	result := randomResult()
+	return result, result
+}
 
-	fmt.Println(x)
+func randomResult() int {
+	rand.Seed(time.Now().UnixNano())
+	probab := rand.Float64()
+	k := findK(probab, 0, lambda)
+	return k + 1
+}
+
+func findK(probab float64, k int, lambda float64) int {
+	p := distuv.Poisson{Lambda: lambda}
+	x1 := distuv.Poisson.CDF(p, float64(k))
+	x2 := distuv.Poisson.CDF(p, float64(k+1))
+
+	if x2 < probab {
+		return findK(probab, k+1, lambda)
+	} else {
+		gap1 := probab - x1
+		gap2 := x2 - probab
+		if gap1 < gap2 {
+			return k
+		} else {
+			return k + 1
+		}
+
+	}
+
+}
+
+func randomResultLoser(resultWinner int, strengthDifference int) int {
+	if resultWinner == 1 {
+		return 0
+	}
+	rand.Seed(time.Now().UnixNano())
+	if strengthDifference == 2 {
+		dilute := math.Pow(0.8+(0.2*rand.Float64()), 2)
+		p := rand.Float64() * dilute
+		return int(math.Round(p * (float64(resultWinner - 1))))
+	} else if strengthDifference == 1 {
+		dilute := 0.8 + (0.2 * rand.Float64())
+		p := rand.Float64() * dilute
+		return int(math.Round(p * (float64(resultWinner - 1))))
+	} else if strengthDifference == 0 {
+		p := rand.Float64()
+		return int(math.Round(p * (float64(resultWinner - 1))))
+	} else if strengthDifference == -1 {
+		concentrate := 1.2 - (0.2 * rand.Float64())
+		p := rand.Float64() * concentrate
+		if p > 1 {
+			return resultWinner - 1
+		} else {
+			return int(math.Round(p * (float64(resultWinner - 1))))
+		}
+	} else if strengthDifference == -2 {
+		concentrate := 1.5 - (0.5 * rand.Float64())
+		p := rand.Float64() * concentrate
+		if p > 1 {
+			return resultWinner - 1
+		} else {
+			return int(math.Round(p * (float64(resultWinner - 1))))
+		}
+	} else {
+		return 0
+	}
+
 }
 
 // def play_group_match(team1: Country, team2: Country):
