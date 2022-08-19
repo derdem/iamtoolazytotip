@@ -1,7 +1,6 @@
 package simulator
 
 import (
-	"fmt"
 	"math"
 	"math/rand"
 	"time"
@@ -15,24 +14,33 @@ type OutcomeProbabilities struct {
 	remis float64
 }
 
+type MatchOutcome struct {
+	Team1      string `json:"team1"`
+	Team1Score int    `json:"team1Score"`
+	Team2      string `json:"team2"`
+	Team2Score int    `json:"team2Score"`
+}
+
 const lambda = 1.3
 
-func TournamentSimulator() {
+func TournamentSimulator() []MatchOutcome {
 	teams := GetAllCountries()
 	groups := GetGroups(teams)
 	playdays := GetPlaydays(groups)
-	//var playdayOutcomes = make()
+	var playdayOutcomes []MatchOutcome
 
 	for i := range playdays {
-		fmt.Printf("Day %d \n", i+1)
+		//fmt.Printf("Day %d \n", i+1)
 		for i, teampair := range playdays[i] {
 			_ = i
-			playGroupMatch(teampair[0], teampair[1])
+			matchOutcome := playGroupMatch(teampair[0], teampair[1])
+			playdayOutcomes = append(playdayOutcomes, matchOutcome)
 		}
 	}
+	return playdayOutcomes
 }
 
-func playGroupMatch(team1 Country, team2 Country) {
+func playGroupMatch(team1 Country, team2 Country) MatchOutcome {
 	outcomeProbabilies := assignProbabilities(team1.strength, team2.strength)
 	winnerCode := determineWinner(outcomeProbabilies)
 	var team1Score int
@@ -48,7 +56,7 @@ func playGroupMatch(team1 Country, team2 Country) {
 		team1Score = randomResultLoser(team2Score, team2.strength-team1.strength)
 	}
 
-	fmt.Printf("%s vs. %s: (%d: %d)\n", team1.name, team2.name, team1Score, team2Score)
+	return MatchOutcome{Team1: team1.name, Team1Score: team1Score, Team2: team2.name, Team2Score: team2Score}
 
 }
 
