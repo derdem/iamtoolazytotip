@@ -2,7 +2,6 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 
@@ -17,12 +16,6 @@ func Start() *mux.Router {
 	return r
 }
 
-type returnValue struct {
-	id   string
-	name string
-	age  int
-}
-
 func runTournament() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		matchOutcome := simulator.TournamentSimulator()
@@ -32,7 +25,7 @@ func runTournament() http.HandlerFunc {
 			log.Fatalf("Error happened in JSON marshal. Err: %s", err)
 		}
 
-		fmt.Println(matchOutcome)
+		//fmt.Println(matchOutcome)
 		w.Header().Set("Content-Type", "application/json")
 		w.Write(js)
 	}

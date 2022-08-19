@@ -1,10 +1,10 @@
 package simulator
 
 type Country struct {
-	strength int
-	name     string
-	points   int
-	goals    int
+	Strength int    `json:"strength"`
+	Name     string `json:"name"`
+	Points   int    `json:"points"`
+	Goals    int    `json:"goals"`
 }
 
 type AllCountries struct {
@@ -35,7 +35,7 @@ type AllCountries struct {
 }
 
 func defineCountry(name string, strength int) Country {
-	country := Country{name: name, strength: strength, points: 0, goals: 0}
+	country := Country{Name: name, Strength: strength, Points: 0, Goals: 0}
 	return country
 }
 
