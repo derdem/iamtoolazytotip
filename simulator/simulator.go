@@ -27,20 +27,36 @@ const lambda = 1.3
 
 func TournamentSimulator() []MatchOutcome {
 	teams := GetAllCountries()
-	groups := GetGroups(teams)
-	playdays := GetPlaydays(groups)
+	playdays := GetPlaydays()
 	var playdayOutcomes []MatchOutcome
 
-	for i := range playdays {
-		fmt.Printf("Day %d \n", i+1)
-		for j, teampair := range playdays[i] {
+	for i, playday := range playdays {
+		_ = i
+		//fmt.Printf("Day %d \n", i+1)
+		for j, teampair := range playday {
 			_ = j
 			matchOutcome := playGroupMatch(teampair[0], teampair[1])
+			UpdateCountry(&teams, matchOutcome.Team1)
+			UpdateCountry(&teams, matchOutcome.Team2)
 			matchOutcomePrintable, _ := json.Marshal(matchOutcome)
 			fmt.Println(string(matchOutcomePrintable))
 			playdayOutcomes = append(playdayOutcomes, matchOutcome)
 		}
 	}
+
+	groups := GetGroups(teams)
+	determineGroupWinner(groups.A)
+
+	// determine group winners and create new groups
+	// create 8th finaly based on playdayOutcomes
+	// let 8th finaly play -> save results -> determine winners
+	// create 4th finaly based on 8th finaly outcome
+	// let 4th finaly play -> save results -> determine winners
+	// create half finaly based on 4th finaly outcome
+	// let half finaly play -> save results -> determine winners
+	// create finaly based on half finaly outcome
+	// let finaly play -> save results -> determine winners
+
 	return playdayOutcomes
 }
 
@@ -101,14 +117,11 @@ func determineWinner(outcomeChanges OutcomeProbabilities) int {
 	rand.Seed(time.Now().UnixNano())
 	randomResult := rand.Float64()
 	if randomResult < outcomeChanges.remis {
-		// remis
-		return 0
+		return 0 // remis
 	} else if randomResult < outcomeChanges.remis+outcomeChanges.team1 {
-		// team 1 wins
-		return 1
+		return 1 // team 1 wins
 	} else {
-		// team 2 wins
-		return 2
+		return 2 // team 2 wins
 	}
 }
 
@@ -139,9 +152,7 @@ func findK(probab float64, k int, lambda float64) int {
 		} else {
 			return k + 1
 		}
-
 	}
-
 }
 
 func randomResultLoser(resultWinner int, strengthDifference int) int {
@@ -180,4 +191,8 @@ func randomResultLoser(resultWinner int, strengthDifference int) int {
 		return 0
 	}
 
+}
+
+func determineGroupWinner(group Group) {
+	fmt.Println(group)
 }
