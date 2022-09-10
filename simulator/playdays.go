@@ -65,6 +65,40 @@ func GetPlaydays() []Playday {
 	return playdays
 }
 
+func getRoundOf16Matches(roundOf16 RoundOf16) [8][2]Country {
+	return [8][2]Country{
+		{roundOf16.member1, roundOf16.member2},
+		{roundOf16.member3, roundOf16.member4},
+		{roundOf16.member5, roundOf16.member6},
+		{roundOf16.member7, roundOf16.member8},
+		{roundOf16.member9, roundOf16.member10},
+		{roundOf16.member11, roundOf16.member12},
+		{roundOf16.member13, roundOf16.member14},
+		{roundOf16.member15, roundOf16.member16},
+	}
+}
+
+// [self.teams[5], self.teams[4]],
+// [self.teams[3], self.teams[1]],
+// [self.teams[2], self.teams[0]],
+// [self.teams[7], self.teams[6]],
+
+func getRoundOf8Matches(teams [8]Country) [4][2]Country {
+	return [4][2]Country{
+		{teams[5], teams[4]},
+		{teams[3], teams[1]},
+		{teams[2], teams[0]},
+		{teams[7], teams[6]},
+	}
+}
+
+func getRoundOf4Matches(teams [4]Country) [2][2]Country {
+	return [2][2]Country{
+		{teams[0], teams[1]},
+		{teams[2], teams[3]},
+	}
+}
+
 // ko_rounds = [
 //     Eighth,
 //     Quarter,

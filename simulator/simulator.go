@@ -1,7 +1,7 @@
 package simulator
 
 import (
-	"encoding/json"
+	//"encoding/json"
 	"fmt"
 	"math"
 	"math/rand"
@@ -32,23 +32,44 @@ func TournamentSimulator() []MatchOutcome {
 
 	for i, playday := range playdays {
 		_ = i
-		//fmt.Printf("Day %d \n", i+1)
 		for j, teampair := range playday {
 			_ = j
 			matchOutcome := playGroupMatch(teampair[0], teampair[1])
 			UpdateCountry(&teams, matchOutcome.Team1)
 			UpdateCountry(&teams, matchOutcome.Team2)
-			matchOutcomePrintable, _ := json.Marshal(matchOutcome)
-			fmt.Println(string(matchOutcomePrintable))
 			playdayOutcomes = append(playdayOutcomes, matchOutcome)
 		}
 	}
 
+	fmt.Println("Round of 16")
 	groups := GetGroups(teams)
-	determineGroupWinner(groups.A)
+	roundOf16 := GetRoudOfSixteen(groups)
+	matchesRoundOf16 := getRoundOf16Matches(roundOf16)
+	var roundOf16Winners [8]Country
+	for i, matchPair := range matchesRoundOf16 {
+		winningCountry := playEliminationMatch(matchPair[0], matchPair[1])
+		roundOf16Winners[i] = winningCountry
+	}
 
-	// determine group winners and create new groups
-	// create 8th finaly based on playdayOutcomes
+	fmt.Println("Round of 8")
+	matchesRoundOf8 := getRoundOf8Matches(roundOf16Winners)
+	var roundOf8Winners [4]Country
+	for i, matchPair := range matchesRoundOf8 {
+		winningCountry := playEliminationMatch(matchPair[0], matchPair[1])
+		roundOf8Winners[i] = winningCountry
+	}
+
+	fmt.Println("Round of 4")
+	matchesRoundOf4 := getRoundOf4Matches(roundOf8Winners)
+	var roundOf4Winners [2]Country
+	for i, matchPair := range matchesRoundOf4 {
+		winningCountry := playEliminationMatch(matchPair[0], matchPair[1])
+		roundOf4Winners[i] = winningCountry
+	}
+
+	fmt.Println("Final Match")
+	playEliminationMatch(roundOf4Winners[0], roundOf4Winners[1])
+
 	// let 8th finaly play -> save results -> determine winners
 	// create 4th finaly based on 8th finaly outcome
 	// let 4th finaly play -> save results -> determine winners
@@ -86,6 +107,40 @@ func playGroupMatch(team1 Country, team2 Country) MatchOutcome {
 
 	return MatchOutcome{Team1: team1, Team1Score: team1Score, Team2: team2, Team2Score: team2Score}
 
+}
+
+func playEliminationMatch(team1 Country, team2 Country) Country {
+	var team1Score int
+	var team2Score int
+	var team1PenaltyScore int
+	var team2PenaltyScore int
+	outcomeProbabilies := assignProbabilities(team1.Strength, team2.Strength)
+	winnerCode := determineWinner(outcomeProbabilies)
+
+	fmt.Println(team1.Name + " vs. " + team2.Name)
+	if winnerCode == 0 {
+		team1Score, team2Score = setRemisScore()
+		team1PenaltyScore, team2PenaltyScore = playPenalty(0, 0)
+		resultString := fmt.Sprintf("%d (%d) - %d (%d)", team1Score, team1Score+team1PenaltyScore, team2Score, team1Score+team2PenaltyScore)
+		fmt.Println(resultString)
+		if team1Score+team1PenaltyScore > team2Score+team2PenaltyScore {
+			return team1
+		} else {
+			return team2
+		}
+	} else if winnerCode == 1 {
+		team1Score = randomResult()
+		team2Score = randomResultLoser(team1Score, team1.Strength-team2.Strength)
+		resultString := fmt.Sprintf("%d - %d", team1Score, team2Score)
+		fmt.Println(resultString)
+		return team1
+	} else {
+		team2Score = randomResult()
+		team1Score = randomResultLoser(team2Score, team2.Strength-team1.Strength)
+		resultString := fmt.Sprintf("%d - %d", team1Score, team2Score)
+		fmt.Println(resultString)
+		return team2
+	}
 }
 
 func assignProbabilities(strength1 int, strength2 int) OutcomeProbabilities {
@@ -193,6 +248,24 @@ func randomResultLoser(resultWinner int, strengthDifference int) int {
 
 }
 
-func determineGroupWinner(group Group) {
-	fmt.Println(group)
+func playPenalty(score1, score2 int) (int, int) {
+	score1Increment := randomScoreBetween0And5()
+	score2Increment := randomScoreBetween0And5()
+	if score1Increment == score2Increment {
+		return playPenalty(score1Increment, score2Increment)
+	} else {
+		return score1Increment, score2Increment
+	}
+}
+
+func randomScoreBetween0And5() int {
+	rand.Seed(time.Now().UnixNano())
+	goals := 0
+	for i := 1; i <= 5; i++ {
+		randomResult := rand.Float64()
+		if randomResult > .25 {
+			goals++
+		}
+	}
+	return goals
 }
