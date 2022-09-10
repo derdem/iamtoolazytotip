@@ -65,7 +65,8 @@ func GetPlaydays() []Playday {
 	return playdays
 }
 
-func getRoundOf16Matches(roundOf16 RoundOf16) [8][2]Country {
+func getRoundOf16Matches(groups Groups) [8][2]Country {
+	roundOf16 := GetRoudOfSixteen(groups)
 	return [8][2]Country{
 		{roundOf16.member1, roundOf16.member2},
 		{roundOf16.member3, roundOf16.member4},

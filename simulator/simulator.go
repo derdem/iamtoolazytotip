@@ -23,6 +23,15 @@ type MatchOutcome struct {
 	Team2Score int     `json:"team2Score"`
 }
 
+// type TournamentOutcome struct {
+// 	Countries
+// 	QualificationPhase
+// 	RoundOf16
+// 	RoundOf8
+// 	RoundOf4
+// 	Final
+// }
+
 const lambda = 1.3
 
 func TournamentSimulator() []MatchOutcome {
@@ -43,8 +52,7 @@ func TournamentSimulator() []MatchOutcome {
 
 	fmt.Println("Round of 16")
 	groups := GetGroups(teams)
-	roundOf16 := GetRoudOfSixteen(groups)
-	matchesRoundOf16 := getRoundOf16Matches(roundOf16)
+	matchesRoundOf16 := getRoundOf16Matches(groups)
 	var roundOf16Winners [8]Country
 	for i, matchPair := range matchesRoundOf16 {
 		winningCountry := playEliminationMatch(matchPair[0], matchPair[1])
@@ -69,14 +77,6 @@ func TournamentSimulator() []MatchOutcome {
 
 	fmt.Println("Final Match")
 	playEliminationMatch(roundOf4Winners[0], roundOf4Winners[1])
-
-	// let 8th finaly play -> save results -> determine winners
-	// create 4th finaly based on 8th finaly outcome
-	// let 4th finaly play -> save results -> determine winners
-	// create half finaly based on 4th finaly outcome
-	// let half finaly play -> save results -> determine winners
-	// create finaly based on half finaly outcome
-	// let finaly play -> save results -> determine winners
 
 	return playdayOutcomes
 }
