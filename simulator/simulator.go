@@ -10,6 +10,10 @@ import (
 	"gonum.org/v1/gonum/stat/distuv"
 )
 
+// const PhaseRegistry struct {
+// 	qualification: "Qualification"
+// }
+
 type OutcomeProbabilities struct {
 	team1 float64
 	team2 float64
@@ -23,6 +27,11 @@ type MatchOutcome struct {
 	Team2Score int     `json:"team2Score"`
 }
 
+// type MatchDetails struct {
+// 	Opponent string `json:"opponent"`
+// 	Phase
+// }
+
 // type TournamentOutcome struct {
 // 	Countries
 // 	QualificationPhase
@@ -35,19 +44,31 @@ type MatchOutcome struct {
 const lambda = 1.3
 
 func TournamentSimulator() []MatchOutcome {
+	fmt.Println("Start")
+	c := make(chan MatchOutcome, 100)
 	teams := GetAllCountries()
 	playdays := GetPlaydays()
 	var playdayOutcomes []MatchOutcome
 
-	for i, playday := range playdays {
-		_ = i
-		for j, teampair := range playday {
-			_ = j
-			matchOutcome := playGroupMatch(teampair[0], teampair[1])
-			UpdateCountry(&teams, matchOutcome.Team1)
-			UpdateCountry(&teams, matchOutcome.Team2)
-			playdayOutcomes = append(playdayOutcomes, matchOutcome)
+	go func() {
+		var closeC = false
+		for i, playday := range playdays {
+			_ = i
+			for j, teampair := range playday {
+				_ = j
+				if i == len(playdays)-1 && j == len(playday)-1 {
+					closeC = true
+				}
+				go playGroupMatch(teampair[0], teampair[1], c, closeC)
+
+			}
 		}
+	}()
+
+	for matchOutcome := range c {
+		UpdateCountry(&teams, matchOutcome.Team1)
+		UpdateCountry(&teams, matchOutcome.Team2)
+		playdayOutcomes = append(playdayOutcomes, matchOutcome)
 	}
 
 	fmt.Println("Round of 16")
@@ -81,7 +102,8 @@ func TournamentSimulator() []MatchOutcome {
 	return playdayOutcomes
 }
 
-func playGroupMatch(team1 Country, team2 Country) MatchOutcome {
+func playGroupMatch(team1 Country, team2 Country, c chan MatchOutcome, closeC bool) {
+	fmt.Println(team1.Name + " - " + team2.Name)
 	outcomeProbabilies := assignProbabilities(team1.Strength, team2.Strength)
 	winnerCode := determineWinner(outcomeProbabilies)
 	var team1Score int
@@ -105,7 +127,16 @@ func playGroupMatch(team1 Country, team2 Country) MatchOutcome {
 	team1.Goals = team1.Goals + team1Score
 	team2.Goals = team2.Goals + team2Score
 
-	return MatchOutcome{Team1: team1, Team1Score: team1Score, Team2: team2, Team2Score: team2Score}
+	rand.Seed(time.Now().UnixNano())
+	multiplier := time.Duration(rand.Intn(100))
+	time.Sleep(time.Millisecond * multiplier)
+
+	c <- MatchOutcome{Team1: team1, Team1Score: team1Score, Team2: team2, Team2Score: team2Score}
+
+	if closeC {
+		time.Sleep(time.Millisecond * 100)
+		close(c)
+	}
 
 }
 
