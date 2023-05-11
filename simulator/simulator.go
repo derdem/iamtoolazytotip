@@ -5,14 +5,11 @@ import (
 	"fmt"
 	"math"
 	"math/rand"
+	"sync"
 	"time"
 
 	"gonum.org/v1/gonum/stat/distuv"
 )
-
-// const PhaseRegistry struct {
-// 	qualification: "Qualification"
-// }
 
 type OutcomeProbabilities struct {
 	team1 float64
@@ -27,103 +24,90 @@ type MatchOutcome struct {
 	Team2Score int     `json:"team2Score"`
 }
 
-// type MatchDetails struct {
-// 	Opponent string `json:"opponent"`
-// 	Phase
-// }
-
-// type TournamentOutcome struct {
-// 	Countries
-// 	QualificationPhase
-// 	RoundOf16
-// 	RoundOf8
-// 	RoundOf4
-// 	Final
-// }
-
 const lambda = 1.3
+
+var wg sync.WaitGroup
 
 func TournamentSimulator() []MatchOutcome {
 	fmt.Println("Start")
-	c := make(chan MatchOutcome, 100)
-	teams := GetAllCountries()
-	playdays := GetPlaydays()
+	//c := make(chan MatchOutcome, 100)
+
+	groups := GetGroups()
+	playdays := DeterminePlaydaysFromGroup(groups)
+	numberMatchesInGroupPhase := CountAllGroupMatches(playdays)
 	var playdayOutcomes []MatchOutcome
 
-	go func() {
-		var closeC = false
-		for i, playday := range playdays {
-			_ = i
-			for j, teampair := range playday {
-				_ = j
-				if i == len(playdays)-1 && j == len(playday)-1 {
-					closeC = true
-				}
-				go playGroupMatch(teampair[0], teampair[1], c, closeC)
-
-			}
+	wg.Add(numberMatchesInGroupPhase)
+	for _, playday := range playdays {
+		for _, match := range playday {
+			go playGroupMatch(match)
 		}
-	}()
-
-	for matchOutcome := range c {
-		UpdateCountry(&teams, matchOutcome.Team1)
-		UpdateCountry(&teams, matchOutcome.Team2)
-		playdayOutcomes = append(playdayOutcomes, matchOutcome)
 	}
+	wg.Wait()
 
-	fmt.Println("Round of 16")
-	groups := GetGroups(teams)
-	matchesRoundOf16 := getRoundOf16Matches(groups)
-	var roundOf16Winners [8]Country
-	for i, matchPair := range matchesRoundOf16 {
-		winningCountry := playEliminationMatch(matchPair[0], matchPair[1])
-		roundOf16Winners[i] = winningCountry
-	}
+	// fmt.Println("Round of 16")
+	// groups := GetGroups(teams)
+	// matchesRoundOf16 := getRoundOf16Matches(groups)
+	// var roundOf16Winners [8]Country
+	// for i, matchPair := range matchesRoundOf16 {
+	// 	winningCountry := playEliminationMatch(matchPair[0], matchPair[1])
+	// 	roundOf16Winners[i] = winningCountry
+	// }
 
-	fmt.Println("Round of 8")
-	matchesRoundOf8 := getRoundOf8Matches(roundOf16Winners)
-	var roundOf8Winners [4]Country
-	for i, matchPair := range matchesRoundOf8 {
-		winningCountry := playEliminationMatch(matchPair[0], matchPair[1])
-		roundOf8Winners[i] = winningCountry
-	}
+	// fmt.Println("Round of 8")
+	// matchesRoundOf8 := getRoundOf8Matches(roundOf16Winners)
+	// var roundOf8Winners [4]Country
+	// for i, matchPair := range matchesRoundOf8 {
+	// 	winningCountry := playEliminationMatch(matchPair[0], matchPair[1])
+	// 	roundOf8Winners[i] = winningCountry
+	// }
 
-	fmt.Println("Round of 4")
-	matchesRoundOf4 := getRoundOf4Matches(roundOf8Winners)
-	var roundOf4Winners [2]Country
-	for i, matchPair := range matchesRoundOf4 {
-		winningCountry := playEliminationMatch(matchPair[0], matchPair[1])
-		roundOf4Winners[i] = winningCountry
-	}
+	// fmt.Println("Round of 4")
+	// matchesRoundOf4 := getRoundOf4Matches(roundOf8Winners)
+	// var roundOf4Winners [2]Country
+	// for i, matchPair := range matchesRoundOf4 {
+	// 	winningCountry := playEliminationMatch(matchPair[0], matchPair[1])
+	// 	roundOf4Winners[i] = winningCountry
+	// }
 
-	fmt.Println("Final Match")
-	playEliminationMatch(roundOf4Winners[0], roundOf4Winners[1])
+	// fmt.Println("Final Match")
+	// playEliminationMatch(roundOf4Winners[0], roundOf4Winners[1])
 
 	return playdayOutcomes
 }
 
-func playGroupMatch(team1 Country, team2 Country, c chan MatchOutcome, closeC bool) {
+func playGroupMatch(match Match) {
+	team1 := match.team1
+	team2 := match.team2
 	fmt.Println(team1.Name + " - " + team2.Name)
 	outcomeProbabilies := assignProbabilities(team1.Strength, team2.Strength)
 	winnerCode := determineWinner(outcomeProbabilies)
 	var team1Score int
 	var team2Score int
 
-	if winnerCode == 0 {
+	switch winnerCode {
+	case 0:
 		team1Score, team2Score = setRemisScore()
 		team1.Points = team1.Points + 1
 		team2.Points = team2.Points + 1
-	} else if winnerCode == 1 {
+		match.winner = nil
+	case 1:
 		team1Score = randomResult()
 		team2Score = randomResultLoser(team1Score, team1.Strength-team2.Strength)
 		team1.Points = team1.Points + 3
 		team2.Points = team2.Points + 0
-	} else if winnerCode == 2 {
+		match.winner = team1
+	case 2:
 		team2Score = randomResult()
 		team1Score = randomResultLoser(team2Score, team2.Strength-team1.Strength)
 		team1.Points = team1.Points + 0
 		team2.Points = team2.Points + 3
+		match.winner = team2
 	}
+
+	match.goalsTeam1 = team1Score
+	match.goalsTeam2 = team2Score
+
 	team1.Goals = team1.Goals + team1Score
 	team2.Goals = team2.Goals + team2Score
 
@@ -131,12 +115,7 @@ func playGroupMatch(team1 Country, team2 Country, c chan MatchOutcome, closeC bo
 	multiplier := time.Duration(rand.Intn(100))
 	time.Sleep(time.Millisecond * multiplier)
 
-	c <- MatchOutcome{Team1: team1, Team1Score: team1Score, Team2: team2, Team2Score: team2Score}
-
-	if closeC {
-		time.Sleep(time.Millisecond * 100)
-		close(c)
-	}
+	wg.Done()
 
 }
 
@@ -145,33 +124,37 @@ func playEliminationMatch(team1 Country, team2 Country) Country {
 	var team2Score int
 	var team1PenaltyScore int
 	var team2PenaltyScore int
+	var winnerTeam Country
 	outcomeProbabilies := assignProbabilities(team1.Strength, team2.Strength)
 	winnerCode := determineWinner(outcomeProbabilies)
 
 	fmt.Println(team1.Name + " vs. " + team2.Name)
-	if winnerCode == 0 {
+	switch winnerCode {
+	case 0:
 		team1Score, team2Score = setRemisScore()
 		team1PenaltyScore, team2PenaltyScore = playPenalty(0, 0)
 		resultString := fmt.Sprintf("%d (%d) - %d (%d)", team1Score, team1Score+team1PenaltyScore, team2Score, team1Score+team2PenaltyScore)
 		fmt.Println(resultString)
 		if team1Score+team1PenaltyScore > team2Score+team2PenaltyScore {
-			return team1
+			winnerTeam = team1
 		} else {
-			return team2
+			winnerTeam = team2
 		}
-	} else if winnerCode == 1 {
+	case 1:
 		team1Score = randomResult()
 		team2Score = randomResultLoser(team1Score, team1.Strength-team2.Strength)
 		resultString := fmt.Sprintf("%d - %d", team1Score, team2Score)
 		fmt.Println(resultString)
-		return team1
-	} else {
+		winnerTeam = team1
+	case 2:
 		team2Score = randomResult()
 		team1Score = randomResultLoser(team2Score, team2.Strength-team1.Strength)
 		resultString := fmt.Sprintf("%d - %d", team1Score, team2Score)
 		fmt.Println(resultString)
-		return team2
+		winnerTeam = team2
 	}
+
+	return winnerTeam
 }
 
 func assignProbabilities(strength1 int, strength2 int) OutcomeProbabilities {

@@ -1,7 +1,14 @@
 package main
 
-import "github.com/derdem/iamtoolazytotip/api"
+import (
+	"fmt"
+
+	"github.com/derdem/iamtoolazytotip/simulator"
+)
 
 func main() {
-	api.Start()
+	// api.Start()
+	result := simulator.TournamentSimulator()
+	fmt.Println(result)
+
 }

@@ -1,73 +1,42 @@
 package simulator
 
-type CountryPair [2]Country
-type Playday []CountryPair
+func DeterminePlaydaysFromGroup(groups []Group) []PlaydayMatches {
+	// combine all matches per group into one map
+	playdaysMap := make(map[int]PlaydayMatches)
 
-func GetPlaydays() []Playday {
-
-	allCountries := GetAllCountries()
-
-	playday1 := Playday{
-		{allCountries.turkey, allCountries.italy},
-		{allCountries.wales, allCountries.switzerland},
-		{allCountries.denmark, allCountries.finland},
-		{allCountries.belgium, allCountries.russia},
-		{allCountries.england, allCountries.kroatia},
-		{allCountries.austria, allCountries.northmazedonia},
-		{allCountries.netherlands, allCountries.ukraine},
+	for _, group := range groups {
+		playplan := group.playplan
+		for day, matches := range playplan {
+			_, ok := playdaysMap[day]
+			if !ok {
+				playdaysMap[day] = PlaydayMatches{}
+			}
+			playdaysMap[day] = append(playdaysMap[day], matches...)
+		}
 	}
 
-	playday2 := Playday{
-		{allCountries.scotland, allCountries.czechrepublic},
-		{allCountries.poland, allCountries.slowakia},
-		{allCountries.spain, allCountries.sweden},
-		{allCountries.hungry, allCountries.portugal},
-		{allCountries.france, allCountries.germany},
+	// convert the map to a slice
+	playdays := []PlaydayMatches{}
+	for _, matchesOfTheDay := range playdaysMap {
+		playdays = append(playdays, matchesOfTheDay)
 	}
 
-	playday3 := Playday{
-		{allCountries.finland, allCountries.russia},
-		{allCountries.turkey, allCountries.wales},
-		{allCountries.italy, allCountries.switzerland},
-		{allCountries.ukraine, allCountries.northmazedonia},
-		{allCountries.denmark, allCountries.belgium},
-		{allCountries.netherlands, allCountries.austria},
-	}
-
-	playday4 := Playday{
-		{allCountries.sweden, allCountries.slowakia},
-		{allCountries.kroatia, allCountries.czechrepublic},
-		{allCountries.england, allCountries.scotland},
-		{allCountries.hungry, allCountries.france},
-		{allCountries.portugal, allCountries.germany},
-		{allCountries.spain, allCountries.poland},
-	}
-
-	playday5 := Playday{
-		{allCountries.italy, allCountries.wales},
-		{allCountries.switzerland, allCountries.turkey},
-		{allCountries.ukraine, allCountries.austria},
-		{allCountries.northmazedonia, allCountries.netherlands},
-		{allCountries.russia, allCountries.denmark},
-		{allCountries.finland, allCountries.belgium},
-	}
-
-	playday6 := Playday{
-		{allCountries.kroatia, allCountries.scotland},
-		{allCountries.czechrepublic, allCountries.england},
-		{allCountries.slowakia, allCountries.spain},
-		{allCountries.sweden, allCountries.poland},
-		{allCountries.portugal, allCountries.france},
-		{allCountries.germany, allCountries.hungry},
-	}
-
-	playdays := []Playday{playday1, playday2, playday3, playday4, playday5, playday6}
 	return playdays
 }
 
-func getRoundOf16Matches(groups Groups) [8][2]Country {
+func CountAllGroupMatches(playdays []PlaydayMatches) int {
+	var numberMatches int = 0
+
+	for _, playday := range playdays {
+		numberMatches += len(playday)
+	}
+
+	return numberMatches
+}
+
+func getRoundOf16Matches(groups Groups) [8][2]*Country {
 	roundOf16 := GetRoudOfSixteen(groups)
-	return [8][2]Country{
+	return [8][2]*Country{
 		{roundOf16.member1, roundOf16.member2},
 		{roundOf16.member3, roundOf16.member4},
 		{roundOf16.member5, roundOf16.member6},
@@ -78,11 +47,6 @@ func getRoundOf16Matches(groups Groups) [8][2]Country {
 		{roundOf16.member15, roundOf16.member16},
 	}
 }
-
-// [self.teams[5], self.teams[4]],
-// [self.teams[3], self.teams[1]],
-// [self.teams[2], self.teams[0]],
-// [self.teams[7], self.teams[6]],
 
 func getRoundOf8Matches(teams [8]Country) [4][2]Country {
 	return [4][2]Country{
@@ -99,10 +63,3 @@ func getRoundOf4Matches(teams [4]Country) [2][2]Country {
 		{teams[2], teams[3]},
 	}
 }
-
-// ko_rounds = [
-//     Eighth,
-//     Quarter,
-//     Half,
-//     Final
-// ]
