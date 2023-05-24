@@ -6,19 +6,22 @@ import (
 )
 
 type Country struct {
-	Strength int    `json:"strength"`
-	Name     string `json:"name"`
-	Points   int    `json:"points"`
-	Goals    int    `json:"goals"`
+	Strength     int    `json:"strength"`
+	Name         string `json:"name"`
+	Points       int    `json:"points"`
+	Goals        int    `json:"goals"`
+	PenaltyGoals int    `json:"penaltyGoals"`
 }
 
 type Match struct {
-	team1      *Country
-	team2      *Country
-	playtime   time.Time
-	goalsTeam1 int
-	goalsTeam2 int
-	winner     *Country
+	team1             *Country
+	team2             *Country
+	playtime          time.Time
+	goalsTeam1        int
+	penaltyScoreTeam1 int
+	penaltyScoreTeam2 int
+	goalsTeam2        int
+	winner            *Country
 }
 
 type PlaydayMatches []Match
@@ -27,6 +30,7 @@ type Group struct {
 	name      string
 	countries []*Country
 	playplan  map[int]PlaydayMatches
+	ranking   []*Country
 }
 
 type Groups struct {
@@ -58,7 +62,7 @@ type RoundOf16 struct {
 }
 
 func defineCountry(name string, strength int) *Country {
-	country := Country{Name: name, Strength: strength, Points: 0, Goals: 0}
+	country := Country{Name: name, Strength: strength, Points: 0, Goals: 0, PenaltyGoals: 0}
 	return &country
 }
 
@@ -243,48 +247,19 @@ func GetGroups() []Group {
 
 }
 
-func determineGroupWinner(group Group) []*Country {
-	groupRanking := make([]*Country, 0, 4)
-	// add first
-	groupRanking = append(groupRanking, group.countries[0])
+func determineGroupRanking(group Group) []*Country {
+	countries := group.countries
+	sort.Slice(countries, func(i, j int) bool {
+		if countries[i].Points == countries[j].Points && countries[i].Goals > countries[j].Goals {
+			return true
+		}
+		return countries[i].Points > countries[j].Points
+	})
 
-	// add second
-	if isBetterFirstCountry(group.countries[1], groupRanking[0]) {
-		groupRanking = append([]*Country{group.countries[1]}, groupRanking...)
-	} else {
-		groupRanking = append(groupRanking, group.countries[1])
-	}
-
-	// add third
-	if isBetterFirstCountry(group.countries[2], groupRanking[0]) {
-		groupRanking = append([]*Country{group.countries[2]}, groupRanking...)
-	} else if isBetterFirstCountry(group.countries[2], groupRanking[1]) {
-		groupRanking = append([]*Country{groupRanking[0]}, group.countries[2], groupRanking[1])
-	} else {
-		groupRanking = append(groupRanking, group.countries[2])
-	}
-
-	// add fourth
-	if isBetterFirstCountry(group.countries[3], groupRanking[0]) {
-		groupRanking = append([]*Country{group.countries[3]}, groupRanking...)
-	} else if isBetterFirstCountry(group.countries[3], groupRanking[1]) {
-		groupRanking = append([]*Country{groupRanking[0]}, group.countries[3], groupRanking[1], groupRanking[2])
-	} else if isBetterFirstCountry(group.countries[3], groupRanking[2]) {
-		groupRanking = append([]*Country{groupRanking[0], groupRanking[1]}, group.countries[3], groupRanking[2])
-	} else {
-		groupRanking = append(groupRanking, group.countries[3])
-	}
-	return groupRanking
+	return countries
 }
 
-func isBetterFirstCountry(country1, country2 *Country) bool {
-	if country1.Points == country2.Points && country1.Goals > country2.Goals {
-		return true
-	}
-	return country1.Points > country2.Points
-}
-
-func getBestFourThirds(thirds [6]*Country) [4]*Country {
+func getBestFourThirds(thirds []*Country) [4]*Country {
 	var thirdsSlice []*Country = thirds[:]
 	sort.Slice(thirdsSlice, func(i, j int) bool {
 		if thirdsSlice[i].Points == thirdsSlice[j].Points && thirdsSlice[i].Goals > thirdsSlice[j].Goals {
@@ -294,46 +269,4 @@ func getBestFourThirds(thirds [6]*Country) [4]*Country {
 	})
 	var bestFourThirds = [4]*Country{thirdsSlice[0], thirdsSlice[1], thirdsSlice[2], thirdsSlice[3]}
 	return bestFourThirds
-}
-
-func GetRoudOfSixteen(groups Groups) RoundOf16 {
-	groupAranked := determineGroupWinner(groups.A)
-	groupBranked := determineGroupWinner(groups.B)
-	groupCranked := determineGroupWinner(groups.C)
-	groupDranked := determineGroupWinner(groups.D)
-	groupEranked := determineGroupWinner(groups.E)
-	groupFranked := determineGroupWinner(groups.F)
-	allThirds := [6]*Country{groupAranked[2], groupBranked[2], groupCranked[2], groupDranked[2], groupEranked[2], groupFranked[2]}
-	bestFourThirds := getBestFourThirds(allThirds)
-	// fmt.Println("Group A")
-	// fmt.Println(groupAranked)
-	// fmt.Println("---------------------------------")
-	// fmt.Println("Group B")
-	// fmt.Println(groupBranked)
-	// fmt.Println("---------------------------------")
-	// fmt.Println("Group C")
-	// fmt.Println(groupCranked)
-	// fmt.Println("---------------------------------")
-	// fmt.Println("Group D")
-	// fmt.Println(groupDranked)
-	// fmt.Println("---------------------------------")
-	// fmt.Println("Group E")
-	// fmt.Println(groupEranked)
-	// fmt.Println("---------------------------------")
-	// fmt.Println("Group F")
-	// fmt.Println(groupFranked)
-	// fmt.Println("---------------------------------")
-	// fmt.Println("best 4 Thirds")
-	// fmt.Println(bestFourThirds)
-	// fmt.Println("---------------------------------")
-	return RoundOf16{
-		groupAranked[1], groupBranked[1],
-		groupAranked[0], groupCranked[1],
-		groupCranked[0], bestFourThirds[0],
-		groupBranked[0], bestFourThirds[1],
-		groupDranked[1], groupEranked[1],
-		groupFranked[0], bestFourThirds[2],
-		groupDranked[0], groupFranked[1],
-		groupEranked[0], bestFourThirds[3],
-	}
 }

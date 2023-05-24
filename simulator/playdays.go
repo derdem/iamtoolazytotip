@@ -34,32 +34,46 @@ func CountAllGroupMatches(playdays []PlaydayMatches) int {
 	return numberMatches
 }
 
-func getRoundOf16Matches(groups Groups) [8][2]*Country {
-	roundOf16 := GetRoudOfSixteen(groups)
-	return [8][2]*Country{
-		{roundOf16.member1, roundOf16.member2},
-		{roundOf16.member3, roundOf16.member4},
-		{roundOf16.member5, roundOf16.member6},
-		{roundOf16.member7, roundOf16.member8},
-		{roundOf16.member9, roundOf16.member10},
-		{roundOf16.member11, roundOf16.member12},
-		{roundOf16.member13, roundOf16.member14},
-		{roundOf16.member15, roundOf16.member16},
+func getRoudOfSixteenMatches(groups []Group) []Match {
+	rankedGroups := make([][]*Country, 0)
+	for _, group := range groups {
+		rankedGroup := determineGroupRanking(group)
+		rankedGroups = append(rankedGroups, rankedGroup)
 	}
+
+	allThirds := make([]*Country, 0)
+	for _, rankedGroup := range rankedGroups {
+		allThirds = append(allThirds, rankedGroup[2])
+	}
+
+	bestFourThirds := getBestFourThirds(allThirds)
+
+	matches := make([]Match, 0)
+	matches = append(matches, defineMatch(rankedGroups[0][1], rankedGroups[1][1]))
+	matches = append(matches, defineMatch(rankedGroups[0][0], rankedGroups[2][1]))
+	matches = append(matches, defineMatch(rankedGroups[2][0], bestFourThirds[0]))
+	matches = append(matches, defineMatch(rankedGroups[1][0], bestFourThirds[1]))
+	matches = append(matches, defineMatch(rankedGroups[3][1], rankedGroups[4][1]))
+	matches = append(matches, defineMatch(rankedGroups[5][0], bestFourThirds[2]))
+	matches = append(matches, defineMatch(rankedGroups[3][0], rankedGroups[5][1]))
+	matches = append(matches, defineMatch(rankedGroups[4][0], bestFourThirds[3]))
+	return matches
 }
 
-func getRoundOf8Matches(teams [8]Country) [4][2]Country {
-	return [4][2]Country{
-		{teams[5], teams[4]},
-		{teams[3], teams[1]},
-		{teams[2], teams[0]},
-		{teams[7], teams[6]},
-	}
+func getRoundOfEightMatches(matches []Match) []Match {
+	nextMatches := make([]Match, 0)
+	nextMatches = append(nextMatches, defineMatch(matches[5].winner, matches[4].winner))
+	nextMatches = append(nextMatches, defineMatch(matches[3].winner, matches[1].winner))
+	nextMatches = append(nextMatches, defineMatch(matches[2].winner, matches[0].winner))
+	nextMatches = append(nextMatches, defineMatch(matches[7].winner, matches[6].winner))
+
+	return nextMatches
 }
 
-func getRoundOf4Matches(teams [4]Country) [2][2]Country {
-	return [2][2]Country{
-		{teams[0], teams[1]},
-		{teams[2], teams[3]},
-	}
+func getRoundOfFourMatches(matches []Match) []Match {
+	nextMatches := make([]Match, 0)
+	nextMatches = append(nextMatches, defineMatch(matches[0].winner, matches[1].winner))
+	nextMatches = append(nextMatches, defineMatch(matches[2].winner, matches[3].winner))
+
+	return nextMatches
 }

@@ -45,33 +45,32 @@ func TournamentSimulator() []MatchOutcome {
 	}
 	wg.Wait()
 
-	// fmt.Println("Round of 16")
-	// groups := GetGroups(teams)
-	// matchesRoundOf16 := getRoundOf16Matches(groups)
-	// var roundOf16Winners [8]Country
-	// for i, matchPair := range matchesRoundOf16 {
-	// 	winningCountry := playEliminationMatch(matchPair[0], matchPair[1])
-	// 	roundOf16Winners[i] = winningCountry
-	// }
+	fmt.Println("Round of 16")
+	matches16 := getRoudOfSixteenMatches(groups)
+	playedMatches16 := make([]Match, 0)
+	for _, match := range matches16 {
+		playedMatches16 = append(playedMatches16, playEliminationMatch(match))
+	}
 
-	// fmt.Println("Round of 8")
-	// matchesRoundOf8 := getRoundOf8Matches(roundOf16Winners)
-	// var roundOf8Winners [4]Country
-	// for i, matchPair := range matchesRoundOf8 {
-	// 	winningCountry := playEliminationMatch(matchPair[0], matchPair[1])
-	// 	roundOf8Winners[i] = winningCountry
-	// }
+	fmt.Println("Round of 8")
+	matches8 := getRoundOfEightMatches(playedMatches16)
+	playedMatches8 := make([]Match, 0)
+	for _, match := range matches8 {
+		playedMatches8 = append(playedMatches8, playEliminationMatch(match))
+	}
 
-	// fmt.Println("Round of 4")
-	// matchesRoundOf4 := getRoundOf4Matches(roundOf8Winners)
-	// var roundOf4Winners [2]Country
-	// for i, matchPair := range matchesRoundOf4 {
-	// 	winningCountry := playEliminationMatch(matchPair[0], matchPair[1])
-	// 	roundOf4Winners[i] = winningCountry
-	// }
+	fmt.Println("Round of 4")
+	matches4 := getRoundOfFourMatches(playedMatches8)
+	playedMatches4 := make([]Match, 0)
+	for _, match := range matches4 {
+		playedMatches4 = append(playedMatches4, playEliminationMatch(match))
+	}
 
-	// fmt.Println("Final Match")
-	// playEliminationMatch(roundOf4Winners[0], roundOf4Winners[1])
+	fmt.Println("Final Match")
+	matchFinal := defineMatch(playedMatches4[0].winner, playedMatches4[1].winner)
+	playedMatchFinal := playEliminationMatch(matchFinal)
+
+	_ = playedMatchFinal
 
 	return playdayOutcomes
 }
@@ -119,12 +118,14 @@ func playGroupMatch(match Match) {
 
 }
 
-func playEliminationMatch(team1 Country, team2 Country) Country {
+func playEliminationMatch(match Match) Match {
+	var team1 = match.team1
+	var team2 = match.team2
 	var team1Score int
 	var team2Score int
-	var team1PenaltyScore int
-	var team2PenaltyScore int
-	var winnerTeam Country
+	var team1PenaltyScore int = 0
+	var team2PenaltyScore int = 0
+	var winnerTeam *Country
 	outcomeProbabilies := assignProbabilities(team1.Strength, team2.Strength)
 	winnerCode := determineWinner(outcomeProbabilies)
 
@@ -154,7 +155,18 @@ func playEliminationMatch(team1 Country, team2 Country) Country {
 		winnerTeam = team2
 	}
 
-	return winnerTeam
+	match.goalsTeam1 = team1Score
+	match.penaltyScoreTeam1 = team1PenaltyScore
+	match.goalsTeam2 = team1Score
+	match.penaltyScoreTeam2 = team2PenaltyScore
+	match.winner = winnerTeam
+
+	team1.Goals = team1.Goals + team1Score
+	team1.PenaltyGoals = team1.PenaltyGoals + team1PenaltyScore
+	team2.Goals = team2.Goals + team2Score
+	team2.PenaltyGoals = team2.PenaltyGoals + team2PenaltyScore
+
+	return match
 }
 
 func assignProbabilities(strength1 int, strength2 int) OutcomeProbabilities {
