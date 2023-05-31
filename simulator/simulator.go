@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"math"
 	"math/rand"
-	"sync"
 	"time"
 
 	"gonum.org/v1/gonum/stat/distuv"
@@ -25,8 +24,6 @@ type MatchOutcome struct {
 }
 
 const lambda = 1.3
-
-var wg sync.WaitGroup
 
 func TournamentSimulator() []MatchOutcome {
 	fmt.Println("Start")
