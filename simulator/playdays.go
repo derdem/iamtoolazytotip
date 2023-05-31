@@ -62,18 +62,18 @@ func getRoudOfSixteenMatches(groups []Group) []Match {
 
 func getRoundOfEightMatches(matches []Match) []Match {
 	nextMatches := make([]Match, 0)
-	nextMatches = append(nextMatches, defineMatch(matches[5].winner, matches[4].winner))
-	nextMatches = append(nextMatches, defineMatch(matches[3].winner, matches[1].winner))
-	nextMatches = append(nextMatches, defineMatch(matches[2].winner, matches[0].winner))
-	nextMatches = append(nextMatches, defineMatch(matches[7].winner, matches[6].winner))
+	nextMatches = append(nextMatches, defineMatch(matches[5].Winner, matches[4].Winner))
+	nextMatches = append(nextMatches, defineMatch(matches[3].Winner, matches[1].Winner))
+	nextMatches = append(nextMatches, defineMatch(matches[2].Winner, matches[0].Winner))
+	nextMatches = append(nextMatches, defineMatch(matches[7].Winner, matches[6].Winner))
 
 	return nextMatches
 }
 
 func getRoundOfFourMatches(matches []Match) []Match {
 	nextMatches := make([]Match, 0)
-	nextMatches = append(nextMatches, defineMatch(matches[0].winner, matches[1].winner))
-	nextMatches = append(nextMatches, defineMatch(matches[2].winner, matches[3].winner))
+	nextMatches = append(nextMatches, defineMatch(matches[0].Winner, matches[1].Winner))
+	nextMatches = append(nextMatches, defineMatch(matches[2].Winner, matches[3].Winner))
 
 	return nextMatches
 }

@@ -25,16 +25,15 @@ type MatchOutcome struct {
 
 const lambda = 1.3
 
-func TournamentSimulator() []MatchOutcome {
+func TournamentSimulator() TournamentMatches {
 	fmt.Println("Start")
 
-	allMatches := make([]Match, 0)
+	allGroupMatches := make([]Match, 0)
 
 	groups := GetGroups()
 	playdays := DeterminePlaydaysFromGroup(groups)
 	numberMatchesInGroupPhase := CountAllGroupMatches(playdays)
 	groupMatchChannel := make(chan Match, numberMatchesInGroupPhase)
-	var playdayOutcomes []MatchOutcome
 
 	for _, playday := range playdays {
 		for _, match := range playday {
@@ -43,7 +42,7 @@ func TournamentSimulator() []MatchOutcome {
 	}
 
 	for i := 0; i < numberMatchesInGroupPhase; i++ {
-		allMatches = append(allMatches, <-groupMatchChannel)
+		allGroupMatches = append(allGroupMatches, <-groupMatchChannel)
 	}
 
 	fmt.Println("Round of 16")
@@ -68,17 +67,23 @@ func TournamentSimulator() []MatchOutcome {
 	}
 
 	fmt.Println("Final Match")
-	matchFinal := defineMatch(playedMatches4[0].winner, playedMatches4[1].winner)
+	matchFinal := defineMatch(playedMatches4[0].Winner, playedMatches4[1].Winner)
 	playedMatchFinal := playEliminationMatch(matchFinal)
 
-	_ = playedMatchFinal
+	tournamentMatches := TournamentMatches{
+		Group:   allGroupMatches,
+		Sixteen: playedMatches16,
+		Eight:   playedMatches8,
+		Four:    playedMatches4,
+		Final:   playedMatchFinal,
+	}
 
-	return playdayOutcomes
+	return tournamentMatches
 }
 
 func playGroupMatch(match Match, c chan Match) {
-	team1 := match.team1
-	team2 := match.team2
+	team1 := match.Team1
+	team2 := match.Team2
 	fmt.Println(team1.Name + " - " + team2.Name)
 	outcomeProbabilies := assignProbabilities(team1.Strength, team2.Strength)
 	winnerCode := determineWinner(outcomeProbabilies)
@@ -90,23 +95,23 @@ func playGroupMatch(match Match, c chan Match) {
 		team1Score, team2Score = setRemisScore()
 		team1.Points = team1.Points + 1
 		team2.Points = team2.Points + 1
-		match.winner = nil
+		match.Winner = nil
 	case 1:
 		team1Score = randomResult()
 		team2Score = randomResultLoser(team1Score, team1.Strength-team2.Strength)
 		team1.Points = team1.Points + 3
 		team2.Points = team2.Points + 0
-		match.winner = team1
+		match.Winner = team1
 	case 2:
 		team2Score = randomResult()
 		team1Score = randomResultLoser(team2Score, team2.Strength-team1.Strength)
 		team1.Points = team1.Points + 0
 		team2.Points = team2.Points + 3
-		match.winner = team2
+		match.Winner = team2
 	}
 
-	match.goalsTeam1 = team1Score
-	match.goalsTeam2 = team2Score
+	match.GoalsTeam1 = team1Score
+	match.GoalsTeam2 = team2Score
 
 	team1.Goals = team1.Goals + team1Score
 	team2.Goals = team2.Goals + team2Score
@@ -119,8 +124,8 @@ func playGroupMatch(match Match, c chan Match) {
 }
 
 func playEliminationMatch(match Match) Match {
-	var team1 = match.team1
-	var team2 = match.team2
+	var team1 = match.Team1
+	var team2 = match.Team2
 	var team1Score int
 	var team2Score int
 	var team1PenaltyScore int = 0
@@ -155,11 +160,11 @@ func playEliminationMatch(match Match) Match {
 		winnerTeam = team2
 	}
 
-	match.goalsTeam1 = team1Score
-	match.penaltyScoreTeam1 = team1PenaltyScore
-	match.goalsTeam2 = team1Score
-	match.penaltyScoreTeam2 = team2PenaltyScore
-	match.winner = winnerTeam
+	match.GoalsTeam1 = team1Score
+	match.PenaltyScoreTeam1 = team1PenaltyScore
+	match.GoalsTeam2 = team2Score
+	match.PenaltyScoreTeam2 = team2PenaltyScore
+	match.Winner = winnerTeam
 
 	team1.Goals = team1.Goals + team1Score
 	team1.PenaltyGoals = team1.PenaltyGoals + team1PenaltyScore
@@ -275,8 +280,8 @@ func randomResultLoser(resultWinner int, strengthDifference int) int {
 }
 
 func playPenalty(score1, score2 int) (int, int) {
-	score1Increment := randomScoreBetween0And5()
-	score2Increment := randomScoreBetween0And5()
+	score1Increment := randomScoreBetween0And5() + score1
+	score2Increment := randomScoreBetween0And5() + score2
 	if score1Increment == score2Increment {
 		return playPenalty(score1Increment, score2Increment)
 	} else {

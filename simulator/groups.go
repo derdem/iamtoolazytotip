@@ -14,14 +14,22 @@ type Country struct {
 }
 
 type Match struct {
-	team1             *Country
-	team2             *Country
-	playtime          time.Time
-	goalsTeam1        int
-	penaltyScoreTeam1 int
-	penaltyScoreTeam2 int
-	goalsTeam2        int
-	winner            *Country
+	Team1             *Country  `json:"team1"`
+	Team2             *Country  `json:"team2"`
+	Playtime          time.Time `json:"playtime"`
+	GoalsTeam1        int       `json:"goalsTeam1"`
+	PenaltyScoreTeam1 int       `json:"penaltyScoreTeam1"`
+	PenaltyScoreTeam2 int       `json:"penaltyScoreTeam2"`
+	GoalsTeam2        int       `json:"goalsTeam2"`
+	Winner            *Country  `json:"winner"`
+}
+
+type TournamentMatches struct {
+	Group   []Match `json:"group"`
+	Sixteen []Match `json:"sixteen"`
+	Eight   []Match `json:"eight"`
+	Four    []Match `json:"four"`
+	Final   Match   `json:"final"`
 }
 
 type PlaydayMatches []Match
@@ -68,12 +76,12 @@ func defineCountry(name string, strength int) *Country {
 
 func defineMatch(team1 *Country, team2 *Country) Match {
 	return Match{
-		team1:      team1,
-		team2:      team2,
-		playtime:   time.Now().UTC(),
-		goalsTeam1: 0,
-		goalsTeam2: 0,
-		winner:     nil,
+		Team1:      team1,
+		Team2:      team2,
+		Playtime:   time.Now().UTC(),
+		GoalsTeam1: 0,
+		GoalsTeam2: 0,
+		Winner:     nil,
 	}
 }
 
