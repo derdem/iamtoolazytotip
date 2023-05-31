@@ -30,20 +30,24 @@ var wg sync.WaitGroup
 
 func TournamentSimulator() []MatchOutcome {
 	fmt.Println("Start")
-	//c := make(chan MatchOutcome, 100)
+
+	allMatches := make([]Match, 0)
 
 	groups := GetGroups()
 	playdays := DeterminePlaydaysFromGroup(groups)
 	numberMatchesInGroupPhase := CountAllGroupMatches(playdays)
+	groupMatchChannel := make(chan Match, numberMatchesInGroupPhase)
 	var playdayOutcomes []MatchOutcome
 
-	wg.Add(numberMatchesInGroupPhase)
 	for _, playday := range playdays {
 		for _, match := range playday {
-			go playGroupMatch(match)
+			go playGroupMatch(match, groupMatchChannel)
 		}
 	}
-	wg.Wait()
+
+	for i := 0; i < numberMatchesInGroupPhase; i++ {
+		allMatches = append(allMatches, <-groupMatchChannel)
+	}
 
 	fmt.Println("Round of 16")
 	matches16 := getRoudOfSixteenMatches(groups)
@@ -75,7 +79,7 @@ func TournamentSimulator() []MatchOutcome {
 	return playdayOutcomes
 }
 
-func playGroupMatch(match Match) {
+func playGroupMatch(match Match, c chan Match) {
 	team1 := match.team1
 	team2 := match.team2
 	fmt.Println(team1.Name + " - " + team2.Name)
@@ -114,8 +118,7 @@ func playGroupMatch(match Match) {
 	multiplier := time.Duration(rand.Intn(100))
 	time.Sleep(time.Millisecond * multiplier)
 
-	wg.Done()
-
+	c <- match
 }
 
 func playEliminationMatch(match Match) Match {
