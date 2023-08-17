@@ -6,14 +6,29 @@ import (
 	"net/http"
 
 	"github.com/derdem/iamtoolazytotip/simulator"
-	"github.com/gorilla/mux"
 )
 
-func Start() *mux.Router {
-	r := mux.NewRouter()
-	r.HandleFunc("/", runTournament())
-	http.ListenAndServe("localhost:8080", r)
-	return r
+func Start() *http.ServeMux {
+	router := http.NewServeMux()
+	corsHandler := enableCors(router)
+	router.HandleFunc("/api/", runTournament())
+	http.ListenAndServe(":8080", corsHandler)
+	return router
+}
+
+func enableCors(handler http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*") // Replace * with the specific origins allowed to access the API
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+
+		if r.Method == "OPTIONS" {
+			// Preflight request handling
+			return
+		}
+
+		handler.ServeHTTP(w, r)
+	})
 }
 
 func runTournament() http.HandlerFunc {
