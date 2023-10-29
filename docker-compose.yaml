@@ -10,14 +10,17 @@ services:
         ports:
             - "8080:8080"
     server:
-        build:
-            context: .
-            dockerfile: ./docker/frontend/Dockerfile
-        image: iamtoolazytotip-server
+        image: node:21.1-alpine3.17
+        entrypoint: /bin/sh -c "npm install && npm start"
+        working_dir: /app
         networks:
             - simulator-network
         ports:
             - "3000:3000"
+        volumes:
+            - type: bind
+              source: ./frontend
+              target: /app/
 
 networks:
     simulator-network:
