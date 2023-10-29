@@ -18,3 +18,13 @@ starting the server with hot reloading
 
 `reflex -r '\.go$' -s -- sh -c "go run main.go"`
 
+# Building images
+
+`docker compose build`
+
+The created images should have the names `iamtoolazytotip-api` and `iamtoolazytotip-server`.
+
+# start containers
+
+`docker compose up -d`
+

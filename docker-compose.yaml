@@ -1,0 +1,24 @@
+version: "3"
+services:
+    api:
+        build:
+            context: .
+            dockerfile: ./docker/api/Dockerfile
+        image: iamtoolazytotip-api
+        networks:
+            - simulator-network
+        ports:
+            - "8080:8080"
+    server:
+        build:
+            context: .
+            dockerfile: ./docker/frontend/Dockerfile
+        image: iamtoolazytotip-server
+        networks:
+            - simulator-network
+        ports:
+            - "3000:3000"
+
+networks:
+    simulator-network:
+        driver: bridge
