@@ -1,8 +1,11 @@
 version: "3"
 services:
     api:
-        image: golang:1.21.3
-        entrypoint: go run main.go
+        build:
+            context: .
+            dockerfile: ./docker/api/Dockerfile
+        image: iamtoolazytotip-api
+        entrypoint: reflex -r '\.go$' -s -- sh -c "go run main.go"
         working_dir: /app
         networks:
             - simulator-network
