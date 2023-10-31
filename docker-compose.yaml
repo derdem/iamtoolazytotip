@@ -3,7 +3,7 @@ services:
     api:
         build:
             context: .
-            dockerfile: ./docker/api/Dockerfile
+            dockerfile: ./docker/api.dockerfile
         image: iamtoolazytotip-api
         entrypoint: reflex -r '\.go$' -s -- sh -c "go run main.go"
         working_dir: /app
@@ -13,20 +13,8 @@ services:
             - "8080:8080"
         volumes:
             - type: bind
-              source: main.go
-              target: /app/main.go
-            - type: bind
-              source: go.mod
-              target: /app/go.mod
-            - type: bind
-              source: go.sum
-              target: /app/go.sum
-            - type: bind
-              source: ./api
-              target: /app/api
-            - type: bind
-              source: ./simulator
-              target: /app/simulator
+              source: ./backend
+              target: /app/
 
     server:
         image: node:21.1-alpine3.17
