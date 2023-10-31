@@ -49,31 +49,31 @@ func getRoudOfSixteenMatches(groups []Group) []Match {
 	bestFourThirds := getBestFourThirds(allThirds)
 
 	matches := make([]Match, 0)
-	matches = append(matches, defineMatch(rankedGroups[0][1], rankedGroups[1][1]))
-	matches = append(matches, defineMatch(rankedGroups[0][0], rankedGroups[2][1]))
-	matches = append(matches, defineMatch(rankedGroups[2][0], bestFourThirds[0]))
-	matches = append(matches, defineMatch(rankedGroups[1][0], bestFourThirds[1]))
-	matches = append(matches, defineMatch(rankedGroups[3][1], rankedGroups[4][1]))
-	matches = append(matches, defineMatch(rankedGroups[5][0], bestFourThirds[2]))
-	matches = append(matches, defineMatch(rankedGroups[3][0], rankedGroups[5][1]))
-	matches = append(matches, defineMatch(rankedGroups[4][0], bestFourThirds[3]))
+	matches = append(matches, defineMatch(rankedGroups[0][1], rankedGroups[1][1], 7))
+	matches = append(matches, defineMatch(rankedGroups[0][0], rankedGroups[2][1], 7))
+	matches = append(matches, defineMatch(rankedGroups[2][0], bestFourThirds[0], 7))
+	matches = append(matches, defineMatch(rankedGroups[1][0], bestFourThirds[1], 7))
+	matches = append(matches, defineMatch(rankedGroups[3][1], rankedGroups[4][1], 7))
+	matches = append(matches, defineMatch(rankedGroups[5][0], bestFourThirds[2], 7))
+	matches = append(matches, defineMatch(rankedGroups[3][0], rankedGroups[5][1], 7))
+	matches = append(matches, defineMatch(rankedGroups[4][0], bestFourThirds[3], 7))
 	return matches
 }
 
 func getRoundOfEightMatches(matches []Match) []Match {
 	nextMatches := make([]Match, 0)
-	nextMatches = append(nextMatches, defineMatch(matches[5].Winner, matches[4].Winner))
-	nextMatches = append(nextMatches, defineMatch(matches[3].Winner, matches[1].Winner))
-	nextMatches = append(nextMatches, defineMatch(matches[2].Winner, matches[0].Winner))
-	nextMatches = append(nextMatches, defineMatch(matches[7].Winner, matches[6].Winner))
+	nextMatches = append(nextMatches, defineMatch(matches[5].Winner, matches[4].Winner, 8))
+	nextMatches = append(nextMatches, defineMatch(matches[3].Winner, matches[1].Winner, 8))
+	nextMatches = append(nextMatches, defineMatch(matches[2].Winner, matches[0].Winner, 8))
+	nextMatches = append(nextMatches, defineMatch(matches[7].Winner, matches[6].Winner, 8))
 
 	return nextMatches
 }
 
 func getRoundOfFourMatches(matches []Match) []Match {
 	nextMatches := make([]Match, 0)
-	nextMatches = append(nextMatches, defineMatch(matches[0].Winner, matches[1].Winner))
-	nextMatches = append(nextMatches, defineMatch(matches[2].Winner, matches[3].Winner))
+	nextMatches = append(nextMatches, defineMatch(matches[0].Winner, matches[1].Winner, 9))
+	nextMatches = append(nextMatches, defineMatch(matches[2].Winner, matches[3].Winner, 9))
 
 	return nextMatches
 }

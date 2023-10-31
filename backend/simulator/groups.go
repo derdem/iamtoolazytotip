@@ -2,7 +2,6 @@ package simulator
 
 import (
 	"sort"
-	"time"
 )
 
 type Country struct {
@@ -14,14 +13,14 @@ type Country struct {
 }
 
 type Match struct {
-	Team1             *Country  `json:"team1"`
-	Team2             *Country  `json:"team2"`
-	Playtime          time.Time `json:"playtime"`
-	GoalsTeam1        int       `json:"goalsTeam1"`
-	PenaltyScoreTeam1 int       `json:"penaltyScoreTeam1"`
-	PenaltyScoreTeam2 int       `json:"penaltyScoreTeam2"`
-	GoalsTeam2        int       `json:"goalsTeam2"`
-	Winner            *Country  `json:"winner"`
+	Team1             *Country `json:"team1"`
+	Team2             *Country `json:"team2"`
+	Playday           int      `json:"playday"`
+	GoalsTeam1        int      `json:"goalsTeam1"`
+	PenaltyScoreTeam1 int      `json:"penaltyScoreTeam1"`
+	PenaltyScoreTeam2 int      `json:"penaltyScoreTeam2"`
+	GoalsTeam2        int      `json:"goalsTeam2"`
+	Winner            *Country `json:"winner"`
 }
 
 type TournamentMatches struct {
@@ -74,11 +73,11 @@ func defineCountry(name string, strength int) *Country {
 	return &country
 }
 
-func defineMatch(team1 *Country, team2 *Country) Match {
+func defineMatch(team1 *Country, team2 *Country, playday int) Match {
 	return Match{
 		Team1:      team1,
 		Team2:      team2,
-		Playtime:   time.Now().UTC(),
+		Playday:    playday,
 		GoalsTeam1: 0,
 		GoalsTeam2: 0,
 		Winner:     nil,
@@ -92,12 +91,12 @@ func GetGroupA() Group {
 	wales := defineCountry("Wales", 1)
 	countries := []*Country{italy, switzerland, turkey, wales}
 
-	turkey_italy := defineMatch(turkey, italy)
-	wales_switzerland := defineMatch(wales, switzerland)
-	turkey_wales := defineMatch(turkey, wales)
-	italy_switzerland := defineMatch(italy, switzerland)
-	italy_wales := defineMatch(italy, wales)
-	switzerland_turkey := defineMatch(switzerland, turkey)
+	turkey_italy := defineMatch(turkey, italy, 1)
+	wales_switzerland := defineMatch(wales, switzerland, 1)
+	turkey_wales := defineMatch(turkey, wales, 3)
+	italy_switzerland := defineMatch(italy, switzerland, 3)
+	italy_wales := defineMatch(italy, wales, 5)
+	switzerland_turkey := defineMatch(switzerland, turkey, 5)
 
 	playplan := make(map[int]PlaydayMatches)
 	playplan[1] = PlaydayMatches{turkey_italy, wales_switzerland}
@@ -118,12 +117,12 @@ func GetGroupB() Group {
 	russia := defineCountry("Russia", 2)
 	countries := []*Country{belgium, denmark, finland, russia}
 
-	denmark_finland := defineMatch(denmark, finland)
-	belgium_russia := defineMatch(belgium, russia)
-	finland_russia := defineMatch(finland, russia)
-	denmark_belgium := defineMatch(denmark, belgium)
-	russia_denmark := defineMatch(russia, denmark)
-	finland_belgium := defineMatch(finland, belgium)
+	denmark_finland := defineMatch(denmark, finland, 1)
+	belgium_russia := defineMatch(belgium, russia, 1)
+	finland_russia := defineMatch(finland, russia, 3)
+	denmark_belgium := defineMatch(denmark, belgium, 3)
+	russia_denmark := defineMatch(russia, denmark, 5)
+	finland_belgium := defineMatch(finland, belgium, 5)
 
 	playplan := make(map[int]PlaydayMatches)
 	playplan[1] = PlaydayMatches{denmark_finland, belgium_russia}
@@ -144,12 +143,12 @@ func GetGroupC() Group {
 	austria := defineCountry("Austria", 2)
 	countries := []*Country{netherlands, northmazedonia, ukraine, austria}
 
-	austria_northmazedonia := defineMatch(austria, northmazedonia)
-	netherlands_ukraine := defineMatch(netherlands, ukraine)
-	ukraine_northmazedonia := defineMatch(ukraine, northmazedonia)
-	netherlands_austria := defineMatch(netherlands, austria)
-	ukraine_austria := defineMatch(ukraine, austria)
-	northmazedonia_netherlands := defineMatch(northmazedonia, netherlands)
+	austria_northmazedonia := defineMatch(austria, northmazedonia, 1)
+	netherlands_ukraine := defineMatch(netherlands, ukraine, 1)
+	ukraine_northmazedonia := defineMatch(ukraine, northmazedonia, 3)
+	netherlands_austria := defineMatch(netherlands, austria, 3)
+	ukraine_austria := defineMatch(ukraine, austria, 5)
+	northmazedonia_netherlands := defineMatch(northmazedonia, netherlands, 5)
 
 	playplan := make(map[int]PlaydayMatches)
 	playplan[1] = PlaydayMatches{austria_northmazedonia, netherlands_ukraine}
@@ -170,12 +169,12 @@ func GetGroupD() Group {
 	czechRepublic := defineCountry("Czech Republic", 2)
 	countries := []*Country{england, kroatia, scotland, czechRepublic}
 
-	england_kroatia := defineMatch(england, kroatia)
-	scotland_czechRepublic := defineMatch(scotland, czechRepublic)
-	kroatia_czechRepublic := defineMatch(kroatia, czechRepublic)
-	england_scotland := defineMatch(england, scotland)
-	kroatia_scotland := defineMatch(kroatia, scotland)
-	czechRepublic_england := defineMatch(czechRepublic, england)
+	england_kroatia := defineMatch(england, kroatia, 1)
+	scotland_czechRepublic := defineMatch(scotland, czechRepublic, 2)
+	kroatia_czechRepublic := defineMatch(kroatia, czechRepublic, 4)
+	england_scotland := defineMatch(england, scotland, 4)
+	kroatia_scotland := defineMatch(kroatia, scotland, 6)
+	czechRepublic_england := defineMatch(czechRepublic, england, 6)
 
 	playday := make(map[int]PlaydayMatches)
 	playday[1] = PlaydayMatches{england_kroatia}
@@ -197,12 +196,12 @@ func GetGroupE() Group {
 	spain := defineCountry("Spain", 1)
 	countries := []*Country{poland, sweden, slowakia, spain}
 
-	poland_slowakia := defineMatch(poland, slowakia)
-	spain_sweden := defineMatch(spain, sweden)
-	sweden_slowakia := defineMatch(sweden, slowakia)
-	spain_poland := defineMatch(spain, poland)
-	slowakia_spain := defineMatch(slowakia, spain)
-	sweden_poland := defineMatch(sweden, poland)
+	poland_slowakia := defineMatch(poland, slowakia, 2)
+	spain_sweden := defineMatch(spain, sweden, 2)
+	sweden_slowakia := defineMatch(sweden, slowakia, 4)
+	spain_poland := defineMatch(spain, poland, 4)
+	slowakia_spain := defineMatch(slowakia, spain, 6)
+	sweden_poland := defineMatch(sweden, poland, 6)
 
 	playday := make(map[int]PlaydayMatches)
 	playday[2] = PlaydayMatches{poland_slowakia, spain_sweden}
@@ -223,12 +222,12 @@ func GetGroupF() Group {
 	hungry := defineCountry("Hungry", 1)
 	countries := []*Country{germany, france, portugal, hungry}
 
-	hungry_portugal := defineMatch(hungry, portugal)
-	france_germany := defineMatch(france, germany)
-	hungry_france := defineMatch(hungry, france)
-	portugal_germany := defineMatch(portugal, germany)
-	portugal_france := defineMatch(portugal, france)
-	germany_hungry := defineMatch(germany, hungry)
+	hungry_portugal := defineMatch(hungry, portugal, 2)
+	france_germany := defineMatch(france, germany, 2)
+	hungry_france := defineMatch(hungry, france, 4)
+	portugal_germany := defineMatch(portugal, germany, 4)
+	portugal_france := defineMatch(portugal, france, 6)
+	germany_hungry := defineMatch(germany, hungry, 6)
 
 	playday := make(map[int]PlaydayMatches)
 	playday[2] = PlaydayMatches{hungry_portugal, france_germany}
