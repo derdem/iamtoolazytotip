@@ -1,14 +1,30 @@
 version: "3"
 services:
     api:
-        build:
-            context: .
-            dockerfile: ./docker/api/Dockerfile
-        image: iamtoolazytotip-api
+        image: golang:1.21.3
+        entrypoint: go run main.go
+        working_dir: /app
         networks:
             - simulator-network
         ports:
             - "8080:8080"
+        volumes:
+            - type: bind
+              source: main.go
+              target: /app/main.go
+            - type: bind
+              source: go.mod
+              target: /app/go.mod
+            - type: bind
+              source: go.sum
+              target: /app/go.sum
+            - type: bind
+              source: ./api
+              target: /app/api
+            - type: bind
+              source: ./simulator
+              target: /app/simulator
+
     server:
         image: node:21.1-alpine3.17
         entrypoint: /bin/sh -c "npm install && npm start"
