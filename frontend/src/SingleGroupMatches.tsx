@@ -1,9 +1,9 @@
 import { Component, For } from "solid-js";
 
-const GroupMatches: Component<{ matches: Array<any> }> = (props) => {
+const SingleGroupMatches: Component<{ matches: any[] }> = (props) => {
   return (
-    <section>
-      <h1>Group phase</h1>
+    <div>
+      <h2>{props.matches[0].groupName}</h2>
       <For each={props.matches}>
         {(match, i) => (
           <div class="flex">
@@ -14,8 +14,8 @@ const GroupMatches: Component<{ matches: Array<any> }> = (props) => {
           </div>
         )}
       </For>
-    </section>
+    </div>
   );
 };
 
-export default GroupMatches;
+export default SingleGroupMatches;

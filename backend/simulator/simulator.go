@@ -67,7 +67,7 @@ func TournamentSimulator() TournamentMatches {
 	}
 
 	fmt.Println("Final Match")
-	matchFinal := defineMatch(playedMatches4[0].Winner, playedMatches4[1].Winner, 10)
+	matchFinal := defineMatch(playedMatches4[0].Winner, playedMatches4[1].Winner, 10, "Final", 10)
 	playedMatchFinal := playEliminationMatch(matchFinal)
 
 	tournamentMatches := TournamentMatches{
