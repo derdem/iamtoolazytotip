@@ -2,8 +2,8 @@ import { Component, For, Show } from "solid-js";
 
 const KoRound: Component<{ matches: Array<any>; name: string }> = (props) => {
   return (
-    <section>
-      <h1>{props.name}</h1>
+    <section class="p-4 w-1/3">
+      <h1 class="pb-2 text-lg">{props.name}</h1>
       <For each={props.matches}>
         {(match, i) => (
           <div class="flex">
