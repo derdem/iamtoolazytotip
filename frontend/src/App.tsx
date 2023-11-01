@@ -40,7 +40,7 @@ const [groupOutcomes, setGroupCoutcomes] = createSignal<{[key: string]: any[];}>
   return (
     <div class={styles.App}>
       <header class={styles.header}>
-        <p>EM soccer tournament simulator</p>
+        <p class="pt-8">EM soccer tournament simulator</p>
       </header>
       <AllGroupMatches groups={groupOutcomes()} />
       <KoRound matches={tournamentOutcome().sixteen} name="Round of 16" />
