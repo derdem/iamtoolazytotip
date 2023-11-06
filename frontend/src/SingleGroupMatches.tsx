@@ -1,19 +1,17 @@
 import { Component, For } from "solid-js";
+import TeamMatchGroup from "./TeamMatchGroup";
 
 const SingleGroupMatches: Component<{ matches: any[] }> = (props) => {
   return (
     <div>
-      <h2 class="pb-2 text-lg">{props.matches[0].groupName}</h2>
+      <h2 class="pb-2 text-lg"><u>{props.matches[0].groupName}</u></h2>
+      <div class="grid grid-cols-[auto_auto_auto_auto] max-w-fit">
       <For each={props.matches}>
         {(match, i) => (
-          <div class="flex">
-            <div class="whitespace-nowrap">
-              {match.team1.name} - {match.team2.name} : {match.goalsTeam1} :{" "}
-              {match.goalsTeam2}
-            </div>
-          </div>
+          <TeamMatchGroup match={match} />
         )}
       </For>
+      </div>
     </div>
   );
 };

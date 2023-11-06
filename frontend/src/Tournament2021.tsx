@@ -15,6 +15,13 @@ const sortGroupMatches = (groupMatches: any[]) => {
   return sortedMatches;
 };
 
+const getNewSimulation = async () => {
+  const response = await fetch("http://localhost:8080/api/2021");
+  const data = await response.json();
+  data.final = [data.final];
+  return data;
+}
+
 const App: Component = () => {
   const [tournamentOutcome, setTournamentOutcome] = createSignal<{
     group: any[];
@@ -30,20 +37,24 @@ const App: Component = () => {
     console.log("The latest groupOutcomes are", groupOutcomes())
   );
 
-  onMount(async () => {
-    const response = await fetch("http://localhost:8080/api/");
-    const data = await response.json();
-    data.final = [data.final];
-    console.log(data);
-    console.log(data.final[0].team1.name);
+  const newSimulation = async () => {
+    const data = await getNewSimulation();
     setTournamentOutcome(data);
     setGroupOutcomes(sortGroupMatches(data.group));
+  }
+
+  onMount(async () => {
+    newSimulation()
   });
 
   return (
     <div>
-      <header class="bg-sky-800 text-center text-white text-2xl">
-        <p class="py-4">EM soccer tournament simulator</p>
+      <header class="bg-sky-800 text-center text-white flex justify-between items-center">
+        <div class="text-2xl ml-4">
+          <p class="py-4">EM soccer tournament simulator 2021</p>
+        </div>
+
+        <button onClick={newSimulation} class="bg-white text-black rounded-md px-4 py-2 mr-4">Run simulation</button>
       </header>
       <AllGroupMatches groups={groupOutcomes()} />
       <h1 class="p-4 text-xl bg-sky-800 bg-opacity-25">KO phase</h1>

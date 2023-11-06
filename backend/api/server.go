@@ -11,7 +11,8 @@ import (
 func Start() *http.ServeMux {
 	router := http.NewServeMux()
 	corsHandler := enableCors(router)
-	router.HandleFunc("/api/", runTournament())
+	router.HandleFunc("/api/2021", runTournament())
+	router.HandleFunc("/api/2024", runTournament())
 	http.ListenAndServe(":8080", corsHandler)
 	return router
 }

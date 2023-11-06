@@ -14,7 +14,7 @@ const AllGroupMatches: Component<{ groups: { [key: string]: any[] } }> = (
       <div class="flex flex-row flex-wrap">
         <For each={groups()}>
           {(group, i) => (
-            <div class="p-4 w-1/3">
+            <div class="p-4 w-1/2 xl:w-1/3">
               <SingleGroupMatches matches={group} />
             </div>
           )}
