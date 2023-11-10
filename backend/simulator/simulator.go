@@ -1,42 +1,27 @@
 package simulator
 
 import (
-	//"encoding/json"
 	"fmt"
 	"math"
 	"math/rand"
+	"sort"
 	"time"
 
 	"gonum.org/v1/gonum/stat/distuv"
 )
 
-type OutcomeProbabilities struct {
-	team1 float64
-	team2 float64
-	remis float64
-}
-
-type MatchOutcome struct {
-	Team1      Country `json:"team1"`
-	Team1Score int     `json:"team1Score"`
-	Team2      Country `json:"team2"`
-	Team2Score int     `json:"team2Score"`
-}
-
 const lambda = 1.3
 
-func TournamentSimulator() TournamentMatches {
+func TournamentSimulator(groups []Group) TournamentMatches {
 	fmt.Println("Start")
 
-	allGroupMatches := make([]Match, 0)
+	allGroupMatches := make([]GroupMatch, 0)
 
-	groups := GetGroups()
-	playdays := DeterminePlaydaysFromGroup(groups)
-	numberMatchesInGroupPhase := CountAllGroupMatches(playdays)
-	groupMatchChannel := make(chan Match, numberMatchesInGroupPhase)
+	numberMatchesInGroupPhase := CountAllGroupMatches(groups)
+	groupMatchChannel := make(chan GroupMatch, numberMatchesInGroupPhase)
 
-	for _, playday := range playdays {
-		for _, match := range playday {
+	for _, group := range groups {
+		for _, match := range group.Matches {
 			go playGroupMatch(match, groupMatchChannel)
 		}
 	}
@@ -67,7 +52,7 @@ func TournamentSimulator() TournamentMatches {
 	}
 
 	fmt.Println("Final Match")
-	matchFinal := defineMatch(playedMatches4[0].Winner, playedMatches4[1].Winner, 10, "Final", 10)
+	matchFinal := CreateMatch(playedMatches4[0].Winner, playedMatches4[1].Winner, time.Date(2021, 7, 11, 19, 0, 0, 0, time.UTC))
 	playedMatchFinal := playEliminationMatch(matchFinal)
 
 	tournamentMatches := TournamentMatches{
@@ -81,7 +66,7 @@ func TournamentSimulator() TournamentMatches {
 	return tournamentMatches
 }
 
-func playGroupMatch(match Match, c chan Match) {
+func playGroupMatch(match GroupMatch, c chan GroupMatch) {
 	team1 := match.Team1
 	team2 := match.Team2
 	fmt.Println(team1.Name + " - " + team2.Name)
@@ -121,6 +106,50 @@ func playGroupMatch(match Match, c chan Match) {
 	time.Sleep(time.Millisecond * multiplier)
 
 	c <- match
+}
+
+func getRoudOfSixteenMatches(groups []Group) []Match {
+	rankedGroups := make([][4]*Country, 0)
+	for _, group := range groups {
+		rankedGroup := determineGroupRanking(group)
+		rankedGroups = append(rankedGroups, rankedGroup)
+	}
+
+	allThirds := make([]*Country, 0)
+	for _, rankedGroup := range rankedGroups {
+		allThirds = append(allThirds, rankedGroup[2])
+	}
+
+	bestFourThirds := getBestFourThirds(allThirds)
+
+	matches := make([]Match, 0)
+	matches = append(matches, CreateMatch(rankedGroups[0][1], rankedGroups[1][1], time.Date(2021, 6, 26, 16, 0, 0, 0, time.UTC)))
+	matches = append(matches, CreateMatch(rankedGroups[0][0], rankedGroups[2][1], time.Date(2021, 6, 26, 19, 0, 0, 0, time.UTC)))
+	matches = append(matches, CreateMatch(rankedGroups[2][0], bestFourThirds[0], time.Date(2021, 6, 27, 16, 0, 0, 0, time.UTC)))
+	matches = append(matches, CreateMatch(rankedGroups[1][0], bestFourThirds[1], time.Date(2021, 6, 27, 19, 0, 0, 0, time.UTC)))
+	matches = append(matches, CreateMatch(rankedGroups[3][1], rankedGroups[4][1], time.Date(2021, 6, 28, 16, 0, 0, 0, time.UTC)))
+	matches = append(matches, CreateMatch(rankedGroups[5][0], bestFourThirds[2], time.Date(2021, 6, 28, 19, 0, 0, 0, time.UTC)))
+	matches = append(matches, CreateMatch(rankedGroups[3][0], rankedGroups[5][1], time.Date(2021, 6, 29, 16, 0, 0, 0, time.UTC)))
+	matches = append(matches, CreateMatch(rankedGroups[4][0], bestFourThirds[3], time.Date(2021, 6, 29, 19, 0, 0, 0, time.UTC)))
+	return matches
+}
+
+func getRoundOfEightMatches(matches []Match) []Match {
+	nextMatches := make([]Match, 0)
+	nextMatches = append(nextMatches, CreateMatch(matches[5].Winner, matches[4].Winner, time.Date(2021, 7, 2, 16, 0, 0, 0, time.UTC)))
+	nextMatches = append(nextMatches, CreateMatch(matches[3].Winner, matches[1].Winner, time.Date(2021, 7, 2, 19, 0, 0, 0, time.UTC)))
+	nextMatches = append(nextMatches, CreateMatch(matches[2].Winner, matches[0].Winner, time.Date(2021, 7, 3, 16, 0, 0, 0, time.UTC)))
+	nextMatches = append(nextMatches, CreateMatch(matches[7].Winner, matches[6].Winner, time.Date(2021, 7, 3, 19, 0, 0, 0, time.UTC)))
+
+	return nextMatches
+}
+
+func getRoundOfFourMatches(matches []Match) []Match {
+	nextMatches := make([]Match, 0)
+	nextMatches = append(nextMatches, CreateMatch(matches[0].Winner, matches[1].Winner, time.Date(2021, 7, 6, 19, 0, 0, 0, time.UTC)))
+	nextMatches = append(nextMatches, CreateMatch(matches[2].Winner, matches[3].Winner, time.Date(2021, 7, 7, 19, 0, 0, 0, time.UTC)))
+
+	return nextMatches
 }
 
 func playEliminationMatch(match Match) Match {
@@ -176,8 +205,8 @@ func playEliminationMatch(match Match) Match {
 
 func assignProbabilities(strength1 int, strength2 int) OutcomeProbabilities {
 	probab1, probab2 := convertStrengthToProbabilities(strength1, strength2)
-	allProbabilities := OutcomeProbabilities{team1: probab1, team2: probab2}
-	allProbabilities.remis = 1 - allProbabilities.team1 - allProbabilities.team2
+	allProbabilities := OutcomeProbabilities{Team1: probab1, Team2: probab2}
+	allProbabilities.Remis = 1 - allProbabilities.Team1 - allProbabilities.Team2
 	return allProbabilities
 }
 
@@ -202,9 +231,9 @@ func convertStrengthToProbabilities(strength1 int, strength2 int) (float64, floa
 func determineWinner(outcomeChanges OutcomeProbabilities) int {
 	rand.Seed(time.Now().UnixNano())
 	randomResult := rand.Float64()
-	if randomResult < outcomeChanges.remis {
+	if randomResult < outcomeChanges.Remis {
 		return 0 // remis
-	} else if randomResult < outcomeChanges.remis+outcomeChanges.team1 {
+	} else if randomResult < outcomeChanges.Remis+outcomeChanges.Team1 {
 		return 1 // team 1 wins
 	} else {
 		return 2 // team 2 wins
@@ -299,4 +328,38 @@ func randomScoreBetween0And5() int {
 		}
 	}
 	return goals
+}
+
+func CountAllGroupMatches(groups []Group) int {
+	var numberMatches int = 0
+
+	for _, group := range groups {
+		numberMatches += len(group.Matches)
+	}
+
+	return numberMatches
+}
+
+func determineGroupRanking(group Group) [4]*Country {
+	countries := group.Countries
+	sort.Slice(countries[:], func(i, j int) bool {
+		if countries[i].Points == countries[j].Points && countries[i].Goals > countries[j].Goals {
+			return true
+		}
+		return countries[i].Points > countries[j].Points
+	})
+
+	return countries
+}
+
+func getBestFourThirds(thirds []*Country) [4]*Country {
+	var thirdsSlice []*Country = thirds[:]
+	sort.Slice(thirdsSlice, func(i, j int) bool {
+		if thirdsSlice[i].Points == thirdsSlice[j].Points && thirdsSlice[i].Goals > thirdsSlice[j].Goals {
+			return true
+		}
+		return thirdsSlice[i].Points > thirdsSlice[j].Points
+	})
+	var bestFourThirds = [4]*Country{thirdsSlice[0], thirdsSlice[1], thirdsSlice[2], thirdsSlice[3]}
+	return bestFourThirds
 }

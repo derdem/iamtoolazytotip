@@ -9,7 +9,4 @@ import (
 func main() {
 	fmt.Println("Starting server...")
 	api.Start()
-	// result := simulator.TournamentSimulator()
-	// fmt.Println(result)
-
 }

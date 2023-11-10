@@ -6,13 +6,31 @@ import KoRound from "./KoRound";
 const sortGroupMatches = (groupMatches: any[]) => {
   const sortedMatches: any = {};
   groupMatches.forEach((match) => {
-    if (!sortedMatches[match.groupNumber]) {
-      sortedMatches[match.groupNumber] = [];
+    if (!sortedMatches[match.groupName]) {
+      sortedMatches[match.groupName] = [];
     }
-    sortedMatches[match.groupNumber].push(match);
+    sortedMatches[match.groupName].push(match);
   });
   console.log(sortedMatches);
-  return sortedMatches;
+
+  const compareGroupName = (a: any, b: any) => {
+    if (a < b) {
+      return -1;
+    }
+    if (a > b) {
+      return 1;
+    }
+    return 0;
+  }
+
+  const sortedGroupNames = Object.keys(sortedMatches).sort(compareGroupName);
+
+  const sortedMatchesAsArray: any[] = [];
+  sortedGroupNames.forEach((groupName) => {
+    sortedMatchesAsArray.push(sortedMatches[groupName]);
+  });
+
+  return sortedMatchesAsArray;
 };
 
 const getNewSimulation = async () => {
@@ -30,9 +48,7 @@ const App: Component = () => {
     four: any[];
     final: any[];
   }>({ group: [], sixteen: [], eight: [], four: [], final: [] });
-  const [groupOutcomes, setGroupOutcomes] = createSignal<{
-    [key: string]: any[];
-  }>({});
+  const [groupOutcomes, setGroupOutcomes] = createSignal<any[]>([]);
   createEffect(() =>
     console.log("The latest groupOutcomes are", groupOutcomes())
   );

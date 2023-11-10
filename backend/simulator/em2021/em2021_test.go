@@ -1,4 +1,4 @@
-package simulator_test
+package em2021_test
 
 import (
 	"fmt"
@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/derdem/iamtoolazytotip/simulator"
+	"github.com/derdem/iamtoolazytotip/simulator/em2021"
 )
 
 func TestSorting(t *testing.T) {
@@ -50,4 +51,9 @@ func TestSorting(t *testing.T) {
 
 	fmt.Println(countries)
 
+}
+
+func TestEm2021(t *testing.T) {
+	tournamentMatches := em2021.Run2021Tournament()
+	fmt.Println(tournamentMatches)
 }
