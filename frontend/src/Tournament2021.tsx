@@ -2,6 +2,7 @@ import { Component, Show, createEffect, createSignal, onMount } from "solid-js";
 
 import AllGroupMatches from "./AllGroupMatches";
 import KoRound from "./KoRound";
+import { A } from "@solidjs/router";
 
 const sortGroupMatches = (groupMatches: any[]) => {
   const sortedMatches: any = {};
@@ -66,7 +67,8 @@ const App: Component = () => {
   return (
     <div>
       <header class="bg-sky-800 text-center text-white flex justify-between items-center">
-        <div class="text-2xl ml-4">
+        <div class="flex text-2xl ml-4">
+          <A href="/" class="no-underline"><i class="py-4 mr-4 fa-solid fa-house"></i></A>
           <p class="py-4">EM soccer tournament simulator 2021</p>
         </div>
 
@@ -85,8 +87,6 @@ const App: Component = () => {
       <Show when={tournamentOutcome().final.length > 0} fallback={<h1 class="p-4 text-xl bg-sky-800 bg-opacity-25">No Winner yet</h1>}>
         <h1 class="p-4 text-xl bg-sky-800 bg-opacity-25 text-center">Winner: {tournamentOutcome().final[0].winner.name}</h1>
       </Show>
-
-      {/* tournamentOutcome().final */}
     </div>
   );
 };

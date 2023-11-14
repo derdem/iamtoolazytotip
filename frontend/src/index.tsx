@@ -6,6 +6,8 @@ import "./index.css";
 import Tournament2021 from "./Tournament2021";
 import Tournament2024 from "./Tournament2024";
 import { Router, Routes, Route } from "@solidjs/router";
+import Home from "./Home";
+import TournamentCustom from "./TournamentCustom";
 
 const root = document.getElementById("root");
 
@@ -19,7 +21,9 @@ render(
   () => (
     <Router>
       <Routes>
-        <Route path="/" component={Tournament2021}/>
+        <Route path="/" component={Home}/>
+        <Route path="/new" component={TournamentCustom}></Route>
+        <Route path="/2021" component={Tournament2021}/>
         <Route path="/2024/" component={Tournament2024}/>
       </Routes>
     </Router>
