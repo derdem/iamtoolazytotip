@@ -1,7 +1,7 @@
 import { A } from "@solidjs/router";
 import { Component, For, JSX, createSignal } from "solid-js";
-import { groups, setGroups } from "./groupStore";
-
+import { GroupInStore, Strength, groups, setGroups } from "./groupStore";
+import CreateGroup from "./CreateGroup";
 
 const TournamentCustom: Component = () => {
   const [groupName, setGroupName] = createSignal("");
@@ -15,8 +15,18 @@ const TournamentCustom: Component = () => {
     if (groupName() === "") {
       return;
     }
-    setGroups([...groups, groupName()]);
-    setGroupName("")
+    const group: GroupInStore = {
+      groupName: groupName(),
+      countries: [
+        { name: "", strength: Strength.Weak },
+        { name: "", strength: Strength.Weak },
+        { name: "", strength: Strength.Weak },
+        { name: "", strength: Strength.Weak },
+      ],
+      index: groups.length,
+    };
+    setGroups([...groups, group]);
+    setGroupName("");
   };
   const createNewGroupOnEnter: JSX.EventHandler<
     HTMLInputElement,
@@ -57,9 +67,10 @@ const TournamentCustom: Component = () => {
           Add
         </button>
       </div>
-      <div>
-        <For each={groups}>{(group) => <div class="p-4">{group}</div>}</For>
+      <div class="flex">
+        <For each={groups}>{(group) => <CreateGroup groupIndex={group.index} />}</For>
       </div>
+      <div>{JSON.stringify(groups)}</div>
     </div>
   );
 };
