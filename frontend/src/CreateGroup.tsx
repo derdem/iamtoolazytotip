@@ -9,7 +9,7 @@ const CreateGroup: Component<CreateGroupProps> = (props) => {
   console.log("CreateGroup rendered")
   const updateCountryName: (
     ci: number
-  ) => JSX.FocusEventHandlerUnion<HTMLInputElement, FocusEvent> =
+  ) => JSX.InputEventHandlerUnion<HTMLInputElement, InputEvent> =
     (countryIndex: number) => (event) => {
       const countryName = event.currentTarget.value;
       const country = {...groups[props.groupIndex].countries[countryIndex]};
@@ -67,7 +67,7 @@ const CreateGroup: Component<CreateGroupProps> = (props) => {
                 name="group-name"
                 value={getCountryName(countryIndex)}
                 class="p-4 mr-2 outline-1 border-2 rounded-lg outline-slate-200 focus:outline-slate-400 shadow"
-                onBlur={updateCountryName(countryIndex)}
+                onInput={updateCountryName(countryIndex)}
               ></input>
             </div>
             <div class="m-4">

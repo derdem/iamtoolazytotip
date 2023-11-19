@@ -5,6 +5,7 @@ import CreateGroup from "./CreateGroup";
 
 const TournamentCustom: Component = () => {
   const [groupName, setGroupName] = createSignal("");
+  const [groupIndex, setGroupIndex] = createSignal<number[]>([]);
   const onGroupNameInput: JSX.EventHandler<HTMLInputElement, InputEvent> = (
     event
   ) => {
@@ -26,6 +27,9 @@ const TournamentCustom: Component = () => {
       index: groups.length,
     };
     setGroups([...groups, group]);
+
+    const newGroupIndex = groupIndex().length;
+    setGroupIndex([...groupIndex(), newGroupIndex])
     setGroupName("");
   };
   const createNewGroupOnEnter: JSX.EventHandler<
@@ -68,7 +72,7 @@ const TournamentCustom: Component = () => {
         </button>
       </div>
       <div class="flex">
-        <For each={groups}>{(group) => <CreateGroup groupIndex={group.index} />}</For>
+        <For each={groupIndex()}>{(groupIndex) => <CreateGroup groupIndex={groupIndex} />}</For>
       </div>
       <div>{JSON.stringify(groups)}</div>
     </div>
