@@ -1,5 +1,5 @@
 import { A } from "@solidjs/router";
-import { Component, For, JSX, createSignal } from "solid-js";
+import { Component, For, JSX, Show, createSignal } from "solid-js";
 import { GroupInStore, Strength, groups, setGroups } from "./groupStore";
 import CreateGroup from "./CreateGroup";
 
@@ -53,25 +53,37 @@ const TournamentCustom: Component = () => {
       </header>
       <div class="p-8 flex">
         <div class="relative">
-          <label class="p-1 absolute bg-white left-2 -top-3 text-sm">
-            Create new Group
-          </label>
+          <Show when={groupIndex().length < 6}>
+            <label class="p-1 absolute bg-white left-2 -top-3 text-sm">
+              Create new Group
+            </label>
+          </Show>
+          <Show when={groupIndex().length >= 6}>
+            <label class="p-1 absolute bg-white left-2 -top-3 text-sm">
+              All Groups created
+            </label>
+          </Show>
           <input
             name="group-name"
             value={groupName()}
             class="p-4 mr-2 outline-1 border-2 rounded-lg outline-slate-200 focus:outline-slate-400 shadow"
             onInput={onGroupNameInput}
             onKeyDown={createNewGroupOnEnter}
+            disabled={groupIndex().length >= 6}
           ></input>
         </div>
+        <Show when={groupIndex().length < 6}>
         <button
           class="shadow p-4 rounded-md bg-slate-200 hover:bg-slate-300"
           onClick={createNewGroup}
+          disabled={groupIndex().length >= 6}
         >
           Add
         </button>
+        </Show>
+        <p class="ml-4 text-sm text-slate-400"> {6 - groupIndex().length} Groups more required </p>
       </div>
-      <div class="flex">
+      <div class="flex flex-wrap">
         <For each={groupIndex()}>{(groupIndex) => <CreateGroup groupIndex={groupIndex} />}</For>
       </div>
       <div>{JSON.stringify(groups)}</div>
