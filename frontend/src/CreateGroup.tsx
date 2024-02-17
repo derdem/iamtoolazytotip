@@ -1,5 +1,5 @@
 import { Component, For, JSX } from "solid-js";
-import { GroupInStore, Strength, groups, setGroups } from "./groupStore";
+import { Strength, groups, setGroups } from "./groupStore";
 
 interface CreateGroupProps {
   groupIndex: number;

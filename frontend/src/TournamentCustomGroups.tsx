@@ -2,16 +2,27 @@ import { A } from "@solidjs/router";
 import { Component, For, JSX, Show, createSignal } from "solid-js";
 import { GroupInStore, Strength, groups, setGroups } from "./groupStore";
 import CreateGroup from "./CreateGroup";
+import CreateGroupMatches from "./CreateGroupMatches";
 
-const TournamentCustom: Component = () => {
+const TournamentCreationStages = {
+  Groups: 1,
+  Matches: 2,
+} as const;
+
+type StageValues = typeof TournamentCreationStages[keyof typeof TournamentCreationStages]
+
+const TournamentCustomGroups: Component = () => {
   const [groupName, setGroupName] = createSignal("");
   const [groupIndex, setGroupIndex] = createSignal<number[]>([]);
+  const [TournamentStage, setTournamentStage] = createSignal<StageValues>(TournamentCreationStages.Groups);
+
   const onGroupNameInput: JSX.EventHandler<HTMLInputElement, InputEvent> = (
     event
   ) => {
     const groupName = event.currentTarget.value;
     setGroupName(groupName);
   };
+
   const createNewGroup = () => {
     if (groupName() === "") {
       return;
@@ -32,6 +43,7 @@ const TournamentCustom: Component = () => {
     setGroupIndex([...groupIndex(), newGroupIndex])
     setGroupName("");
   };
+
   const createNewGroupOnEnter: JSX.EventHandler<
     HTMLInputElement,
     KeyboardEvent
@@ -48,7 +60,7 @@ const TournamentCustom: Component = () => {
           <A href="/" class="no-underline">
             <i class="py-4 mr-4 fa-solid fa-house"></i>
           </A>
-          <p class="py-4">EM soccer tournament simulator 2024</p>
+          <p class="py-4">Create custom Tournament</p>
         </div>
       </header>
       <div class="p-8 flex">
@@ -81,14 +93,46 @@ const TournamentCustom: Component = () => {
           Add
         </button>
         </Show>
-        <p class="ml-4 text-sm text-slate-400"> {6 - groupIndex().length} Groups more required </p>
+        <Show when={groupIndex().length < 6}>
+        <p class="mx-4 text-sm text-slate-400"> {6 - groupIndex().length} Groups more required </p>
+        </Show>
+
+        <Show when={TournamentStage() == TournamentCreationStages.Groups}>
+        <button
+          class="shadow p-4 rounded-md bg-slate-200 hover:bg-slate-300"
+          onClick={() => setTournamentStage(TournamentCreationStages.Matches)}
+          disabled={groupIndex().length < 0}
+        >
+          Manage Matches
+        </button>
+        </Show>
+
+        <Show when={TournamentStage() == TournamentCreationStages.Matches}>
+        <button
+          class="shadow p-4 rounded-md bg-slate-200 hover:bg-slate-300"
+          onClick={() => setTournamentStage(TournamentCreationStages.Groups)}
+        >
+          Back to Groups
+        </button>
+        </Show>
+
       </div>
+
+      <Show when={TournamentStage() == TournamentCreationStages.Groups}>
       <div class="flex flex-wrap">
         <For each={groupIndex()}>{(groupIndex) => <CreateGroup groupIndex={groupIndex} />}</For>
       </div>
+      </Show>
+
+      <Show when={TournamentStage() == TournamentCreationStages.Matches}>
+      <div class="flex flex-wrap">
+        <For each={groupIndex()}>{(groupIndex) => <CreateGroupMatches groupIndex={groupIndex} />}</For>
+      </div>
+      </Show>
+
       <div>{JSON.stringify(groups)}</div>
     </div>
   );
 };
 
-export default TournamentCustom;
+export default TournamentCustomGroups;
