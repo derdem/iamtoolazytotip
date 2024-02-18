@@ -17,9 +17,25 @@ export interface GroupInStore {
   index: number
 }
 
+export interface MatchInStore {
+  groupIndex: number
+  matchIndex: number
+  country1: string
+  country2: string
+}
+
 const createGroupStore = () => {
   return createStore<GroupInStore[]>([])
 }
 
+const createMatchStore = () => {
+  return createStore<MatchInStore[]>([])
+}
+
+export const createEmptyMatch: () => MatchInStore = () => (
+  {groupIndex: 0, matchIndex: 0, country1: "", country2: ""}
+)
+
 export const [groups, setGroups] = createGroupStore()
+export const [matches, setMatches] = createMatchStore()
 

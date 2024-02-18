@@ -1,6 +1,6 @@
 import { A } from "@solidjs/router";
 import { Component, For, JSX, Show, createSignal } from "solid-js";
-import { GroupInStore, Strength, groups, setGroups } from "./groupStore";
+import { GroupInStore, Strength, groups, matches, setGroups } from "./groupStore";
 import CreateGroup from "./CreateGroup";
 import CreateGroupMatches from "./CreateGroupMatches";
 
@@ -131,6 +131,8 @@ const TournamentCustomGroups: Component = () => {
       </Show>
 
       <div>{JSON.stringify(groups)}</div>
+      <hr/>
+      <div>{JSON.stringify(matches)}</div>
     </div>
   );
 };
