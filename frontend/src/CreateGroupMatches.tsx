@@ -16,29 +16,27 @@ const CreateGroupMatches: Component<CreateGroupProps> = (props) => {
       return match.groupIndex === groupIndex && match.matchIndex === matchIndex;
     })
 
-    // If no match exists, create a new one
-    if (thisMatches.length === 0) {
-      const thisMatch = createEmptyMatch();
-      thisMatch.groupIndex = groupIndex;
-      thisMatch.matchIndex = matchIndex;
-      updateCountry(thisMatch, selectedCountry);
-      setMatches([...matches, thisMatch]);
-
-    // If a match exists, update it
-    } else {
-      const thisMatch = thisMatches[0];
-      const thisMatchNew = createEmptyMatch();
-      thisMatchNew.groupIndex = groupIndex;
-      thisMatchNew.matchIndex = matchIndex;
-      thisMatchNew.country1 = thisMatch.country1;
-      thisMatchNew.country2 = thisMatch.country2;
-      updateCountry(thisMatchNew, selectedCountry);
-      const allOtherMatches = matches.filter((match) => {
-        return match.groupIndex !== groupIndex || match.matchIndex !== matchIndex;
-      })
-      setMatches([...allOtherMatches, thisMatchNew]);
+    if (thisMatches.length !== 1) {
+      throw new Error("Match should exist")
     }
+
+    const thisMatch = thisMatches[0];
+    const thisMatchNew = createEmptyMatch();
+    thisMatchNew.groupIndex = groupIndex;
+    thisMatchNew.matchIndex = matchIndex;
+    thisMatchNew.country1 = thisMatch.country1;
+    thisMatchNew.country2 = thisMatch.country2;
+    updateCountry(thisMatchNew, selectedCountry);
+    const allOtherMatches = matches.filter((match) => {
+      return match.groupIndex !== groupIndex || match.matchIndex !== matchIndex;
+    })
+    setMatches([...allOtherMatches, thisMatchNew]);
+
   }
+
+  const groupMatches = matches.filter((match) => {
+    return match.groupIndex === props.groupIndex;
+  });
 
   type UpdateCountry = (match: MatchInStore, selectedCountry: string) => void
   const updateCountry1: UpdateCountry = (match, selectedCountry) => {
@@ -51,20 +49,20 @@ const CreateGroupMatches: Component<CreateGroupProps> = (props) => {
 
   return (
     <div class="m-4 p-2 border shadow">
-      <h1 class="underline mb-2">{groupName}</h1>
-      <For each={[0, 1, 2, 3, 4, 5]}>
-        {(matchIndex) => (
+      <h1 class="underline mb-2">Matches for: {groupName}</h1>
+      <For each={groupMatches}>
+        {(match) => (
           <div class="flex">
             <div class="m-4">
               <select
-                name={groupName + "-" + (matchIndex + 1).toString() + "-1"}
-                id={groupName + "-" + (matchIndex + 1).toString() + "-1"}
-                onChange={onChangeMatchCountry(props.groupIndex, matchIndex, updateCountry1)}
+                name={groupName + "-" + (match.matchIndex + 1).toString() + "-1"}
+                id={groupName + "-" + (match.matchIndex + 1).toString() + "-1"}
+                onChange={onChangeMatchCountry(props.groupIndex, match.matchIndex, updateCountry1)}
               >
-                <option value="" disabled selected>Select Country</option>
+                <option value="" disabled selected={match.country1 === ""}>Select Country</option>
                 <For each={countries}>
                   {(country) => (
-                    <option value={country.name}>{country.name}</option>
+                    <option value={country.name} selected={country.name === match.country1}>{country.name}</option>
                   )}
                 </For>
               </select>
@@ -72,15 +70,15 @@ const CreateGroupMatches: Component<CreateGroupProps> = (props) => {
             <div class="pt-4"> - </div>
             <div class="m-4">
               <select
-                name={groupName + "-" + (matchIndex + 1).toString() + "-2"}
-                id={groupName + "-" + (matchIndex + 1).toString() + "-2"}
-                onChange={onChangeMatchCountry(props.groupIndex, matchIndex, updateCountry2)}
+                name={groupName + "-" + (match.matchIndex + 1).toString() + "-2"}
+                id={groupName + "-" + (match.matchIndex + 1).toString() + "-2"}
+                onChange={onChangeMatchCountry(props.groupIndex, match.matchIndex, updateCountry2)}
                 value=""
               >
-                <option value="" disabled selected>Select Country</option>
+                <option value="" disabled selected={match.country2 === ""}>Select Country</option>
                 <For each={countries}>
                   {(country) => (
-                    <option value={country.name}>{country.name}</option>
+                    <option value={country.name} selected={country.name === match.country2}>{country.name}</option>
                   )}
                 </For>
               </select>

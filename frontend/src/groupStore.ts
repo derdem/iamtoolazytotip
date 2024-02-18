@@ -36,6 +36,16 @@ export const createEmptyMatch: () => MatchInStore = () => (
   {groupIndex: 0, matchIndex: 0, country1: "", country2: ""}
 )
 
+export const createGroupsEmptyMatches = (groupIndex: number) => {
+  const indices = [...Array(6).keys()]
+  const matches: MatchInStore[] = []
+  indices.forEach((matchIndex) => {
+      matches.push({groupIndex, matchIndex, country1: "", country2: ""})
+  })
+
+  return matches
+}
+
 export const [groups, setGroups] = createGroupStore()
 export const [matches, setMatches] = createMatchStore()
 

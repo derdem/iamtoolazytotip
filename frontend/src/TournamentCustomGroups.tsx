@@ -1,6 +1,6 @@
 import { A } from "@solidjs/router";
 import { Component, For, JSX, Show, createSignal } from "solid-js";
-import { GroupInStore, Strength, groups, matches, setGroups } from "./groupStore";
+import { GroupInStore, Strength, createGroupsEmptyMatches, groups, matches, setGroups, setMatches } from "./groupStore";
 import CreateGroup from "./CreateGroup";
 import CreateGroupMatches from "./CreateGroupMatches";
 
@@ -39,8 +39,14 @@ const TournamentCustomGroups: Component = () => {
     };
     setGroups([...groups, group]);
 
+
+
     const newGroupIndex = groupIndex().length;
     setGroupIndex([...groupIndex(), newGroupIndex])
+
+    const thisGroupsMatches = createGroupsEmptyMatches(newGroupIndex)
+    setMatches([...matches, ...thisGroupsMatches]);
+
     setGroupName("");
   };
 
