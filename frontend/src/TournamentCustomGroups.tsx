@@ -108,6 +108,7 @@ const TournamentCustomGroups: Component = () => {
           class="shadow p-4 rounded-md bg-slate-200 hover:bg-slate-300"
           onClick={() => setTournamentStage(TournamentCreationStages.Matches)}
           disabled={groupIndex().length < 0}
+          data-cy="manage-matches-button"
         >
           Manage Matches
         </button>

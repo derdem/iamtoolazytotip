@@ -6,7 +6,6 @@ interface CreateGroupProps {
 }
 
 const CreateGroup: Component<CreateGroupProps> = (props) => {
-  console.log("CreateGroup rendered")
   const updateCountryName: (
     ci: number
   ) => JSX.InputEventHandlerUnion<HTMLInputElement, InputEvent> =
@@ -68,6 +67,7 @@ const CreateGroup: Component<CreateGroupProps> = (props) => {
                 value={getCountryName(countryIndex)}
                 class="p-4 mr-2 outline-1 border-2 rounded-lg outline-slate-200 focus:outline-slate-400 shadow"
                 onInput={updateCountryName(countryIndex)}
+                data-cy={`${groups[props.groupIndex].groupName}-${countryIndex}`}
               ></input>
             </div>
             <div class="m-4">
