@@ -1,6 +1,16 @@
 import { A } from "@solidjs/router";
 import { Component, For, JSX, Show, createSignal } from "solid-js";
-import { GroupInStore, Strength, createGroupsEmptyMatches, groups, matches, setGroups, setMatches } from "./groupStore";
+import {
+  GroupInStore,
+  Strength,
+  createGroupsEmptyMatches,
+  groups,
+  groupIndex,
+  matches,
+  setGroups,
+  setGroupIndex,
+  setMatches,
+} from "./groupStore";
 import CreateGroup from "./CreateGroup";
 import CreateGroupMatches from "./CreateGroupMatches";
 
@@ -9,12 +19,15 @@ const TournamentCreationStages = {
   Matches: 2,
 } as const;
 
-type StageValues = typeof TournamentCreationStages[keyof typeof TournamentCreationStages]
+type StageValues =
+  (typeof TournamentCreationStages)[keyof typeof TournamentCreationStages];
 
 const TournamentCustomGroups: Component = () => {
   const [groupName, setGroupName] = createSignal("");
-  const [groupIndex, setGroupIndex] = createSignal<number[]>([]);
-  const [TournamentStage, setTournamentStage] = createSignal<StageValues>(TournamentCreationStages.Groups);
+
+  const [TournamentStage, setTournamentStage] = createSignal<StageValues>(
+    TournamentCreationStages.Groups
+  );
 
   const onGroupNameInput: JSX.EventHandler<HTMLInputElement, InputEvent> = (
     event
@@ -39,12 +52,10 @@ const TournamentCustomGroups: Component = () => {
     };
     setGroups([...groups, group]);
 
+    const newGroupIndex = groupIndex.length;
+    setGroupIndex([...groupIndex, newGroupIndex]);
 
-
-    const newGroupIndex = groupIndex().length;
-    setGroupIndex([...groupIndex(), newGroupIndex])
-
-    const thisGroupsMatches = createGroupsEmptyMatches(newGroupIndex)
+    const thisGroupsMatches = createGroupsEmptyMatches(newGroupIndex);
     setMatches([...matches, ...thisGroupsMatches]);
 
     setGroupName("");
@@ -71,12 +82,12 @@ const TournamentCustomGroups: Component = () => {
       </header>
       <div class="p-8 flex">
         <div class="relative">
-          <Show when={groupIndex().length < 6}>
+          <Show when={groupIndex.length < 6}>
             <label class="p-1 absolute bg-white left-2 -top-3 text-sm">
               Create new Group
             </label>
           </Show>
-          <Show when={groupIndex().length >= 6}>
+          <Show when={groupIndex.length >= 6}>
             <label class="p-1 absolute bg-white left-2 -top-3 text-sm">
               All Groups created
             </label>
@@ -87,58 +98,64 @@ const TournamentCustomGroups: Component = () => {
             class="p-4 mr-2 outline-1 border-2 rounded-lg outline-slate-200 focus:outline-slate-400 shadow"
             onInput={onGroupNameInput}
             onKeyDown={createNewGroupOnEnter}
-            disabled={groupIndex().length >= 6}
+            disabled={groupIndex.length >= 6}
           ></input>
         </div>
-        <Show when={groupIndex().length < 6}>
-        <button
-          class="shadow p-4 rounded-md bg-slate-200 hover:bg-slate-300"
-          onClick={createNewGroup}
-          disabled={groupIndex().length >= 6}
-        >
-          Add
-        </button>
+        <Show when={groupIndex.length < 6}>
+          <button
+            class="shadow p-4 rounded-md bg-slate-200 hover:bg-slate-300"
+            onClick={createNewGroup}
+            disabled={groupIndex.length >= 6}
+          >
+            Add
+          </button>
         </Show>
-        <Show when={groupIndex().length < 6}>
-        <p class="mx-4 text-sm text-slate-400"> {6 - groupIndex().length} Groups more required </p>
+        <Show when={groupIndex.length < 6}>
+          <p class="mx-4 text-sm text-slate-400">
+            {" "}
+            {6 - groupIndex.length} Groups more required{" "}
+          </p>
         </Show>
 
         <Show when={TournamentStage() == TournamentCreationStages.Groups}>
-        <button
-          class="shadow p-4 rounded-md bg-slate-200 hover:bg-slate-300"
-          onClick={() => setTournamentStage(TournamentCreationStages.Matches)}
-          disabled={groupIndex().length < 0}
-          data-cy="manage-matches-button"
-        >
-          Manage Matches
-        </button>
+          <button
+            class="shadow p-4 rounded-md bg-slate-200 hover:bg-slate-300"
+            onClick={() => setTournamentStage(TournamentCreationStages.Matches)}
+            disabled={groupIndex.length < 0}
+            data-cy="manage-matches-button"
+          >
+            Manage Matches
+          </button>
         </Show>
 
         <Show when={TournamentStage() == TournamentCreationStages.Matches}>
-        <button
-          class="shadow p-4 rounded-md bg-slate-200 hover:bg-slate-300"
-          onClick={() => setTournamentStage(TournamentCreationStages.Groups)}
-        >
-          Back to Groups
-        </button>
+          <button
+            class="shadow p-4 rounded-md bg-slate-200 hover:bg-slate-300"
+            onClick={() => setTournamentStage(TournamentCreationStages.Groups)}
+          >
+            Back to Groups
+          </button>
         </Show>
-
       </div>
 
       <Show when={TournamentStage() == TournamentCreationStages.Groups}>
-      <div class="flex flex-wrap">
-        <For each={groupIndex()}>{(groupIndex) => <CreateGroup groupIndex={groupIndex} />}</For>
-      </div>
+        <div class="flex flex-wrap">
+          <For each={groupIndex}>
+            {(groupIndex) => <CreateGroup groupIndex={groupIndex} />}
+          </For>
+        </div>
       </Show>
 
       <Show when={TournamentStage() == TournamentCreationStages.Matches}>
-      <div class="flex flex-wrap">
-        <For each={groupIndex()}>{(groupIndex) => <CreateGroupMatches groupIndex={groupIndex} />}</For>
-      </div>
+        <div class="flex flex-wrap">
+          <For each={groupIndex}>
+            {(groupIndex) => <CreateGroupMatches groupIndex={groupIndex} />}
+          </For>
+        </div>
       </Show>
 
       <div>{JSON.stringify(groups)}</div>
-      <hr/>
+      <hr />
       <div>{JSON.stringify(matches)}</div>
     </div>
   );

@@ -1,3 +1,4 @@
+import { create } from "cypress/types/lodash";
 import { createStore } from "solid-js/store";
 
 export enum Strength {
@@ -28,6 +29,10 @@ const createGroupStore = () => {
   return createStore<GroupInStore[]>([])
 }
 
+const createGroupIndexStore = () => {
+  return createStore<number[]>([])
+}
+
 const createMatchStore = () => {
   return createStore<MatchInStore[]>([])
 }
@@ -47,5 +52,10 @@ export const createGroupsEmptyMatches = (groupIndex: number) => {
 }
 
 export const [groups, setGroups] = createGroupStore()
+
+// changing this to a signal array rerenders the component, while user is
+// typing inside the group card this signal stays untouched
+export const [groupIndex, setGroupIndex] = createGroupIndexStore()
+
 export const [matches, setMatches] = createMatchStore()
 

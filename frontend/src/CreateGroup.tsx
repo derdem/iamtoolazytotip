@@ -1,5 +1,11 @@
 import { Component, For, JSX } from "solid-js";
-import { Strength, groups, setGroups } from "./groupStore";
+import {
+  Strength,
+  groupIndex,
+  groups,
+  setGroupIndex,
+  setGroups,
+} from "./groupStore";
 
 interface CreateGroupProps {
   groupIndex: number;
@@ -11,14 +17,14 @@ const CreateGroup: Component<CreateGroupProps> = (props) => {
   ) => JSX.InputEventHandlerUnion<HTMLInputElement, InputEvent> =
     (countryIndex: number) => (event) => {
       const countryName = event.currentTarget.value;
-      const country = {...groups[props.groupIndex].countries[countryIndex]};
+      const country = { ...groups[props.groupIndex].countries[countryIndex] };
       country.name = countryName;
 
       const groupIndex = props.groupIndex;
       const countries = [...groups[props.groupIndex].countries];
       countries[countryIndex] = country;
 
-      const group = {...groups[props.groupIndex]};
+      const group = { ...groups[props.groupIndex] };
       group.countries = countries;
 
       const updatedGroups = [...groups];
@@ -32,14 +38,14 @@ const CreateGroup: Component<CreateGroupProps> = (props) => {
   ) => JSX.ChangeEventHandlerUnion<HTMLSelectElement, Event> =
     (countryIndex: number) => (event) => {
       const countryStrength = Number(event.currentTarget.value);
-      const country = {...groups[props.groupIndex].countries[countryIndex]};
+      const country = { ...groups[props.groupIndex].countries[countryIndex] };
       country.strength = countryStrength;
 
       const groupIndex = props.groupIndex;
       const countries = [...groups[props.groupIndex].countries];
       countries[countryIndex] = country;
 
-      const group = {...groups[props.groupIndex]};
+      const group = { ...groups[props.groupIndex] };
       group.countries = countries;
 
       const updatedGroups = [...groups];
@@ -52,9 +58,26 @@ const CreateGroup: Component<CreateGroupProps> = (props) => {
     return groups[props.groupIndex].countries[countryIndex].name;
   };
 
+  const deleteGroup = () => {
+    const updatedGroupIndex = [...groupIndex];
+    const updatedGroups = [...groups];
+    updatedGroupIndex.splice(props.groupIndex, 1);
+    updatedGroups.splice(props.groupIndex, 1);
+    setGroupIndex(updatedGroupIndex);
+    setGroups(updatedGroups);
+  };
+
   return (
     <div class="m-4 p-2 border shadow">
-      <h1 class="underline mb-2">{groups[props.groupIndex].groupName}</h1>
+      <div class="flex justify-between">
+        <h1 class="underline mb-2">{groups[props.groupIndex].groupName}</h1>
+        <button
+          class="ml-4 p-2 bg-red-500 text-white rounded-lg"
+          onClick={deleteGroup}
+        >
+          Delete Group
+        </button>
+      </div>
       <For each={[0, 1, 2, 3]}>
         {(countryIndex) => (
           <div class="flex">
@@ -67,14 +90,18 @@ const CreateGroup: Component<CreateGroupProps> = (props) => {
                 value={getCountryName(countryIndex)}
                 class="p-4 mr-2 outline-1 border-2 rounded-lg outline-slate-200 focus:outline-slate-400 shadow"
                 onInput={updateCountryName(countryIndex)}
-                data-cy={`${groups[props.groupIndex].groupName}-${countryIndex}`}
+                data-cy={`${
+                  groups[props.groupIndex].groupName
+                }-${countryIndex}`}
               ></input>
             </div>
             <div class="m-4">
-              <label class="p-1 bg-white left-2 -top-3 text-sm">
-                Strength
-              </label>
-              <select name="Strength" id="strength" onChange={updateCountryStrength(countryIndex)}>
+              <label class="p-1 bg-white left-2 -top-3 text-sm">Strength</label>
+              <select
+                name="Strength"
+                id="strength"
+                onChange={updateCountryStrength(countryIndex)}
+              >
                 <option value={Strength.Weak}>{Strength.Weak}</option>
                 <option value={Strength.Medium}>{Strength.Medium}</option>
                 <option value={Strength.Strong}>{Strength.Strong}</option>
