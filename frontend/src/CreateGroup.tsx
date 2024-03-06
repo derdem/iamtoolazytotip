@@ -1,68 +1,83 @@
 import { Component, For, JSX } from "solid-js";
 import {
+  Country,
   Strength,
+  getGroup,
   groupIndex,
   groups,
+  matches,
   setGroupIndex,
   setGroups,
+  setMatches,
 } from "./groupStore";
 
 interface CreateGroupProps {
-  groupIndex: number;
+  groupIndex: Symbol;
 }
 
 const CreateGroup: Component<CreateGroupProps> = (props) => {
-  const updateCountryName: (
+
+  type PropertyHandler = (c: Country, ev: string) => void;
+  type UpdateCountryProperty = (ci: number, ev: string, ph: PropertyHandler) => void;
+  const updateCountryProperty: UpdateCountryProperty = (countryIndex, eventValue, propertyHandler) => {
+    const group = {...getGroup(props.groupIndex)};
+
+    const country = { ...group.countries[countryIndex] };
+    propertyHandler(country, eventValue);
+    const groupIndex = props.groupIndex;
+    const countries = [...group.countries];
+    countries[countryIndex] = country;
+
+    group.countries = countries;
+    const updatedGroups = groups.filter(group => group.index !== groupIndex);
+    setGroups([...updatedGroups, group]);
+  }
+
+  const mutateName = (country: Country, name: string) => {
+    country.name = name;
+  }
+
+  const mutateStrength = (country: Country, strength: string) => {
+    country.strength = Number(strength);
+  }
+
+  type UpdateCountryName = (
     ci: number
-  ) => JSX.InputEventHandlerUnion<HTMLInputElement, InputEvent> =
+  ) => JSX.InputEventHandlerUnion<HTMLInputElement, InputEvent>;
+  const updateCountryName: UpdateCountryName =
     (countryIndex: number) => (event) => {
-      const countryName = event.currentTarget.value;
-      const country = { ...groups[props.groupIndex].countries[countryIndex] };
-      country.name = countryName;
-
-      const groupIndex = props.groupIndex;
-      const countries = [...groups[props.groupIndex].countries];
-      countries[countryIndex] = country;
-
-      const group = { ...groups[props.groupIndex] };
-      group.countries = countries;
-
-      const updatedGroups = [...groups];
-      updatedGroups[groupIndex] = group;
-
-      setGroups(updatedGroups);
+      updateCountryProperty(countryIndex, event.currentTarget.value, mutateName);
     };
 
-  const updateCountryStrength: (
+  type UpdateCountryStrength = (
     ci: number
-  ) => JSX.ChangeEventHandlerUnion<HTMLSelectElement, Event> =
+  ) => JSX.ChangeEventHandlerUnion<HTMLSelectElement, Event>;
+  const updateCountryStrength: UpdateCountryStrength =
     (countryIndex: number) => (event) => {
-      const countryStrength = Number(event.currentTarget.value);
-      const country = { ...groups[props.groupIndex].countries[countryIndex] };
-      country.strength = countryStrength;
-
-      const groupIndex = props.groupIndex;
-      const countries = [...groups[props.groupIndex].countries];
-      countries[countryIndex] = country;
-
-      const group = { ...groups[props.groupIndex] };
-      group.countries = countries;
-
-      const updatedGroups = [...groups];
-      updatedGroups[groupIndex] = group;
-
-      setGroups(updatedGroups);
+      updateCountryProperty(countryIndex, event.currentTarget.value, mutateStrength);
     };
 
   const getCountryName = (countryIndex: number) => {
-    return groups[props.groupIndex].countries[countryIndex].name;
+    const group = getGroup(props.groupIndex);
+    return group.countries[countryIndex].name;
+  };
+
+  const getGroupName = (groupIndex: Symbol) => {
+    const group = getGroup(props.groupIndex);
+    return group.groupName;
   };
 
   const deleteGroup = () => {
-    const updatedGroupIndex = [...groupIndex];
-    const updatedGroups = [...groups];
-    updatedGroupIndex.splice(props.groupIndex, 1);
-    updatedGroups.splice(props.groupIndex, 1);
+    const updatedGroupIndex = groupIndex.filter(
+      (oneIndex) => oneIndex !== props.groupIndex
+    );
+    const updatedGroups = groups.filter(
+      (group) => group.index !== props.groupIndex
+    );
+    const updatedGroupMatches = matches.filter(
+      (match) => match.groupIndex !== props.groupIndex
+    );
+    setMatches(updatedGroupMatches);
     setGroupIndex(updatedGroupIndex);
     setGroups(updatedGroups);
   };
@@ -70,7 +85,7 @@ const CreateGroup: Component<CreateGroupProps> = (props) => {
   return (
     <div class="m-4 p-2 border shadow">
       <div class="flex justify-between">
-        <h1 class="underline mb-2">{groups[props.groupIndex].groupName}</h1>
+        <h1 class="underline mb-2">{getGroupName(props.groupIndex)}</h1>
         <button
           class="ml-4 p-2 bg-red-500 text-white rounded-lg"
           onClick={deleteGroup}
@@ -90,9 +105,7 @@ const CreateGroup: Component<CreateGroupProps> = (props) => {
                 value={getCountryName(countryIndex)}
                 class="p-4 mr-2 outline-1 border-2 rounded-lg outline-slate-200 focus:outline-slate-400 shadow"
                 onInput={updateCountryName(countryIndex)}
-                data-cy={`${
-                  groups[props.groupIndex].groupName
-                }-${countryIndex}`}
+                data-cy={`${getGroupName(props.groupIndex)}-${countryIndex}`}
               ></input>
             </div>
             <div class="m-4">

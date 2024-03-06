@@ -40,6 +40,7 @@ const TournamentCustomGroups: Component = () => {
     if (groupName() === "") {
       return;
     }
+    const newSymbol = Symbol();
     const group: GroupInStore = {
       groupName: groupName(),
       countries: [
@@ -48,14 +49,13 @@ const TournamentCustomGroups: Component = () => {
         { name: "", strength: Strength.Weak },
         { name: "", strength: Strength.Weak },
       ],
-      index: groups.length,
+      index: newSymbol,
     };
     setGroups([...groups, group]);
 
-    const newGroupIndex = groupIndex.length;
-    setGroupIndex([...groupIndex, newGroupIndex]);
+    setGroupIndex([...groupIndex, newSymbol]);
 
-    const thisGroupsMatches = createGroupsEmptyMatches(newGroupIndex);
+    const thisGroupsMatches = createGroupsEmptyMatches(newSymbol);
     setMatches([...matches, ...thisGroupsMatches]);
 
     setGroupName("");

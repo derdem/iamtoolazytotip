@@ -1,16 +1,17 @@
 import { Component, For, JSX } from "solid-js";
-import { MatchInStore, createEmptyMatch, groups, matches, setMatches } from "./groupStore";
+import { MatchInStore, createEmptyMatch, getGroup, groups, matches, setMatches } from "./groupStore";
 
 interface CreateGroupProps {
-  groupIndex: number;
+  groupIndex: Symbol;
 }
 
 const CreateGroupMatches: Component<CreateGroupProps> = (props) => {
-  const groupName = groups[props.groupIndex].groupName;
-  const countries = groups[props.groupIndex].countries;
+  const group = getGroup(props.groupIndex);
+  const groupName = group.groupName;
+  const countries = group.countries;
 
-  type OnChangeMatch = (gi: number, mi: number, uc: UpdateCountry) => JSX.ChangeEventHandlerUnion<HTMLSelectElement, Event>
-  const onChangeMatchCountry: OnChangeMatch = (groupIndex: number, matchIndex: number, updateCountry: UpdateCountry) => (event) => {
+  type OnChangeMatch = (gi: Symbol, mi: number, uc: UpdateCountry) => JSX.ChangeEventHandlerUnion<HTMLSelectElement, Event>
+  const onChangeMatchCountry: OnChangeMatch = (groupIndex, matchIndex, updateCountry) => (event) => {
     const selectedCountry = event.currentTarget.value;
     const thisMatches = matches.filter((match) => {
       return match.groupIndex === groupIndex && match.matchIndex === matchIndex;

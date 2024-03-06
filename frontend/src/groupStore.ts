@@ -15,11 +15,11 @@ export interface Country {
 export interface GroupInStore {
   groupName: string
   countries: Country[],
-  index: number
+  index: Symbol | null
 }
 
 export interface MatchInStore {
-  groupIndex: number
+  groupIndex: Symbol | null
   matchIndex: number
   country1: string
   country2: string
@@ -30,7 +30,7 @@ const createGroupStore = () => {
 }
 
 const createGroupIndexStore = () => {
-  return createStore<number[]>([])
+  return createStore<Symbol[]>([])
 }
 
 const createMatchStore = () => {
@@ -38,10 +38,10 @@ const createMatchStore = () => {
 }
 
 export const createEmptyMatch: () => MatchInStore = () => (
-  {groupIndex: 0, matchIndex: 0, country1: "", country2: ""}
+  {groupIndex: null, matchIndex: 0, country1: "", country2: ""}
 )
 
-export const createGroupsEmptyMatches = (groupIndex: number) => {
+export const createGroupsEmptyMatches = (groupIndex: Symbol) => {
   const indices = [...Array(6).keys()]
   const matches: MatchInStore[] = []
   indices.forEach((matchIndex) => {
@@ -58,4 +58,12 @@ export const [groups, setGroups] = createGroupStore()
 export const [groupIndex, setGroupIndex] = createGroupIndexStore()
 
 export const [matches, setMatches] = createMatchStore()
+
+export const getGroup = (groupIndex: Symbol) => {
+  const myGroups = groups.filter((group) => group.index === groupIndex);
+  if (myGroups.length !== 1) {
+    throw new Error("Group not found");
+  }
+  return myGroups[0];
+}
 
