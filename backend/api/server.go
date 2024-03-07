@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"io"
 	"log"
 	"net/http"
 
@@ -13,6 +14,7 @@ func Start() *http.ServeMux {
 	corsHandler := enableCors(router)
 	router.HandleFunc("/api/2021", run2021Tournament())
 	router.HandleFunc("/api/2024", run2024Tournament())
+	router.HandleFunc("/api/run-custom", runCustomTournament())
 	http.ListenAndServe(":8080", corsHandler)
 	return router
 }
@@ -59,5 +61,19 @@ func run2024Tournament() http.HandlerFunc {
 		//fmt.Println(matchOutcome)
 		w.Header().Set("Content-Type", "application/json")
 		w.Write(js)
+	}
+}
+
+func runCustomTournament() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		resBody, err := io.ReadAll(r.Body)
+		if err != nil {
+			log.Fatalf("Error happened in reading request body. Err: %s", err)
+		}
+
+		log.Println(string(resBody))
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(resBody)
+
 	}
 }

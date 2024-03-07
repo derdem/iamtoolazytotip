@@ -70,6 +70,18 @@ const TournamentCustomGroups: Component = () => {
     }
   };
 
+  const runTournament = async () => {
+    const response = await fetch("http://localhost:8080/api/run-custom", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ groups, matches }),
+    });
+    const data = await response.json();
+    console.log("Request complete! response:", data);
+  };
+
   return (
     <div>
       <header class="bg-sky-800 text-center text-white flex justify-between items-center">
@@ -136,6 +148,14 @@ const TournamentCustomGroups: Component = () => {
             Back to Groups
           </button>
         </Show>
+
+        <button
+            class="shadow p-4 rounded-md bg-slate-200 hover:bg-slate-300  mx-4"
+            onClick={runTournament}
+          >
+            Run Tournament
+          </button>
+
       </div>
 
       <Show when={TournamentStage() == TournamentCreationStages.Groups}>
