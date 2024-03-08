@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 
+	customtournament "github.com/derdem/iamtoolazytotip/simulator/customTournament"
 	"github.com/derdem/iamtoolazytotip/simulator/em2021"
 )
 
@@ -71,7 +72,8 @@ func runCustomTournament() http.HandlerFunc {
 			log.Fatalf("Error happened in reading request body. Err: %s", err)
 		}
 
-		log.Println(string(resBody))
+		// log.Println(string(resBody))
+		customtournament.RunCustomTournament(resBody)
 		w.Header().Set("Content-Type", "application/json")
 		w.Write(resBody)
 

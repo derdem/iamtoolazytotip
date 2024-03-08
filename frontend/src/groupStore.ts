@@ -1,4 +1,3 @@
-import { create } from "cypress/types/lodash";
 import { createStore } from "solid-js/store";
 
 export enum Strength {
@@ -15,11 +14,11 @@ export interface Country {
 export interface GroupInStore {
   groupName: string
   countries: Country[],
-  index: Symbol | null
+  index: Symbol
 }
 
 export interface MatchInStore {
-  groupIndex: Symbol | null
+  groupIndex: Symbol
   matchIndex: number
   country1: string
   country2: string
@@ -38,7 +37,7 @@ const createMatchStore = () => {
 }
 
 export const createEmptyMatch: () => MatchInStore = () => (
-  {groupIndex: null, matchIndex: 0, country1: "", country2: ""}
+  {groupIndex: Symbol(), matchIndex: 0, country1: "", country2: ""}
 )
 
 export const createGroupsEmptyMatches = (groupIndex: Symbol) => {

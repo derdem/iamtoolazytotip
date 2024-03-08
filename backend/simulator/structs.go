@@ -95,3 +95,25 @@ type RoundOf16 struct {
 	Member15 *Country
 	Member16 *Country
 }
+
+type CountryFrontend struct {
+	Name     string `json:"name"`
+	Strength int    `json:"strength"`
+}
+
+type GroupFrontend struct {
+	Name      string             `json:"groupName"`
+	Countries [4]CountryFrontend `json:"countries"`
+}
+
+type MatchFrontend struct {
+	GroupIndex int    `json:"groupIndex"`
+	MatchIndex int    `json:"matchIndex"`
+	Country1   string `json:"country1"`
+	Country2   string `json:"country2"`
+}
+
+type GroupsAndMatches struct {
+	Groups  []GroupFrontend `json:"groups"`
+	Matches []MatchFrontend `json:"matches"`
+}

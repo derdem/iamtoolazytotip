@@ -10,6 +10,7 @@ import {
   setGroups,
   setGroupIndex,
   setMatches,
+  MatchInStore,
 } from "./groupStore";
 import CreateGroup from "./CreateGroup";
 import CreateGroupMatches from "./CreateGroupMatches";
@@ -71,16 +72,37 @@ const TournamentCustomGroups: Component = () => {
   };
 
   const runTournament = async () => {
+    const preprocessedMatches = preprocessMatches(matches);
     const response = await fetch("http://localhost:8080/api/run-custom", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ groups, matches }),
+      body: JSON.stringify({ groups, matches: preprocessedMatches }),
     });
     const data = await response.json();
     console.log("Request complete! response:", data);
   };
+
+  const preprocessMatches = (rawMatches: MatchInStore[]) => {
+    const groupIndexMap = new Map<Symbol, number>();
+    groupIndex.forEach((symbol, index) => {
+      groupIndexMap.set(symbol, index);
+    });
+    const processedMatches = rawMatches.map((match) => {
+      const groupIndex = groupIndexMap.get(match.groupIndex);
+      if (groupIndex === undefined) {
+        throw new Error("Group index not found");
+      }
+      return {
+        groupIndex: groupIndexMap.get(match.groupIndex),
+        matchIndex: match.matchIndex,
+        country1: match.country1,
+        country2: match.country2,
+      };
+    });
+    return processedMatches;
+  }
 
   return (
     <div>
@@ -176,7 +198,7 @@ const TournamentCustomGroups: Component = () => {
 
       <div>{JSON.stringify(groups)}</div>
       <hr />
-      <div>{JSON.stringify(matches)}</div>
+      <div>{JSON.stringify(preprocessMatches(matches))}</div>
     </div>
   );
 };
