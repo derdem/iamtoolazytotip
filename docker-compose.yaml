@@ -28,6 +28,7 @@ services:
             - type: bind
               source: ./frontend
               target: /app/
+        stop_grace_period: 1s
 
 networks:
     simulator-network:
