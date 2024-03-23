@@ -18,7 +18,7 @@ services:
 
     server:
         image: node:21.1-alpine3.17
-        entrypoint: /bin/sh -c "npm install && npm start"
+        entrypoint: /bin/sh -c "exec npm install && npm start"
         working_dir: /app
         networks:
             - simulator-network
@@ -28,7 +28,7 @@ services:
             - type: bind
               source: ./frontend
               target: /app/
-        stop_grace_period: 1s
+        # stop_grace_period: 1s
 
 networks:
     simulator-network:
