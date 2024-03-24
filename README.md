@@ -18,13 +18,24 @@ starting the server with hot reloading
 
 `reflex -r '\.go$' -s -- sh -c "go run main.go"`
 
-# Building images
+# Building images - dev
 
 `docker compose build`
 
-The created images should have the names `iamtoolazytotip-api` and `iamtoolazytotip-server`.
+The created images should have the names `iamtoolazytotip-api`.
+
+# Building images - prod
+
+`docker compose -f docker-compose.prod.yml build`
+
+The created images should have the names `iamtoolazytotip-api-prod`.
 
 # start containers
 
 `docker compose up -d`
 
+# Api documentation
+
+- `/api/2021`
+- `/api/2024`
+- `/api/run-custom`
