@@ -1,6 +1,7 @@
 version: "3"
 services:
     api-server:
+        container_name: go-api-server
         build:
             context: .
             dockerfile: ./docker/api.prod.dockerfile
@@ -10,16 +11,22 @@ services:
         ports:
             - "8080:8080"
 
-    frontend:
-        build:
-            context: .
-            dockerfile: ./docker/frontend.prod.dockerfile
-        image: iamtoolazytotip-frontend
+    nginx_local_dev_proxy:
+        container_name: nginx-local-proxy
         init: true
+        image: nginx:1.25.4
+        ports:
+            - "3000:3000"
+        volumes:
+            - type: bind
+              source: ./nginx/nginx.conf
+              target: /etc/nginx/nginx.conf
+            - type: bind
+              source: ./frontend/dist
+              target: /usr/share/nginx/html
+        command: [nginx-debug, '-g', 'daemon off;']
         networks:
             - simulator-network
-        ports:
-            - "4173:4173"
 
 networks:
     simulator-network:
