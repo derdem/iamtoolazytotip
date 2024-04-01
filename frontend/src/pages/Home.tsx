@@ -1,5 +1,5 @@
 import { Component } from "solid-js";
-import EnterTournamentCard from "./EnterTournamentCard";
+import EnterTournamentCard from "../EnterTournamentCard";
 
 const Home: Component = () => {
   return (

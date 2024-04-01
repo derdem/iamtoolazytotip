@@ -3,11 +3,11 @@ import { render } from "solid-js/web";
 import "solid-devtools";
 
 import "./index.css";
-import Tournament2021 from "./Tournament2021";
-import Tournament2024 from "./Tournament2024";
+import Tournament2021 from "./pages/Tournament2021";
+import Tournament2024 from "./pages/Tournament2024";
 import { Router, Routes, Route } from "@solidjs/router";
-import Home from "./Home";
-import TournamentCustomGroups from "./TournamentCustomGroups";
+import Home from "./pages/Home";
+import TournamentCustomGroups from "./pages/TournamentCustomGroups";
 
 const root = document.getElementById("root");
 

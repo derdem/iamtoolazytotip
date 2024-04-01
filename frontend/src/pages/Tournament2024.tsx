@@ -1,7 +1,7 @@
 import { Component, Show, createEffect, createSignal, onMount } from "solid-js";
 
-import AllGroupMatches from "./AllGroupMatches";
-import KoRound from "./KoRound";
+import AllGroupMatches from "../AllGroupMatches";
+import KoRound from "../KoRound";
 import { A } from "@solidjs/router";
 
 const sortGroupMatches = (groupMatches: any[]) => {

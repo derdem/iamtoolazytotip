@@ -11,9 +11,9 @@ import {
   setGroupIndex,
   setMatches,
   MatchInStore,
-} from "./groupStore";
-import CreateGroup from "./CreateGroup";
-import CreateGroupMatches from "./CreateGroupMatches";
+} from "../groupStore";
+import CreateGroup from "../CreateGroup";
+import CreateGroupMatches from "../CreateGroupMatches";
 
 const TournamentCreationStages = {
   Groups: 1,
