@@ -46,6 +46,16 @@ services:
         networks:
             - simulator-network
 
+    database:
+        container_name: database
+        image: postgres:16.2-alpine3.19
+        environment:
+            POSTGRES_USER: iamtoolazytotip
+            POSTGRES_PASSWORD: iamtoolazytotip
+            POSTGRES_DB: iamtoolazytotip
+        shm_size: 256mb
+
+
 networks:
     simulator-network:
         driver: bridge
