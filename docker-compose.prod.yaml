@@ -8,8 +8,8 @@ services:
         image: iamtoolazytotip-api-prod
         networks:
             - simulator-network
-        ports:
-            - "8080:8080"
+        # ports:
+        #     - "8080:8080"
 
     nginx_local_dev_proxy:
         container_name: nginx-local-proxy

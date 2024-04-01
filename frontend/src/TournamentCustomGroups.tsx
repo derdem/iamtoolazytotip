@@ -73,7 +73,7 @@ const TournamentCustomGroups: Component = () => {
 
   const runTournament = async () => {
     const preprocessedMatches = preprocessMatches(matches);
-    const response = await fetch("http://localhost:8080/api/run-custom", {
+    const response = await fetch("http://localhost:3000/api/run-custom", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

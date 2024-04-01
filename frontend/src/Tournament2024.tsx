@@ -17,7 +17,7 @@ const sortGroupMatches = (groupMatches: any[]) => {
 };
 
 const getNewSimulation = async () => {
-  const response = await fetch("http://localhost:8080/api/2024");
+  const response = await fetch("http://localhost:3000/api/2024");
   const data = await response.json();
   data.final = [data.final];
   return data;

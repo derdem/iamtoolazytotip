@@ -1,6 +1,7 @@
 version: "3"
 services:
     api-server:
+        container_name: go-api-server
         build:
             context: .
             dockerfile: ./docker/api.dockerfile
@@ -9,26 +10,41 @@ services:
         working_dir: /app
         networks:
             - simulator-network
-        ports:
-            - "8080:8080"
+        # ports:
+        #     - "8080:8080"
         volumes:
             - type: bind
               source: ./backend
               target: /app/
 
     frontend:
+        container_name: frontend
         image: node:21.7.1-alpine3.18
         init: true
         command: /bin/sh -c "npm install && npm start"
         working_dir: /app
         networks:
             - simulator-network
-        ports:
-            - "3000:3000"
+        # ports:
+        #     - "9000:9000"
         volumes:
             - type: bind
               source: ./frontend
               target: /app/
+
+    nginx_local_dev_proxy:
+        container_name: nginx-local-proxy
+        init: true
+        image: nginx:1.25.4
+        ports:
+            - "3000:3000"
+        volumes:
+            - type: bind
+              source: ./nginx/nginx.dev.conf
+              target: /etc/nginx/nginx.conf
+        command: [nginx-debug, '-g', 'daemon off;']
+        networks:
+            - simulator-network
 
 networks:
     simulator-network:
