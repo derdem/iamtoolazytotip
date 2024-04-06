@@ -1,5 +1,42 @@
 version: "3"
 services:
+    database:
+        container_name: database
+        image: postgres:16.2-alpine3.19
+        environment:
+            POSTGRES_USER: iamtoolazytotip
+            POSTGRES_PASSWORD: iamtoolazytotip
+            POSTGRES_DB: tournaments
+        shm_size: 256mb
+        ports:
+            - "5432:5432"
+        networks:
+            - simulator-network
+        volumes:
+            - type: bind
+              source: ./database/setup.sql
+              target: /docker-entrypoint-initdb.d/setup.sql
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U iamtoolazytotip -d tournaments"]
+            interval: 3s
+            timeout: 5s
+            retries: 5
+
+    database-connection-test:
+        container_name: database-connection-test
+        image: postgres:16.2-alpine3.19
+        command: psql postgresql://iamtoolazytotip:iamtoolazytotip@database/tournaments -c 'SELECT * FROM players;'
+        working_dir: /app
+        volumes:
+            - type: bind
+              source: ./database
+              target: /app/
+        networks:
+            - simulator-network
+        depends_on:
+            database:
+              condition: service_healthy
+
     api-server:
         container_name: go-api-server
         build:
@@ -45,16 +82,11 @@ services:
         command: [nginx-debug, '-g', 'daemon off;']
         networks:
             - simulator-network
-
-    database:
-        container_name: database
-        image: postgres:16.2-alpine3.19
-        environment:
-            POSTGRES_USER: iamtoolazytotip
-            POSTGRES_PASSWORD: iamtoolazytotip
-            POSTGRES_DB: iamtoolazytotip
-        shm_size: 256mb
-
+        depends_on:
+            frontend:
+                condition: service_started
+            api-server:
+                condition: service_started
 
 networks:
     simulator-network:
