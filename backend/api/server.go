@@ -8,6 +8,7 @@ import (
 
 	customtournament "github.com/derdem/iamtoolazytotip/simulator/customTournament"
 	"github.com/derdem/iamtoolazytotip/simulator/em2021"
+	"github.com/derdem/iamtoolazytotip/simulator/readTournamentFromDb"
 )
 
 func Start() *http.ServeMux {
@@ -16,6 +17,7 @@ func Start() *http.ServeMux {
 	router.HandleFunc("/api/2021", run2021Tournament())
 	router.HandleFunc("/api/2024", run2024Tournament())
 	router.HandleFunc("/api/run-custom", runCustomTournament())
+	router.HandleFunc("/api/read-tournament-1", readTournament1())
 	http.ListenAndServe(":8080", corsHandler)
 	return router
 }
@@ -77,5 +79,19 @@ func runCustomTournament() http.HandlerFunc {
 		w.Header().Set("Content-Type", "application/json")
 		w.Write(resBody)
 
+	}
+}
+
+func readTournament1() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		groups := readTournamentFromDb.ReadTournament1()
+		js, err := json.Marshal(groups)
+
+		if err != nil {
+			log.Fatalf("Error happened in JSON marshal. Err: %s", err)
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(js)
 	}
 }
