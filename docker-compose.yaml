@@ -14,28 +14,35 @@ services:
             - simulator-network
         volumes:
             - type: bind
-              source: ./database/setup.sql
-              target: /docker-entrypoint-initdb.d/setup.sql
+              source: ./database/migrate
+              target: /docker-entrypoint-initdb.d/01_migrate
+            - type: bind
+              source: ./database/dev_setup
+              target: /docker-entrypoint-initdb.d/02_dev_setup
+            - type: bind
+              source: ./database/initdb.sh
+              target: /docker-entrypoint-initdb.d/initdb.sh
+
         healthcheck:
             test: ["CMD-SHELL", "pg_isready -U iamtoolazytotip -d tournaments"]
             interval: 3s
             timeout: 5s
             retries: 5
 
-    database-connection-test:
-        container_name: database-connection-test
-        image: postgres:16.2-alpine3.19
-        command: psql postgresql://iamtoolazytotip:iamtoolazytotip@database/tournaments -c 'SELECT * FROM players;'
-        working_dir: /app
-        volumes:
-            - type: bind
-              source: ./database
-              target: /app/
-        networks:
-            - simulator-network
-        depends_on:
-            database:
-              condition: service_healthy
+    # database-connection-test:
+    #     container_name: database-connection-test
+    #     image: postgres:16.2-alpine3.19
+    #     command: psql postgresql://iamtoolazytotip:iamtoolazytotip@database/tournaments -c 'SELECT * FROM players;'
+    #     working_dir: /app
+    #     volumes:
+    #         - type: bind
+    #           source: ./database
+    #           target: /app/
+    #     networks:
+    #         - simulator-network
+    #     depends_on:
+    #         database:
+    #           condition: service_healthy
 
     api-server:
         container_name: go-api-server
@@ -47,8 +54,8 @@ services:
         working_dir: /app
         networks:
             - simulator-network
-        # ports:
-        #     - "8080:8080"
+        ports:
+            - "8080:8080"
         volumes:
             - type: bind
               source: ./backend
