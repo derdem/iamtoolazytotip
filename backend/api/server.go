@@ -9,6 +9,7 @@ import (
 	"github.com/derdem/iamtoolazytotip/simulator"
 	customtournament "github.com/derdem/iamtoolazytotip/simulator/customTournament"
 	"github.com/derdem/iamtoolazytotip/simulator/em2021"
+	"github.com/derdem/iamtoolazytotip/simulator/readTournamentFromDb"
 )
 
 func Start() *http.ServeMux {
@@ -39,7 +40,8 @@ func enableCors(handler http.Handler) http.Handler {
 
 func run2021Tournament() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		matchOutcome := simulator.RunSimulator(2)
+		groups := readTournamentFromDb.LoadGroupFromDb(2)
+		matchOutcome := simulator.TournamentSimulator(groups)
 
 		js, err := json.Marshal(matchOutcome)
 		if err != nil {
@@ -84,8 +86,9 @@ func runCustomTournament() http.HandlerFunc {
 
 func readTournament1() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		groups := simulator.RunSimulator(1)
-		js, err := json.Marshal(groups)
+		groups := readTournamentFromDb.LoadGroupFromDb(2)
+		matchOutcome := simulator.TournamentSimulator(groups)
+		js, err := json.Marshal(matchOutcome)
 
 		if err != nil {
 			log.Fatalf("Error happened in JSON marshal. Err: %s", err)

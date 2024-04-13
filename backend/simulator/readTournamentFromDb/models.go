@@ -1,35 +1,39 @@
 package readTournamentFromDb
 
-type Group struct {
-	Id           int     `json:"id"`
-	Name         string  `json:"name"`
-	TournamentId int     `json:"tournament_id"`
-	Teams        []Team  `json:"teams"`
-	Matches      []Match `json:"matches"`
+import "github.com/derdem/iamtoolazytotip/simulator"
+
+type TournamentDb struct {
+	Id      int            `json:"id"`
+	Name    string         `json:"name"`
+	Groups  []GroupLightDb `json:"groups"`
+	Teams   []TeamDb       `json:"teams"`
+	Matches []MatchDb      `json:"matches"`
 }
 
-type Team struct {
-	Id       int      `json:"id"`
-	Name     string   `json:"name"`
-	GroupId  int      `json:"group_id"`
-	Strength Strength `json:"strength"`
+type GroupDb struct {
+	Id           int       `json:"id"`
+	Name         string    `json:"name"`
+	TournamentId int       `json:"tournament_id"`
+	Teams        []TeamDb  `json:"teams"`
+	Matches      []MatchDb `json:"matches"`
 }
 
-type Match struct {
-	Id                int `json:"id"`
-	GroupId           int `json:"group_id"`
-	Team1Id           int `json:"team1_id"`
-	Team1Goals        int `json:"team1_goals"`
-	Team1PenaltyGoals int `json:"team1_penalty_goals"`
-	Team2Id           int `json:"team2_id"`
-	Team2Goals        int `json:"team2_goals"`
-	Team2PenaltyGoals int `json:"team2_penalty_goals"`
+type GroupLightDb struct {
+	Id           int    `json:"id"`
+	Name         string `json:"name"`
+	TournamentId int    `json:"tournament_id"`
 }
 
-type Strength string
+type TeamDb struct {
+	Id       int                `json:"id"`
+	Name     string             `json:"name"`
+	GroupId  int                `json:"group_id"`
+	Strength simulator.Strength `json:"strength"`
+}
 
-const (
-	LowStrength    Strength = "low"
-	MediumStrength Strength = "medium"
-	HighStrength   Strength = "high"
-)
+type MatchDb struct {
+	Id      int `json:"id"`
+	GroupId int `json:"group_id"`
+	Team1Id int `json:"team1_id"`
+	Team2Id int `json:"team2_id"`
+}

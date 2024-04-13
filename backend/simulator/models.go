@@ -117,3 +117,11 @@ type GroupsAndMatches struct {
 	Groups  []GroupFrontend `json:"groups"`
 	Matches []MatchFrontend `json:"matches"`
 }
+
+type Strength string
+
+const (
+	LowStrength    Strength = "low"
+	MediumStrength Strength = "medium"
+	HighStrength   Strength = "high"
+)

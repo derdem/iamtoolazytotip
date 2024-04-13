@@ -60,6 +60,6 @@ func TestEm2021(t *testing.T) {
 		readTournamentFromDb.GetConnection = postgres_connection.GetConnection
 	}()
 
-	groups := simulator.LoadGroupFromDb(2)
+	groups := readTournamentFromDb.LoadGroupFromDb(2)
 	fmt.Println(groups)
 }

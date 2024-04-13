@@ -21,6 +21,7 @@ func GetConnection() *pgx.Conn {
 		fmt.Println(err)
 		os.Exit(1)
 	}
+
 	return conn
 }
 

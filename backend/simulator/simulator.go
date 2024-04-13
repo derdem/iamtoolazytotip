@@ -12,17 +12,12 @@ import (
 
 const lambda = 1.3
 
-func RunSimulator(tournament_id int) TournamentMatches {
-	groups := LoadGroupFromDb(tournament_id)
-	return TournamentSimulator(groups)
-}
-
 func TournamentSimulator(groups []Group) TournamentMatches {
 	fmt.Println("Start")
 
 	allGroupMatches := make([]GroupMatch, 0)
 
-	numberMatchesInGroupPhase := CountAllGroupMatches(groups)
+	numberMatchesInGroupPhase := CountAllGroupMatches(groups) // required to know when to close the channel
 	groupMatchChannel := make(chan GroupMatch, numberMatchesInGroupPhase)
 
 	for _, group := range groups {
