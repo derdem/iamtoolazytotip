@@ -81,9 +81,10 @@ func ConvertTournamentDbToModel(tournamentDb TournamentDb) simulator.Tournament 
 		team1 := teamMap[match.Team1Id]
 		team2 := teamMap[match.Team2Id]
 		matches = append(matches, simulator.Match2{
-			Id:    match.Id,
-			Team1: team1,
-			Team2: team2,
+			Id:      match.Id,
+			Team1:   team1,
+			Team2:   team2,
+			GroupId: match.GroupId,
 		})
 	}
 

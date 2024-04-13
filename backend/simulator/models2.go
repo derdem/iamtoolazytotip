@@ -22,9 +22,10 @@ type Team struct {
 }
 
 type Match2 struct {
-	Id    int
-	Team1 Team
-	Team2 Team
+	Id      int
+	GroupId int
+	Team1   Team
+	Team2   Team
 }
 
 type MatchResult struct {
@@ -36,4 +37,12 @@ type MatchResult struct {
 	Team1PointsGained int
 	Team2PointsGained int
 	Winner            Team
+}
+
+type GroupRanking struct {
+	GroupId int
+	Team    Team
+	Ranking int
+	Points  int
+	Goals   int
 }
