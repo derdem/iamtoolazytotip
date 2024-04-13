@@ -5,8 +5,9 @@ import (
 	"sort"
 	"testing"
 
+	"github.com/derdem/iamtoolazytotip/postgres_connection"
 	"github.com/derdem/iamtoolazytotip/simulator"
-	"github.com/derdem/iamtoolazytotip/simulator/em2021"
+	"github.com/derdem/iamtoolazytotip/simulator/readTournamentFromDb"
 )
 
 func TestSorting(t *testing.T) {
@@ -54,6 +55,11 @@ func TestSorting(t *testing.T) {
 }
 
 func TestEm2021(t *testing.T) {
-	tournamentMatches := em2021.Run2021Tournament()
-	fmt.Println(tournamentMatches)
+	readTournamentFromDb.GetConnection = postgres_connection.GetConnectionForTest
+	defer func() {
+		readTournamentFromDb.GetConnection = postgres_connection.GetConnection
+	}()
+
+	groups := simulator.LoadGroupFromDb(2)
+	fmt.Println(groups)
 }

@@ -39,7 +39,7 @@ func getGroupsRaw() []byte {
                 {"team1": 1, "team2": 3, "playtime": "2021-06-16T13:00:00Z"},
                 {"team1": 0, "team2": 2, "playtime": "2021-06-17T16:00:00Z"},
                 {"team1": 3, "team2": 0, "playtime": "2021-06-21T19:00:00Z"},
-                {"team1": 2, "team2": 2, "playtime": "2021-06-21T19:00:00Z"}
+                {"team1": 1, "team2": 2, "playtime": "2021-06-21T19:00:00Z"}
             ]
         },
         {
