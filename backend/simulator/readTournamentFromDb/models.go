@@ -1,29 +1,29 @@
 package readTournamentFromDb
 
 type Group struct {
-	Id           int
-	Name         string
-	TournamentId int
-	Teams        []Team
-	Matches      []Match
+	Id           int     `json:"id"`
+	Name         string  `json:"name"`
+	TournamentId int     `json:"tournament_id"`
+	Teams        []Team  `json:"teams"`
+	Matches      []Match `json:"matches"`
 }
 
 type Team struct {
-	Id       int
-	Name     string
-	GroupId  int
-	Strength Strength
+	Id       int      `json:"id"`
+	Name     string   `json:"name"`
+	GroupId  int      `json:"group_id"`
+	Strength Strength `json:"strength"`
 }
 
 type Match struct {
-	Id                int
-	GroupId           int
-	Team1Id           int
-	Team1Goals        int
-	Team1PenaltyGoals int
-	Team2Id           int
-	Team2Goals        int
-	Team2PenaltyGoals int
+	Id                int `json:"id"`
+	GroupId           int `json:"group_id"`
+	Team1Id           int `json:"team1_id"`
+	Team1Goals        int `json:"team1_goals"`
+	Team1PenaltyGoals int `json:"team1_penalty_goals"`
+	Team2Id           int `json:"team2_id"`
+	Team2Goals        int `json:"team2_goals"`
+	Team2PenaltyGoals int `json:"team2_penalty_goals"`
 }
 
 type Strength string

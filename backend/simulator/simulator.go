@@ -12,8 +12,8 @@ import (
 
 const lambda = 1.3
 
-func RunSimulator() TournamentMatches {
-	groups := LoadGroupFromDb()
+func RunSimulator(tournament_id int) TournamentMatches {
+	groups := LoadGroupFromDb(tournament_id)
 	return TournamentSimulator(groups)
 }
 

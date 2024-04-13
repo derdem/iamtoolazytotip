@@ -60,8 +60,8 @@ func CreateGroupMatch(team1 *Country, team2 *Country, playtime time.Time, groupN
 	}
 }
 
-func LoadGroupFromDb() []Group {
-	groupsRaw := readTournamentFromDb.ReadTournament1()
+func LoadGroupFromDb(tournament_id int) []Group {
+	groupsRaw := readTournamentFromDb.ReadTournament(tournament_id)
 	groups := make([]Group, 0)
 	for _, groupRaw := range groupsRaw {
 		countries, countryIdIndexMap := getCountriesFromDbEntries(groupRaw.Teams)
