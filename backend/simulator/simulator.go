@@ -12,6 +12,11 @@ import (
 
 const lambda = 1.3
 
+func RunSimulator() TournamentMatches {
+	groups := LoadGroupFromDb()
+	return TournamentSimulator(groups)
+}
+
 func TournamentSimulator(groups []Group) TournamentMatches {
 	fmt.Println("Start")
 

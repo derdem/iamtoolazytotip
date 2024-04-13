@@ -1,5 +1,6 @@
 CREATE TABLE IF NOT EXISTS tournament (
-    id SERIAL PRIMARY KEY
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL
 );
 
 -- create a strength enum
@@ -43,7 +44,7 @@ CREATE TABLE IF NOT EXISTS results (
     FOREIGN KEY (match_id) REFERENCES matches(id)
 );
 
-INSERT INTO tournament (id) VALUES (1);
+INSERT INTO tournament (id, name) VALUES (1, 'Test tournament');
 
 INSERT INTO groups (name, tournament_id) VALUES ('A', 1);
 INSERT INTO groups (name, tournament_id) VALUES ('B', 1);

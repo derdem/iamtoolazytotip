@@ -12,7 +12,7 @@ type Team struct {
 	Id       int
 	Name     string
 	GroupId  int
-	Strength string
+	Strength Strength
 }
 
 type Match struct {
@@ -25,3 +25,11 @@ type Match struct {
 	Team2Goals        int
 	Team2PenaltyGoals int
 }
+
+type Strength string
+
+const (
+	LowStrength    Strength = "low"
+	MediumStrength Strength = "medium"
+	HighStrength   Strength = "high"
+)

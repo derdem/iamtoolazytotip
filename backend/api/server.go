@@ -6,9 +6,9 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/derdem/iamtoolazytotip/simulator"
 	customtournament "github.com/derdem/iamtoolazytotip/simulator/customTournament"
 	"github.com/derdem/iamtoolazytotip/simulator/em2021"
-	"github.com/derdem/iamtoolazytotip/simulator/readTournamentFromDb"
 )
 
 func Start() *http.ServeMux {
@@ -84,7 +84,7 @@ func runCustomTournament() http.HandlerFunc {
 
 func readTournament1() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		groups := readTournamentFromDb.ReadTournament1()
+		groups := simulator.RunSimulator()
 		js, err := json.Marshal(groups)
 
 		if err != nil {
