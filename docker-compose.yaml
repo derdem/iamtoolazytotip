@@ -69,8 +69,6 @@ services:
         working_dir: /app
         networks:
             - simulator-network
-        # ports:
-        #     - "9000:9000"
         volumes:
             - type: bind
               source: ./frontend

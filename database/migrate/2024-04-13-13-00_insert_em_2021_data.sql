@@ -1,5 +1,5 @@
 -- Description: Insert data for Test tournament
-INSERT INTO tournament (id, name) VALUES (1, 'Test tournament');
+INSERT INTO tournaments (id, name) VALUES (1, 'Test tournament');
 
 INSERT INTO groups (id, name, tournament_id) VALUES (1, 'A', 1);
 INSERT INTO groups (id, name, tournament_id) VALUES (2, 'B', 1);
@@ -83,7 +83,7 @@ INSERT INTO matches (id, team1_id, team2_id, group_id) VALUES (36, 22, 23, 6);
 
 
 -- Description: Insert data for the Euro 2021 tournament
-INSERT INTO tournament (id, name) VALUES (2, 'EM 2021');
+INSERT INTO tournaments (id, name) VALUES (2, 'EM 2021');
 
 INSERT INTO groups (id, name, tournament_id) VALUES (7, 'Group A', 2);
 INSERT INTO groups (id, name, tournament_id) VALUES (8, 'Group B', 2);
