@@ -164,3 +164,33 @@ INSERT INTO matches (id, team1_id, team2_id, group_id) VALUES (69, 45, 47, 12); 
 INSERT INTO matches (id, team1_id, team2_id, group_id) VALUES (70, 46, 48, 12); -- Portugal vs Germany
 INSERT INTO matches (id, team1_id, team2_id, group_id) VALUES (71, 46, 47, 12); -- Portugal vs France
 INSERT INTO matches (id, team1_id, team2_id, group_id) VALUES (72, 48, 45, 12); -- Germany vs Hungary
+
+
+-- GROUP Ko groups
+INSERT INTO groups (id, name, tournament_id) VALUES (13, 'Round 16', 2);
+INSERT INTO groups (id, name, tournament_id) VALUES (14, 'Quarterfinals', 2);
+INSERT INTO groups (id, name, tournament_id) VALUES (15, 'Semifinals', 2);
+INSERT INTO groups (id, name, tournament_id) VALUES (16, 'Final', 2);
+
+-- GROUP Round 16 matches
+INSERT INTO ko_matches (id, group_id, group_id1, group_id2, ranking1, ranking2) VALUES (1, 13,  8, 12, 1, 3); -- B1 vs F3
+INSERT INTO ko_matches (id, group_id, group_id1, group_id2, ranking1, ranking2) VALUES (2, 13,  7, 9,  1, 2); -- A1 vs C2
+INSERT INTO ko_matches (id, group_id, group_id1, group_id2, ranking1, ranking2) VALUES (3, 13, 12, 7,  1, 3); -- F1 vs A3
+INSERT INTO ko_matches (id, group_id, group_id1, group_id2, ranking1, ranking2) VALUES (4, 13, 10, 11, 2, 2); -- D2 vs E2
+INSERT INTO ko_matches (id, group_id, group_id1, group_id2, ranking1, ranking2) VALUES (5, 13, 11, 9,  1, 3); -- E1 vs C3
+INSERT INTO ko_matches (id, group_id, group_id1, group_id2, ranking1, ranking2) VALUES (6, 13, 10, 12, 1, 2); -- D1 vs F2
+INSERT INTO ko_matches (id, group_id, group_id1, group_id2, ranking1, ranking2) VALUES (7, 13,  9, 10, 1, 3); -- C1 vs D3
+INSERT INTO ko_matches (id, group_id, group_id1, group_id2, ranking1, ranking2) VALUES (8, 13,  7, 8,  2, 2); -- A2 vs B2
+
+-- GROUP Quarterfinals matches
+INSERT INTO ko_matches (id, group_id, group_id1, group_id2, ranking1, ranking2) VALUES (9,  14,  13, 13, 1, 2); -- 1 vs 2
+INSERT INTO ko_matches (id, group_id, group_id1, group_id2, ranking1, ranking2) VALUES (10, 14,  13, 13, 3, 4); -- 3 vs 4
+INSERT INTO ko_matches (id, group_id, group_id1, group_id2, ranking1, ranking2) VALUES (11, 14,  13, 13, 5, 6); -- 5 vs 6
+INSERT INTO ko_matches (id, group_id, group_id1, group_id2, ranking1, ranking2) VALUES (12, 14,  13, 13, 7, 8); -- 7 vs 8
+
+-- GROUP Semifinals matches
+INSERT INTO ko_matches (id, group_id, group_id1, group_id2, ranking1, ranking2) VALUES (13, 15,  14, 14, 1, 2); -- 1 vs 2
+INSERT INTO ko_matches (id, group_id, group_id1, group_id2, ranking1, ranking2) VALUES (14, 15,  14, 14, 3, 4); -- 3 vs 4
+
+-- GROUP Final matches
+INSERT INTO ko_matches (id, group_id, group_id1, group_id2, ranking1, ranking2) VALUES (15, 16,  15, 15, 1, 2); -- 1 vs 2

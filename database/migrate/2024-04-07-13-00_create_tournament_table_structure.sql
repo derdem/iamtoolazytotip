@@ -52,3 +52,16 @@ CREATE TABLE IF NOT EXISTS group_rankings (
     FOREIGN KEY (team_id) REFERENCES teams(id)
     UNIQUE (group_id, team_id)
 );
+
+
+CREATE TABLE IF NOT EXISTS ko_matches (
+    id SERIAL PRIMARY KEY,
+    group_id INT NOT NULL,
+    group_id1 INT NOT NULL,
+    group_id2 INT NOT NULL,
+    ranking1 INT NOT NULL,
+    ranking2 INT NOT NULL,
+    FOREIGN KEY (group_id) REFERENCES groups(id),
+    FOREIGN KEY (group_id1) REFERENCES groups(id),
+    FOREIGN KEY (group_id2) REFERENCES groups(id)
+);

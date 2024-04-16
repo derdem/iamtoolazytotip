@@ -1,11 +1,14 @@
 package simulator
 
 type Tournament struct {
-	Id      int
-	Name    string
-	Groups  []Group2
-	Teams   []Team
-	Matches []Match2
+	Id            int
+	Name          string
+	Groups        []Group2 // need to distinguish between groups and ko rounds
+	Teams         []Team
+	Matches       []Match2
+	MatchResults  []MatchResult
+	GroupRankings []GroupRanking
+	KoMatches     []KoMatch
 }
 
 type Group2 struct {
@@ -26,6 +29,15 @@ type Match2 struct {
 	GroupId int
 	Team1   Team
 	Team2   Team
+}
+
+type KoMatch struct {
+	Id       int
+	GroupId  int
+	Group1   Group2
+	Group2   Group2
+	ranking1 int
+	ranking2 int
 }
 
 type MatchResult struct {
