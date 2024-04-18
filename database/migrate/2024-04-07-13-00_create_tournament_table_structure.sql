@@ -3,14 +3,15 @@ CREATE TABLE IF NOT EXISTS tournaments (
     name VARCHAR(255) NOT NULL
 );
 
--- create a strength enum
 CREATE TYPE strength AS ENUM ('low', 'medium', 'high');
+CREATE TYPE group_type AS ENUM ('group_phase', 'knockout_phase');
 
 
 CREATE TABLE IF NOT EXISTS groups (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     tournament_id INT NOT NULL,
+    group_type group_type NOT NULL,
     FOREIGN KEY (tournament_id) REFERENCES tournaments(id)
 );
 

@@ -85,12 +85,12 @@ INSERT INTO matches (id, team1_id, team2_id, group_id) VALUES (36, 22, 23, 6);
 -- Description: Insert data for the Euro 2021 tournament
 INSERT INTO tournaments (id, name) VALUES (2, 'EM 2021');
 
-INSERT INTO groups (id, name, tournament_id) VALUES (7, 'Group A', 2);
-INSERT INTO groups (id, name, tournament_id) VALUES (8, 'Group B', 2);
-INSERT INTO groups (id, name, tournament_id) VALUES (9, 'Group C', 2);
-INSERT INTO groups (id, name, tournament_id) VALUES (10, 'Group D', 2);
-INSERT INTO groups (id, name, tournament_id) VALUES (11, 'Group E', 2);
-INSERT INTO groups (id, name, tournament_id) VALUES (12, 'Group F', 2);
+INSERT INTO groups (id, name, tournament_id, group_type) VALUES (7, 'Group A', 2, 'group_phase');
+INSERT INTO groups (id, name, tournament_id, group_type) VALUES (8, 'Group B', 2, 'group_phase');
+INSERT INTO groups (id, name, tournament_id, group_type) VALUES (9, 'Group C', 2, 'group_phase');
+INSERT INTO groups (id, name, tournament_id, group_type) VALUES (10, 'Group D', 2, 'group_phase');
+INSERT INTO groups (id, name, tournament_id, group_type) VALUES (11, 'Group E', 2, 'group_phase');
+INSERT INTO groups (id, name, tournament_id, group_type) VALUES (12, 'Group F', 2, 'group_phase');
 
 INSERT INTO teams (id, name, strength, group_id) VALUES (25, 'Turkey', 'medium', 7);
 INSERT INTO teams (id, name, strength, group_id) VALUES (26, 'Italy', 'high', 7);
@@ -167,10 +167,10 @@ INSERT INTO matches (id, team1_id, team2_id, group_id) VALUES (72, 48, 45, 12); 
 
 
 -- GROUP Ko groups
-INSERT INTO groups (id, name, tournament_id) VALUES (13, 'Round 16', 2);
-INSERT INTO groups (id, name, tournament_id) VALUES (14, 'Quarterfinals', 2);
-INSERT INTO groups (id, name, tournament_id) VALUES (15, 'Semifinals', 2);
-INSERT INTO groups (id, name, tournament_id) VALUES (16, 'Final', 2);
+INSERT INTO groups (id, name, tournament_id, group_type) VALUES (13, 'Round 16', 2, 'knockout_phase');
+INSERT INTO groups (id, name, tournament_id, group_type) VALUES (14, 'Quarterfinals', 2, 'knockout_phase');
+INSERT INTO groups (id, name, tournament_id, group_type) VALUES (15, 'Semifinals', 2, 'knockout_phase');
+INSERT INTO groups (id, name, tournament_id, group_type) VALUES (16, 'Final', 2, 'knockout_phase');
 
 -- GROUP Round 16 matches
 INSERT INTO ko_matches (id, group_id, group_id1, group_id2, ranking1, ranking2) VALUES (1, 13,  8, 12, 1, 3); -- B1 vs F3
