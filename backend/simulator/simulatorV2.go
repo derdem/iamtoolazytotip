@@ -103,7 +103,8 @@ func determineGroupRanking2(matchResults []MatchResult, tournament Tournament) [
 
 	teamsSortedIntoGroups := getTeamsSortedIntoGroups(tournament.Teams)
 
-	for _, group := range tournament.Groups {
+    groupPhaseGroups := filterByGroupPhase(tournament.Groups)
+	for _, group := range groupPhaseGroups {
 		sortedTeams := determineRankingPerGroup(
 			group.Id,
 			teamsSortedIntoGroups[group.Id],
@@ -117,6 +118,21 @@ func determineGroupRanking2(matchResults []MatchResult, tournament Tournament) [
 	return groupRankings
 
 }
+
+func filterGroup(groupType GroupType) {
+    return func (groups Group2) {
+        filteredGroups := make([]Group2, 0)
+        for _, group := range groups {
+            if group.Type == groupType {
+                filteredGroups = append(filteredGroups, group)
+            }
+        }
+        return filteredGroups
+    }
+}
+
+var filterByGroupPhase = filterBy(GroupType.GroupPhase)
+var filterByKoRound = filterBy(GroupType.KoRound)
 
 func getTeamsSortedIntoGroups(teams []Team) map[int][]Team {
 	var teamsSortedIntoGroups = make(map[int][]Team) // groupId -> teams
