@@ -129,6 +129,7 @@ const (
 type GroupType string
 
 const (
-	GroupPhaseType GroupType = "group_phase"
-	KoPhaseType    GroupType = "knockout_phase"
+	GroupPhaseGroupType GroupType = "group_phase"
+	KoPhaseGroupType    GroupType = "knockout_phase"
+	SupportGroupType    GroupType = "support"
 )
