@@ -15,6 +15,7 @@ type Group2 struct {
 	Id           int
 	Name         string
 	TournamentId int
+	GroupType    GroupType
 }
 
 type Team struct {

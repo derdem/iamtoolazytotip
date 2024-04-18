@@ -125,3 +125,10 @@ const (
 	MediumStrength Strength = "medium"
 	HighStrength   Strength = "high"
 )
+
+type GroupType string
+
+const (
+	GroupPhaseType GroupType = "group_phase"
+	KoPhaseType    GroupType = "knockout_phase"
+)
