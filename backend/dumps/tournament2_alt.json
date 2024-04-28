@@ -1,0 +1,793 @@
+{
+    "id": 2,
+    "name": "EM 2021",
+    "groups": [
+        {
+            "id": 7,
+            "name": "Group A",
+            "tournamentId": 2,
+            "groupType": "group_phase"
+        },
+        {
+            "id": 8,
+            "name": "Group B",
+            "tournamentId": 2,
+            "groupType": "group_phase"
+        },
+        {
+            "id": 9,
+            "name": "Group C",
+            "tournamentId": 2,
+            "groupType": "group_phase"
+        },
+        {
+            "id": 10,
+            "name": "Group D",
+            "tournamentId": 2,
+            "groupType": "group_phase"
+        },
+        {
+            "id": 11,
+            "name": "Group E",
+            "tournamentId": 2,
+            "groupType": "group_phase"
+        },
+        {
+            "id": 12,
+            "name": "Group F",
+            "tournamentId": 2,
+            "groupType": "group_phase"
+        },
+        {
+            "id": 13,
+            "name": "Round 16",
+            "tournamentId": 2,
+            "groupType": "knockout_phase"
+        },
+        {
+            "id": 14,
+            "name": "Quarterfinals",
+            "tournamentId": 2,
+            "groupType": "knockout_phase"
+        },
+        {
+            "id": 15,
+            "name": "Semifinals",
+            "tournamentId": 2,
+            "groupType": "knockout_phase"
+        },
+        {
+            "id": 16,
+            "name": "Final",
+            "tournamentId": 2,
+            "groupType": "knockout_phase"
+        }
+    ],
+    "teams": [
+        {
+            "id": 25,
+            "name": "Turkey",
+            "groupId": 7,
+            "strength": 2
+        },
+        {
+            "id": 26,
+            "name": "Italy",
+            "groupId": 7,
+            "strength": 3
+        },
+        {
+            "id": 27,
+            "name": "Wales",
+            "groupId": 7,
+            "strength": 1
+        },
+        {
+            "id": 28,
+            "name": "Switzerland",
+            "groupId": 7,
+            "strength": 2
+        },
+        {
+            "id": 29,
+            "name": "Denmark",
+            "groupId": 8,
+            "strength": 2
+        },
+        {
+            "id": 30,
+            "name": "Finland",
+            "groupId": 8,
+            "strength": 1
+        },
+        {
+            "id": 31,
+            "name": "Belgien",
+            "groupId": 8,
+            "strength": 2
+        },
+        {
+            "id": 32,
+            "name": "Russia",
+            "groupId": 8,
+            "strength": 2
+        },
+        {
+            "id": 33,
+            "name": "Netherlands",
+            "groupId": 9,
+            "strength": 3
+        },
+        {
+            "id": 34,
+            "name": "Ukraine",
+            "groupId": 9,
+            "strength": 1
+        },
+        {
+            "id": 35,
+            "name": "Austria",
+            "groupId": 9,
+            "strength": 2
+        },
+        {
+            "id": 36,
+            "name": "North Mazedonia",
+            "groupId": 9,
+            "strength": 1
+        },
+        {
+            "id": 37,
+            "name": "England",
+            "groupId": 10,
+            "strength": 3
+        },
+        {
+            "id": 38,
+            "name": "Croatia",
+            "groupId": 10,
+            "strength": 2
+        },
+        {
+            "id": 39,
+            "name": "Scotland",
+            "groupId": 10,
+            "strength": 2
+        },
+        {
+            "id": 40,
+            "name": "Czech Republic",
+            "groupId": 10,
+            "strength": 2
+        },
+        {
+            "id": 41,
+            "name": "Spain",
+            "groupId": 11,
+            "strength": 3
+        },
+        {
+            "id": 42,
+            "name": "Sweden",
+            "groupId": 11,
+            "strength": 2
+        },
+        {
+            "id": 43,
+            "name": "Poland",
+            "groupId": 11,
+            "strength": 2
+        },
+        {
+            "id": 44,
+            "name": "Slovakia",
+            "groupId": 11,
+            "strength": 2
+        },
+        {
+            "id": 45,
+            "name": "Hungry",
+            "groupId": 12,
+            "strength": 1
+        },
+        {
+            "id": 46,
+            "name": "Portugal",
+            "groupId": 12,
+            "strength": 3
+        },
+        {
+            "id": 47,
+            "name": "France",
+            "groupId": 12,
+            "strength": 3
+        },
+        {
+            "id": 48,
+            "name": "Germany",
+            "groupId": 12,
+            "strength": 3
+        }
+    ],
+    "matches": [
+        {
+            "id": 37,
+            "groupId": 7,
+            "team1": {
+                "id": 25,
+                "name": "Turkey",
+                "groupId": 7,
+                "strength": 2
+            },
+            "team2": {
+                "id": 26,
+                "name": "Italy",
+                "groupId": 7,
+                "strength": 3
+            }
+        },
+        {
+            "id": 38,
+            "groupId": 7,
+            "team1": {
+                "id": 27,
+                "name": "Wales",
+                "groupId": 7,
+                "strength": 1
+            },
+            "team2": {
+                "id": 28,
+                "name": "Switzerland",
+                "groupId": 7,
+                "strength": 2
+            }
+        },
+        {
+            "id": 39,
+            "groupId": 7,
+            "team1": {
+                "id": 25,
+                "name": "Turkey",
+                "groupId": 7,
+                "strength": 2
+            },
+            "team2": {
+                "id": 27,
+                "name": "Wales",
+                "groupId": 7,
+                "strength": 1
+            }
+        },
+        {
+            "id": 40,
+            "groupId": 7,
+            "team1": {
+                "id": 26,
+                "name": "Italy",
+                "groupId": 7,
+                "strength": 3
+            },
+            "team2": {
+                "id": 28,
+                "name": "Switzerland",
+                "groupId": 7,
+                "strength": 2
+            }
+        },
+        {
+            "id": 41,
+            "groupId": 7,
+            "team1": {
+                "id": 28,
+                "name": "Switzerland",
+                "groupId": 7,
+                "strength": 2
+            },
+            "team2": {
+                "id": 25,
+                "name": "Turkey",
+                "groupId": 7,
+                "strength": 2
+            }
+        },
+        {
+            "id": 42,
+            "groupId": 7,
+            "team1": {
+                "id": 26,
+                "name": "Italy",
+                "groupId": 7,
+                "strength": 3
+            },
+            "team2": {
+                "id": 27,
+                "name": "Wales",
+                "groupId": 7,
+                "strength": 1
+            }
+        },
+        {
+            "id": 43,
+            "groupId": 8,
+            "team1": {
+                "id": 29,
+                "name": "Denmark",
+                "groupId": 8,
+                "strength": 2
+            },
+            "team2": {
+                "id": 30,
+                "name": "Finland",
+                "groupId": 8,
+                "strength": 1
+            }
+        },
+        {
+            "id": 44,
+            "groupId": 8,
+            "team1": {
+                "id": 31,
+                "name": "Belgien",
+                "groupId": 8,
+                "strength": 2
+            },
+            "team2": {
+                "id": 32,
+                "name": "Russia",
+                "groupId": 8,
+                "strength": 2
+            }
+        },
+        {
+            "id": 45,
+            "groupId": 8,
+            "team1": {
+                "id": 30,
+                "name": "Finland",
+                "groupId": 8,
+                "strength": 1
+            },
+            "team2": {
+                "id": 32,
+                "name": "Russia",
+                "groupId": 8,
+                "strength": 2
+            }
+        },
+        {
+            "id": 46,
+            "groupId": 8,
+            "team1": {
+                "id": 29,
+                "name": "Denmark",
+                "groupId": 8,
+                "strength": 2
+            },
+            "team2": {
+                "id": 31,
+                "name": "Belgien",
+                "groupId": 8,
+                "strength": 2
+            }
+        },
+        {
+            "id": 47,
+            "groupId": 8,
+            "team1": {
+                "id": 32,
+                "name": "Russia",
+                "groupId": 8,
+                "strength": 2
+            },
+            "team2": {
+                "id": 29,
+                "name": "Denmark",
+                "groupId": 8,
+                "strength": 2
+            }
+        },
+        {
+            "id": 48,
+            "groupId": 8,
+            "team1": {
+                "id": 30,
+                "name": "Finland",
+                "groupId": 8,
+                "strength": 1
+            },
+            "team2": {
+                "id": 31,
+                "name": "Belgien",
+                "groupId": 8,
+                "strength": 2
+            }
+        },
+        {
+            "id": 49,
+            "groupId": 9,
+            "team1": {
+                "id": 35,
+                "name": "Austria",
+                "groupId": 9,
+                "strength": 2
+            },
+            "team2": {
+                "id": 36,
+                "name": "North Mazedonia",
+                "groupId": 9,
+                "strength": 1
+            }
+        },
+        {
+            "id": 50,
+            "groupId": 9,
+            "team1": {
+                "id": 33,
+                "name": "Netherlands",
+                "groupId": 9,
+                "strength": 3
+            },
+            "team2": {
+                "id": 34,
+                "name": "Ukraine",
+                "groupId": 9,
+                "strength": 1
+            }
+        },
+        {
+            "id": 51,
+            "groupId": 9,
+            "team1": {
+                "id": 34,
+                "name": "Ukraine",
+                "groupId": 9,
+                "strength": 1
+            },
+            "team2": {
+                "id": 36,
+                "name": "North Mazedonia",
+                "groupId": 9,
+                "strength": 1
+            }
+        },
+        {
+            "id": 52,
+            "groupId": 9,
+            "team1": {
+                "id": 33,
+                "name": "Netherlands",
+                "groupId": 9,
+                "strength": 3
+            },
+            "team2": {
+                "id": 35,
+                "name": "Austria",
+                "groupId": 9,
+                "strength": 2
+            }
+        },
+        {
+            "id": 53,
+            "groupId": 9,
+            "team1": {
+                "id": 36,
+                "name": "North Mazedonia",
+                "groupId": 9,
+                "strength": 1
+            },
+            "team2": {
+                "id": 33,
+                "name": "Netherlands",
+                "groupId": 9,
+                "strength": 3
+            }
+        },
+        {
+            "id": 54,
+            "groupId": 9,
+            "team1": {
+                "id": 34,
+                "name": "Ukraine",
+                "groupId": 9,
+                "strength": 1
+            },
+            "team2": {
+                "id": 35,
+                "name": "Austria",
+                "groupId": 9,
+                "strength": 2
+            }
+        },
+        {
+            "id": 55,
+            "groupId": 10,
+            "team1": {
+                "id": 37,
+                "name": "England",
+                "groupId": 10,
+                "strength": 3
+            },
+            "team2": {
+                "id": 38,
+                "name": "Croatia",
+                "groupId": 10,
+                "strength": 2
+            }
+        },
+        {
+            "id": 56,
+            "groupId": 10,
+            "team1": {
+                "id": 39,
+                "name": "Scotland",
+                "groupId": 10,
+                "strength": 2
+            },
+            "team2": {
+                "id": 40,
+                "name": "Czech Republic",
+                "groupId": 10,
+                "strength": 2
+            }
+        },
+        {
+            "id": 57,
+            "groupId": 10,
+            "team1": {
+                "id": 38,
+                "name": "Croatia",
+                "groupId": 10,
+                "strength": 2
+            },
+            "team2": {
+                "id": 40,
+                "name": "Czech Republic",
+                "groupId": 10,
+                "strength": 2
+            }
+        },
+        {
+            "id": 58,
+            "groupId": 10,
+            "team1": {
+                "id": 37,
+                "name": "England",
+                "groupId": 10,
+                "strength": 3
+            },
+            "team2": {
+                "id": 39,
+                "name": "Scotland",
+                "groupId": 10,
+                "strength": 2
+            }
+        },
+        {
+            "id": 59,
+            "groupId": 10,
+            "team1": {
+                "id": 38,
+                "name": "Croatia",
+                "groupId": 10,
+                "strength": 2
+            },
+            "team2": {
+                "id": 39,
+                "name": "Scotland",
+                "groupId": 10,
+                "strength": 2
+            }
+        },
+        {
+            "id": 60,
+            "groupId": 10,
+            "team1": {
+                "id": 40,
+                "name": "Czech Republic",
+                "groupId": 10,
+                "strength": 2
+            },
+            "team2": {
+                "id": 37,
+                "name": "England",
+                "groupId": 10,
+                "strength": 3
+            }
+        },
+        {
+            "id": 61,
+            "groupId": 11,
+            "team1": {
+                "id": 43,
+                "name": "Poland",
+                "groupId": 11,
+                "strength": 2
+            },
+            "team2": {
+                "id": 44,
+                "name": "Slovakia",
+                "groupId": 11,
+                "strength": 2
+            }
+        },
+        {
+            "id": 62,
+            "groupId": 11,
+            "team1": {
+                "id": 41,
+                "name": "Spain",
+                "groupId": 11,
+                "strength": 3
+            },
+            "team2": {
+                "id": 42,
+                "name": "Sweden",
+                "groupId": 11,
+                "strength": 2
+            }
+        },
+        {
+            "id": 63,
+            "groupId": 11,
+            "team1": {
+                "id": 42,
+                "name": "Sweden",
+                "groupId": 11,
+                "strength": 2
+            },
+            "team2": {
+                "id": 44,
+                "name": "Slovakia",
+                "groupId": 11,
+                "strength": 2
+            }
+        },
+        {
+            "id": 64,
+            "groupId": 11,
+            "team1": {
+                "id": 41,
+                "name": "Spain",
+                "groupId": 11,
+                "strength": 3
+            },
+            "team2": {
+                "id": 43,
+                "name": "Poland",
+                "groupId": 11,
+                "strength": 2
+            }
+        },
+        {
+            "id": 65,
+            "groupId": 11,
+            "team1": {
+                "id": 44,
+                "name": "Slovakia",
+                "groupId": 11,
+                "strength": 2
+            },
+            "team2": {
+                "id": 41,
+                "name": "Spain",
+                "groupId": 11,
+                "strength": 3
+            }
+        },
+        {
+            "id": 66,
+            "groupId": 11,
+            "team1": {
+                "id": 42,
+                "name": "Sweden",
+                "groupId": 11,
+                "strength": 2
+            },
+            "team2": {
+                "id": 43,
+                "name": "Poland",
+                "groupId": 11,
+                "strength": 2
+            }
+        },
+        {
+            "id": 67,
+            "groupId": 12,
+            "team1": {
+                "id": 45,
+                "name": "Hungry",
+                "groupId": 12,
+                "strength": 1
+            },
+            "team2": {
+                "id": 46,
+                "name": "Portugal",
+                "groupId": 12,
+                "strength": 3
+            }
+        },
+        {
+            "id": 68,
+            "groupId": 12,
+            "team1": {
+                "id": 47,
+                "name": "France",
+                "groupId": 12,
+                "strength": 3
+            },
+            "team2": {
+                "id": 48,
+                "name": "Germany",
+                "groupId": 12,
+                "strength": 3
+            }
+        },
+        {
+            "id": 69,
+            "groupId": 12,
+            "team1": {
+                "id": 45,
+                "name": "Hungry",
+                "groupId": 12,
+                "strength": 1
+            },
+            "team2": {
+                "id": 47,
+                "name": "France",
+                "groupId": 12,
+                "strength": 3
+            }
+        },
+        {
+            "id": 70,
+            "groupId": 12,
+            "team1": {
+                "id": 46,
+                "name": "Portugal",
+                "groupId": 12,
+                "strength": 3
+            },
+            "team2": {
+                "id": 48,
+                "name": "Germany",
+                "groupId": 12,
+                "strength": 3
+            }
+        },
+        {
+            "id": 71,
+            "groupId": 12,
+            "team1": {
+                "id": 46,
+                "name": "Portugal",
+                "groupId": 12,
+                "strength": 3
+            },
+            "team2": {
+                "id": 47,
+                "name": "France",
+                "groupId": 12,
+                "strength": 3
+            }
+        },
+        {
+            "id": 72,
+            "groupId": 12,
+            "team1": {
+                "id": 48,
+                "name": "Germany",
+                "groupId": 12,
+                "strength": 3
+            },
+            "team2": {
+                "id": 45,
+                "name": "Hungry",
+                "groupId": 12,
+                "strength": 1
+            }
+        }
+    ],
+    "matchResults": null,
+    "groupRankings": null,
+    "koMatches": null
+}

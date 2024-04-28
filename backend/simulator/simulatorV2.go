@@ -5,7 +5,7 @@ import (
 	"sort"
 )
 
-func TournamentSimulator2(tournament Tournament) {
+func TournamentSimulator2(tournament Tournament) Tournament {
 	fmt.Println("Start")
 
 	// group matches are played and results are stored in matchResults
@@ -13,7 +13,9 @@ func TournamentSimulator2(tournament Tournament) {
 	tournament.MatchResults = matchResults
 
 	// matchResults are evaluated and groupRankings are determined
-	groupRankings := determineGroupRanking2(matchResults, tournament)
+	groupPhaseGroups := filterByGroupPhase(tournament.Groups)
+	teamsSortedIntoGroups := getTeamsSortedIntoGroups(tournament.Teams)
+	groupRankings := determineGroupRanking2(matchResults, teamsSortedIntoGroups, groupPhaseGroups)
 	tournament.GroupRankings = groupRankings
 
 	// group of thirds is created and added to the tournament
@@ -27,6 +29,8 @@ func TournamentSimulator2(tournament Tournament) {
 
 	winner := playKoRounds(tournament)
 	fmt.Println("Winner of the tournament is", winner.Name)
+
+	return tournament
 
 }
 
@@ -89,7 +93,7 @@ func playGroupMatch2(match Match2, matchResultChannel chan MatchResult) {
 	matchResultChannel <- result
 }
 
-func determineGroupRanking2(matchResults []MatchResult, tournament Tournament) []GroupRanking {
+func determineGroupRanking2(matchResults []MatchResult, teamsSortedIntoGroups map[int][]Team, groups []Group2) []GroupRanking {
 	var teamPoints = make(map[int]int) // teamId -> points
 	var teamGoals = make(map[int]int)  // teamId -> goals
 	var groupRankings = make([]GroupRanking, 0)
@@ -102,10 +106,7 @@ func determineGroupRanking2(matchResults []MatchResult, tournament Tournament) [
 		teamGoals[matchResult.Match.Team2.Id] += matchResult.Team2Goals
 	}
 
-	teamsSortedIntoGroups := getTeamsSortedIntoGroups(tournament.Teams)
-
-	groupPhaseGroups := filterByGroupPhase(tournament.Groups)
-	for _, group := range groupPhaseGroups {
+	for _, group := range groups {
 		sortedTeams := determineRankingPerGroup(
 			group.Id,
 			teamsSortedIntoGroups[group.Id],
@@ -240,11 +241,17 @@ func playKoRounds(tournament Tournament) Team {
 	koMatchMap := mapKoMatchesToGroups(tournament.KoMatches)
 	koGroups := filterByKoRound(tournament.Groups)
 	for _, koGroup := range koGroups {
+		fmt.Println("Playing Ko Group", koGroup.Name)
 		koMatches := koMatchMap[koGroup.Id]
-		matchResults := playKoGroupsMatches(koGroup, koMatches, tournament.GroupRankings)
+		rankingsSortedIntoGroups := getRankingsSortedIntoGroups(tournament.GroupRankings)
+		matches := CreateMatchFromKoMatch(koMatches, rankingsSortedIntoGroups)
+		matchResults := playKoGroupsMatches(matches)
 		tournament.MatchResults = append(tournament.MatchResults, matchResults...)
 
-		groupRankings := determineGroupRanking2(matchResults, tournament)
+		teamsInGroup := GetTeamsFromMatches(matches)
+		teamsMap := make(map[int][]Team)
+		teamsMap[koGroup.Id] = teamsInGroup
+		groupRankings := determineGroupRanking2(matchResults, teamsMap, []Group2{koGroup})
 		tournament.GroupRankings = append(tournament.GroupRankings, groupRankings...)
 	}
 
@@ -254,10 +261,37 @@ func playKoRounds(tournament Tournament) Team {
 	return winner
 }
 
-func playKoGroupsMatches(koGroup Group2, koMatches []KoMatch, groupRankings []GroupRanking) []MatchResult {
-	fmt.Println("Playing Ko Group", koGroup.Name)
+func mapKoMatchesToGroups(koMatches []KoMatch) map[int][]KoMatch {
+	var koMatchesMappedToGroups = make(map[int][]KoMatch) // groupId -> koMatches
+	for _, koMatch := range koMatches {
+		koMatchesMappedToGroups[koMatch.GroupId] = append(koMatchesMappedToGroups[koMatch.GroupId], koMatch)
+	}
+	return koMatchesMappedToGroups
+}
+
+func CreateMatchFromKoMatch(koMatches []KoMatch, rankingsSortedIntoGroups map[int][]GroupRanking) []Match2 {
+	matches := make([]Match2, 0)
+	for _, koMatch := range koMatches {
+		team1GroupRankings := rankingsSortedIntoGroups[koMatch.GroupId1]
+		team2GroupRankings := rankingsSortedIntoGroups[koMatch.GroupId2]
+		if len(team1GroupRankings) < koMatch.Ranking1 || len(team2GroupRankings) < koMatch.Ranking2 {
+			error_string := "Error: Not enough teams in group to create match. Error for KoMatch with id: " + fmt.Sprint(koMatch.Id)
+			panic(error_string)
+		}
+
+		match := Match2{
+			Id:      getNextMatchId(matches),
+			Team1:   team1GroupRankings[koMatch.Ranking1-1].Team,
+			Team2:   team2GroupRankings[koMatch.Ranking2-1].Team,
+			GroupId: koMatch.GroupId,
+		}
+		matches = append(matches, match)
+	}
+	return matches
+}
+
+func playKoGroupsMatches(matches []Match2) []MatchResult {
 	var matchResults []MatchResult
-	matches := createMatchFromKoMatch(koMatches, groupRankings)
 	matchResultChannel := make(chan MatchResult, len(matches))
 	numberOfMatches := len(matches)
 	pointsForWinner := numberOfMatches // maybe not a good solution as it ignores the match setup defined in the DB, need to check
@@ -272,29 +306,6 @@ func playKoGroupsMatches(koGroup Group2, koMatches []KoMatch, groupRankings []Gr
 	}
 
 	return matchResults
-
-}
-
-func mapKoMatchesToGroups(koMatches []KoMatch) map[int][]KoMatch {
-	var koMatchesMappedToGroups = make(map[int][]KoMatch) // groupId -> koMatches
-	for _, koMatch := range koMatches {
-		koMatchesMappedToGroups[koMatch.GroupId] = append(koMatchesMappedToGroups[koMatch.GroupId], koMatch)
-	}
-	return koMatchesMappedToGroups
-}
-
-func createMatchFromKoMatch(koMatches []KoMatch, groupRankings []GroupRanking) []Match2 {
-	matches := make([]Match2, 0)
-	rankingsSortedIntoGroups := getRankingsSortedIntoGroups(groupRankings)
-	for _, koMatch := range koMatches {
-		match := Match2{
-			Id:    getNextMatchId(matches),
-			Team1: rankingsSortedIntoGroups[koMatch.Group1.Id][koMatch.ranking1-1].Team,
-			Team2: rankingsSortedIntoGroups[koMatch.Group2.Id][koMatch.ranking2-1].Team,
-		}
-		matches = append(matches, match)
-	}
-	return matches
 
 }
 
@@ -371,13 +382,21 @@ func playEliminationMatch2(match Match2, pointsForWinner int, matchResultChannel
 	matchResultChannel <- result
 }
 
+func GetTeamsFromMatches(matches []Match2) []Team {
+	teams := make([]Team, 0)
+	for _, match := range matches {
+		teams = append(teams, match.Team1, match.Team2)
+	}
+	return teams
+}
+
 func determineWinner2(finalGroupId int, groupRankings []GroupRanking) Team {
 	rankingsSortedIntoGroups := getRankingsSortedIntoGroups(groupRankings)
 	finalRankings := rankingsSortedIntoGroups[finalGroupId]
 	winner := finalRankings[0].Team
 
 	if len(finalRankings) != 2 {
-		fmt.Println("Error: Final group does not have 2 teams")
+		panic("Error: Final group does not have 2 teams")
 	}
 
 	return winner

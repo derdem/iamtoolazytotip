@@ -40,8 +40,8 @@ CREATE TABLE IF NOT EXISTS match_results (
     team1_penalty_goals INT DEFAULT NULL,
     team2_goals INT NOT NULL,
     team2_penalty_goals INT DEFAULT NULL,
-    FOREIGN KEY (match_id) REFERENCES matches(id)
-    UNIQUE (match_id)
+    FOREIGN KEY (match_id) REFERENCES matches(id),
+    UNIQUE(match_id)
 );
 
 CREATE TABLE IF NOT EXISTS group_rankings (
@@ -50,8 +50,8 @@ CREATE TABLE IF NOT EXISTS group_rankings (
     team_id INT NOT NULL,
     ranking INT NOT NULL,
     FOREIGN KEY (group_id) REFERENCES groups(id),
-    FOREIGN KEY (team_id) REFERENCES teams(id)
-    UNIQUE (group_id, team_id)
+    FOREIGN KEY (team_id) REFERENCES teams(id),
+    UNIQUE(group_id, team_id)
 );
 
 

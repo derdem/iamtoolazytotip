@@ -60,6 +60,7 @@ func ConvertTournamentDbToModel(tournamentDb TournamentDb) simulator.Tournament 
 			Id:           groupDb.Id,
 			Name:         groupDb.Name,
 			TournamentId: groupDb.TournamentId,
+			GroupType:    simulator.GroupType(groupDb.GroupType),
 		})
 	}
 
@@ -88,12 +89,25 @@ func ConvertTournamentDbToModel(tournamentDb TournamentDb) simulator.Tournament 
 		})
 	}
 
+	var koMatches []simulator.KoMatch
+	for _, koMatch := range tournamentDb.KoMatches {
+		koMatches = append(koMatches, simulator.KoMatch{
+			Id:       koMatch.Id,
+			GroupId:  koMatch.GroupId,
+			GroupId1: koMatch.GroupId1,
+			GroupId2: koMatch.GroupId2,
+			Ranking1: koMatch.Ranking1,
+			Ranking2: koMatch.Ranking2,
+		})
+	}
+
 	return simulator.Tournament{
-		Id:      tournamentDb.Id,
-		Name:    tournamentDb.Name,
-		Groups:  groups,
-		Teams:   teams,
-		Matches: matches,
+		Id:        tournamentDb.Id,
+		Name:      tournamentDb.Name,
+		Groups:    groups,
+		Teams:     teams,
+		Matches:   matches,
+		KoMatches: koMatches,
 	}
 
 }
@@ -104,17 +118,19 @@ func ReadTournament(tournament_id int) TournamentDb {
 	PanicAtError(err)
 	id, name := readTournament(tx, tournament_id)
 	groups := readGroups(tx, tournament_id)
-	group_ids := getGroupIds(groups)
-	teams := readTeams(tx, group_ids)
-	matches := readMatches(tx, group_ids)
+	group_ids := getGroupIdsMap(groups)
+	teams := readTeams(tx, group_ids[simulator.GroupPhaseGroupType])
+	matches := readMatches(tx, group_ids[simulator.GroupPhaseGroupType])
+	koMatches := readKoMatches(tx, group_ids[simulator.KoPhaseGroupType])
 	tx.Rollback()
 
 	return TournamentDb{
-		Id:      id,
-		Name:    name,
-		Groups:  groups,
-		Teams:   teams,
-		Matches: matches,
+		Id:        id,
+		Name:      name,
+		Groups:    groups,
+		Teams:     teams,
+		Matches:   matches,
+		KoMatches: koMatches,
 	}
 }
 
@@ -144,6 +160,7 @@ func readGroups(tx *pgx.Tx, tournament_id int) []GroupLightDb {
 			&group.Id,
 			&group.Name,
 			&group.TournamentId,
+			&group.GroupType,
 		)
 		PanicAtError(err)
 		groups = append(groups, group)
@@ -152,10 +169,10 @@ func readGroups(tx *pgx.Tx, tournament_id int) []GroupLightDb {
 	return groups
 }
 
-func getGroupIds(groups []GroupLightDb) []int {
-	groupIds := make([]int, len(groups))
-	for i, group := range groups {
-		groupIds[i] = group.Id
+func getGroupIdsMap(groups []GroupLightDb) map[simulator.GroupType][]int {
+	groupIds := make(map[simulator.GroupType][]int, len(groups))
+	for _, group := range groups {
+		groupIds[group.GroupType] = append(groupIds[group.GroupType], group.Id)
 	}
 	return groupIds
 }
@@ -200,6 +217,32 @@ func readMatches(tx *pgx.Tx, group_ids []int) []MatchDb {
 			&match.GroupId,
 			&match.Team1Id,
 			&match.Team2Id,
+		)
+		PanicAtError(err)
+		matches = append(matches, match)
+	}
+
+	return matches
+}
+
+func readKoMatches(tx *pgx.Tx, group_ids []int) []KoMatchDb {
+	matchRows, err := tx.Query(`
+        SELECT id, group_id, group_id1, group_id2, ranking1, ranking2
+        FROM ko_matches WHERE group_id = ANY($1);
+    `, group_ids)
+	PanicAtError(err)
+	defer matchRows.Close()
+
+	var matches []KoMatchDb
+	for matchRows.Next() {
+		var match KoMatchDb
+		err := matchRows.Scan(
+			&match.Id,
+			&match.GroupId,
+			&match.GroupId1,
+			&match.GroupId2,
+			&match.Ranking1,
+			&match.Ranking2,
 		)
 		PanicAtError(err)
 		matches = append(matches, match)

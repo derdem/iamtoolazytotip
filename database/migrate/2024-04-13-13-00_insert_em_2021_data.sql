@@ -1,12 +1,12 @@
 -- Description: Insert data for Test tournament
 INSERT INTO tournaments (id, name) VALUES (1, 'Test tournament');
 
-INSERT INTO groups (id, name, tournament_id) VALUES (1, 'A', 1);
-INSERT INTO groups (id, name, tournament_id) VALUES (2, 'B', 1);
-INSERT INTO groups (id, name, tournament_id) VALUES (3, 'C', 1);
-INSERT INTO groups (id, name, tournament_id) VALUES (4, 'D', 1);
-INSERT INTO groups (id, name, tournament_id) VALUES (5, 'E', 1);
-INSERT INTO groups (id, name, tournament_id) VALUES (6, 'F', 1);
+INSERT INTO groups (id, name, tournament_id, group_type) VALUES (1, 'A', 1, 'group_phase');
+INSERT INTO groups (id, name, tournament_id, group_type) VALUES (2, 'B', 1, 'group_phase');
+INSERT INTO groups (id, name, tournament_id, group_type) VALUES (3, 'C', 1, 'group_phase');
+INSERT INTO groups (id, name, tournament_id, group_type) VALUES (4, 'D', 1, 'group_phase');
+INSERT INTO groups (id, name, tournament_id, group_type) VALUES (5, 'E', 1, 'group_phase');
+INSERT INTO groups (id, name, tournament_id, group_type) VALUES (6, 'F', 1, 'group_phase');
 
 INSERT INTO teams (id, name, strength, group_id) VALUES (1, 'team1', 'low', 1);
 INSERT INTO teams (id, name, strength, group_id) VALUES (2, 'team2', 'low', 1);
