@@ -175,11 +175,11 @@ INSERT INTO groups (id, name, tournament_id, group_type) VALUES (16, 'Final', 2,
 -- GROUP Round 16 matches
 INSERT INTO ko_matches (id, group_id, group_id1, group_id2, ranking1, ranking2) VALUES (1, 13,  8, NULL, 1, 3); -- B1 vs *3
 INSERT INTO ko_matches (id, group_id, group_id1, group_id2, ranking1, ranking2) VALUES (2, 13,  7, 9,  1, 2); -- A1 vs C2
-INSERT INTO ko_matches (id, group_id, group_id1, group_id2, ranking1, ranking2) VALUES (3, 13, 12, NULL,  1, 3); -- F1 vs *3
+INSERT INTO ko_matches (id, group_id, group_id1, group_id2, ranking1, ranking2) VALUES (3, 13,  9, NULL,  1, 3); -- C1 vs *3
 INSERT INTO ko_matches (id, group_id, group_id1, group_id2, ranking1, ranking2) VALUES (4, 13, 10, 11, 2, 2); -- D2 vs E2
 INSERT INTO ko_matches (id, group_id, group_id1, group_id2, ranking1, ranking2) VALUES (5, 13, 11, NULL,  1, 3); -- E1 vs *3
 INSERT INTO ko_matches (id, group_id, group_id1, group_id2, ranking1, ranking2) VALUES (6, 13, 10, 12, 1, 2); -- D1 vs F2
-INSERT INTO ko_matches (id, group_id, group_id1, group_id2, ranking1, ranking2) VALUES (7, 13,  9, NULL, 1, 3); -- C1 vs *3
+INSERT INTO ko_matches (id, group_id, group_id1, group_id2, ranking1, ranking2) VALUES (7, 13, 12, NULL, 1, 3); -- F1 vs *3
 INSERT INTO ko_matches (id, group_id, group_id1, group_id2, ranking1, ranking2) VALUES (8, 13,  7, 8,  2, 2); -- A2 vs B2
 
 -- GROUP Quarterfinals matches

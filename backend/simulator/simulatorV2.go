@@ -184,20 +184,28 @@ func sortTeamsByPointsAndGoals(teams []Team, teamPoints map[int]int, teamGoals m
 	return teams
 }
 
-func determineRankingOfThirds(rankings []GroupRanking, groupId int) []GroupRanking {
-	thirds := make([]Team, 0)
-	var teamPoints = make(map[int]int) // teamId -> points
-	var teamGoals = make(map[int]int)  // teamId -> goals
+func sortRankingsByPointsAndGoals(rankings []GroupRanking) []GroupRanking {
+	sortedRankings := make([]GroupRanking, len(rankings))
+	copy(sortedRankings, rankings)
+	sort.Slice(sortedRankings, func(i, j int) bool {
+		if sortedRankings[i].Points == sortedRankings[j].Points {
+			return sortedRankings[i].Goals > sortedRankings[j].Goals
+		}
+		return sortedRankings[i].Points > sortedRankings[j].Points
+	})
+	return sortedRankings
+}
+
+func RankingOfThirds(rankings []GroupRanking) []GroupRanking {
+	rankingThirds := make([]GroupRanking, 0)
+
 	for _, ranking := range rankings {
 		if ranking.Ranking == 3 {
-			third := ranking.Team
-			teamPoints[ranking.Team.Id] += ranking.Points
-			teamGoals[ranking.Team.Id] += ranking.Goals
-			thirds = append(thirds, third)
+			rankingThirds = append(rankingThirds, ranking)
 		}
 	}
 
-	return determineRankingPerGroup(groupId, thirds, teamPoints, teamGoals)
+	return rankingThirds
 }
 
 func createGroupOfThirds(groups []Group2, tournamentId int) Group2 {
@@ -243,8 +251,8 @@ func UpdateKoMatchesWithThirds(tournament Tournament) []KoMatch {
 	koMatches := tournament.KoMatches
 	groupRankings := tournament.GroupRankings
 
-	groupOfThirds := createGroupOfThirds(tournament.Groups, tournament.Id)
-	rankingOfThirds := determineRankingOfThirds(groupRankings, groupOfThirds.Id)
+	rankingThirds := RankingOfThirds(groupRankings)
+	sortedRankingThirds := sortRankingsByPointsAndGoals(rankingThirds)
 
 	var firstKoGroupId int
 	for _, group := range tournament.Groups {
@@ -297,25 +305,25 @@ func UpdateKoMatchesWithThirds(tournament Tournament) []KoMatch {
 	}
 
 	totalWeight := 0
-	for index, rankingOfThird := range rankingOfThirds {
-		if index == 5 {
+	for index, rankingOfThird := range sortedRankingThirds {
+		if index == 4 {
 			break
 		}
 		totalWeight += groupIdWeight[GroupId(rankingOfThird.GroupId)]
 	}
 
-	rankingOfThirdPattern := Best4WithRanking3Pattern(weight)
+	rankingOfThirdPattern := Best4WithRanking3Pattern(totalWeight)
 
 	updatesKoMatches := make([]KoMatch, 0)
 	updatedKoMatchIndex := 0
 	numberFirstKoGroupMatches := 0
 	for _, koMatch := range koMatches {
-		if koMatch.GroupId == 0 {
+		if koMatch.GroupId1 == 0 {
 			panic("Error: GroupId1 is unspecified for KoMatch with Id " + fmt.Sprint(koMatch.Id))
 		}
 		if koMatch.GroupId2 == 0 {
 			rankingOfThirdIndex := rankingOfThirdPattern[updatedKoMatchIndex]
-			rankingOfThird := rankingOfThirds[rankingOfThirdIndex]
+			rankingOfThird := rankingThirds[rankingOfThirdIndex]
 			koMatch.GroupId2 = rankingOfThird.GroupId
 			updatedKoMatchIndex++
 		}
@@ -335,21 +343,21 @@ func UpdateKoMatchesWithThirds(tournament Tournament) []KoMatch {
 
 func Best4WithRanking3Pattern(weight int) [4]int {
 	pattern := map[int][4]int{
-		15: {0, 3, 1, 2}, // X X X X 0  0  => 15
-		23: {0, 4, 1, 2}, // X X X 0 X  0  => 23
-		39: {0, 5, 1, 2}, // X X X 0 0  X  => 39
-		27: {3, 4, 0, 1}, // X X 0 X X  0  => 27
-		43: {3, 5, 0, 1}, // X X 0 X 0  X  => 43
-		51: {4, 5, 1, 0}, // X X 0 0 X  X  => 51
-		29: {4, 3, 2, 0}, // X 0 X X X  0  => 29
-		45: {5, 3, 2, 0}, // X 0 X X 0  X  => 45
-		53: {4, 5, 2, 0}, // X 0 X 0 X  X  => 53
-		57: {4, 5, 3, 0}, // X 0 0 X X  X  => 57
-		30: {4, 3, 1, 2}, // 0 X X X X  0  => 30
-		46: {5, 3, 2, 1}, // 0 X X X 0  X  => 46
-		54: {5, 4, 2, 1}, // 0 X X 0 X  X  => 54
-		58: {5, 4, 3, 1}, // 0 X 0 X X  X  => 58
-		60: {5, 4, 3, 2}, // 0 0 X X X  X  => 60
+		15: {0, 3, 1, 2}, // X X X X 0 0  => 1 + 2 + 4  + 8  = 15
+		23: {0, 4, 1, 2}, // X X X 0 X 0  => 1 + 2 + 4  + 16 = 23
+		39: {0, 5, 1, 2}, // X X X 0 0 X  => 1 + 2 + 4  + 32 = 39
+		27: {3, 4, 0, 1}, // X X 0 X X 0  => 1 + 2 + 8  + 16 = 27
+		43: {3, 5, 0, 1}, // X X 0 X 0 X  => 1 + 2 + 8  + 32 = 43
+		51: {4, 5, 1, 0}, // X X 0 0 X X  => 1 + 2 + 16 + 32 = 51
+		29: {4, 3, 2, 0}, // X 0 X X X 0  => 1 + 4 + 8  + 16 = 29
+		45: {5, 3, 2, 0}, // X 0 X X 0 X  => 1 + 4 + 8  + 32 = 45
+		53: {4, 5, 2, 0}, // X 0 X 0 X X  => 1 + 4 + 16 + 32 = 53
+		57: {4, 5, 3, 0}, // X 0 0 X X X  => 1 + 8 + 16 + 32 = 57
+		30: {4, 3, 1, 2}, // 0 X X X X 0  => 2 + 4 + 8  + 16 = 30
+		46: {5, 3, 2, 1}, // 0 X X X 0 X  => 2 + 4 + 8  + 32 = 46
+		54: {5, 4, 2, 1}, // 0 X X 0 X X  => 2 + 4 + 16 + 32 = 54
+		58: {5, 4, 3, 1}, // 0 X 0 X X X  => 2 + 8 + 16 + 32 = 58
+		60: {5, 4, 3, 2}, // 0 0 X X X X  => 4 + 8 + 16 + 32 = 60
 	}
 
 	return pattern[weight]

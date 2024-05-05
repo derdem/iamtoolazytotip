@@ -58,8 +58,8 @@ CREATE TABLE IF NOT EXISTS group_rankings (
 CREATE TABLE IF NOT EXISTS ko_matches (
     id SERIAL PRIMARY KEY,
     group_id INT NOT NULL,
-    group_id1 INT NOT NULL,
-    group_id2 INT NOT NULL,
+    group_id1 INT, -- can be null when the value depends on the outcome of previous matches
+    group_id2 INT, -- can be null when the value depends on the outcome of previous matches
     ranking1 INT NOT NULL,
     ranking2 INT NOT NULL,
     FOREIGN KEY (group_id) REFERENCES groups(id),

@@ -73,6 +73,7 @@ func TestRunFullTournament(t *testing.T) {
 	if len(tournament.GroupRankings) != 30 {
 		t.Errorf("Expected 30 group rankings, got %v", tournament.GroupRankings)
 	}
+
 }
 
 func TestUpdateKoMatchesWithThirds(t *testing.T) {

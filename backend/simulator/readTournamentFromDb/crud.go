@@ -227,7 +227,7 @@ func readMatches(tx *pgx.Tx, group_ids []int) []MatchDb {
 
 func readKoMatches(tx *pgx.Tx, group_ids []int) []KoMatchDb {
 	matchRows, err := tx.Query(`
-        SELECT id, group_id, group_id1, group_id2, ranking1, ranking2
+        SELECT id, group_id, COALESCE(group_id1, 0), COALESCE(group_id2, 0), ranking1, ranking2
         FROM ko_matches WHERE group_id = ANY($1);
     `, group_ids)
 	PanicAtError(err)

@@ -794,7 +794,7 @@
             "id": 1,
             "group_id": 13,
             "group_id1": 8,
-            "group_id2": 12,
+            "group_id2": 0,
             "ranking1": 1,
             "ranking2": 3
         },
@@ -809,8 +809,8 @@
         {
             "id": 3,
             "group_id": 13,
-            "group_id1": 12,
-            "group_id2": 7,
+            "group_id1": 9,
+            "group_id2": 0,
             "ranking1": 1,
             "ranking2": 3
         },
@@ -826,7 +826,7 @@
             "id": 5,
             "group_id": 13,
             "group_id1": 11,
-            "group_id2": 9,
+            "group_id2": 0,
             "ranking1": 1,
             "ranking2": 3
         },
@@ -841,8 +841,8 @@
         {
             "id": 7,
             "group_id": 13,
-            "group_id1": 9,
-            "group_id2": 10,
+            "group_id1": 12,
+            "group_id2": 0,
             "ranking1": 1,
             "ranking2": 3
         },
