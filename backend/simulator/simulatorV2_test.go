@@ -75,6 +75,33 @@ func TestRunFullTournament(t *testing.T) {
 	}
 }
 
+func TestUpdateKoMatchesWithThirds(t *testing.T) {
+	tournament := simulator.ReadTournamentFromFile("../dumps/tournament2.json")
+
+	matchResults := simulator.PlayGroupMatches(tournament)
+	tournament.MatchResults = matchResults
+
+	// matchResults are evaluated and groupRankings are determined
+	groupPhaseGroups := simulator.FilterByGroupPhase(tournament.Groups)
+	teamsSortedIntoGroups := simulator.GetTeamsSortedIntoGroups(tournament.Teams)
+	groupRankings := simulator.DetermineGroupRanking2(matchResults, teamsSortedIntoGroups, groupPhaseGroups)
+	tournament.GroupRankings = groupRankings
+
+	// Ko matches are updated with the third placed teams
+	updatedKoMatches := simulator.UpdateKoMatchesWithThirds(tournament)
+
+	koMatchesWithThirds := make([]simulator.KoMatch, 0)
+	for _, match := range updatedKoMatches {
+		if match.Ranking2 == 3 {
+			koMatchesWithThirds = append(koMatchesWithThirds, match)
+		}
+	}
+
+	if len(koMatchesWithThirds) != 4 {
+		t.Errorf("Expected 4 ko matches with thirds, got %v", len(koMatchesWithThirds))
+	}
+}
+
 func TestPlayKoRounds_HappyCase(t *testing.T) {
 	tournamentId := 1
 	groupRankings := []simulator.GroupRanking{

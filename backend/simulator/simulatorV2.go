@@ -15,26 +15,19 @@ func TournamentSimulator2(tournament Tournament) Tournament {
 	fmt.Println("Start")
 
 	// group matches are played and results are stored in matchResults
-	matchResults := playGroupMatches(tournament)
+	matchResults := PlayGroupMatches(tournament)
 	tournament.MatchResults = matchResults
 
 	// matchResults are evaluated and groupRankings are determined
-	groupPhaseGroups := filterByGroupPhase(tournament.Groups)
-	teamsSortedIntoGroups := getTeamsSortedIntoGroups(tournament.Teams)
-	groupRankings := determineGroupRanking2(matchResults, teamsSortedIntoGroups, groupPhaseGroups)
+	groupPhaseGroups := FilterByGroupPhase(tournament.Groups)
+	teamsSortedIntoGroups := GetTeamsSortedIntoGroups(tournament.Teams)
+	groupRankings := DetermineGroupRanking2(matchResults, teamsSortedIntoGroups, groupPhaseGroups)
 	tournament.GroupRankings = groupRankings
 
-	// group of thirds is created and added to the tournament
-	// This group is a help to setup the round of 16
-	groupOfThirds := createGroupOfThirds(tournament.Groups, tournament.Id)
-	// update round of 16 matches with the group of thirds
-	tournament.Groups = append(tournament.Groups, groupOfThirds)
-	// third teams are determined and added to the groupRankings
-	rankingOfThirds := determineRankingOfThirds(groupRankings, groupOfThirds.Id)
-	tournament.GroupRankings = append(tournament.GroupRankings, rankingOfThirds...)
+	// update ko matches with the group of thirds
+	updatedKoMatches := UpdateKoMatchesWithThirds(tournament)
 
-	// update round of 16 matches with the group of thirds
-	UpdateFirstKoRoundWithGroupOfThirds(tournament)
+	tournament.KoMatches = updatedKoMatches
 
 	winner := PlayKoRounds(tournament)
 	fmt.Println("Winner of the tournament is", winner.Name)
@@ -43,7 +36,7 @@ func TournamentSimulator2(tournament Tournament) Tournament {
 
 }
 
-func playGroupMatches(tournament Tournament) []MatchResult {
+func PlayGroupMatches(tournament Tournament) []MatchResult {
 	groupMatchResults := make([]MatchResult, 0)
 	matchResultChannel := make(chan MatchResult, len(tournament.Matches))
 
@@ -102,7 +95,7 @@ func playGroupMatch2(match Match2, matchResultChannel chan MatchResult) {
 	matchResultChannel <- result
 }
 
-func determineGroupRanking2(matchResults []MatchResult, teamsSortedIntoGroups map[int][]Team, groups []Group2) []GroupRanking {
+func DetermineGroupRanking2(matchResults []MatchResult, teamsSortedIntoGroups map[int][]Team, groups []Group2) []GroupRanking {
 	var teamPoints = make(map[int]int) // teamId -> points
 	var teamGoals = make(map[int]int)  // teamId -> goals
 	var groupRankings = make([]GroupRanking, 0)
@@ -130,7 +123,7 @@ func determineGroupRanking2(matchResults []MatchResult, teamsSortedIntoGroups ma
 
 }
 
-func filterGroup(groupType GroupType) func(groups []Group2) []Group2 {
+func FilterGroup(groupType GroupType) func(groups []Group2) []Group2 {
 	return func(groups []Group2) []Group2 {
 		filteredGroups := make([]Group2, 0)
 		for _, group := range groups {
@@ -142,10 +135,10 @@ func filterGroup(groupType GroupType) func(groups []Group2) []Group2 {
 	}
 }
 
-var filterByGroupPhase = filterGroup(GroupPhaseGroupType)
-var filterByKoRound = filterGroup(KoPhaseGroupType)
+var FilterByGroupPhase = FilterGroup(GroupPhaseGroupType)
+var FilterByKoRound = FilterGroup(KoPhaseGroupType)
 
-func getTeamsSortedIntoGroups(teams []Team) map[int][]Team {
+func GetTeamsSortedIntoGroups(teams []Team) map[int][]Team {
 	var teamsSortedIntoGroups = make(map[int][]Team) // groupId -> teams
 	for _, team := range teams {
 		teamsSortedIntoGroups[team.GroupId] = append(teamsSortedIntoGroups[team.GroupId], team)
@@ -246,7 +239,7 @@ func getNextMatchId(matches []Match2) int {
 	return getHighestMatchId(matches) + 1
 }
 
-func UpdateFirstKoRoundWithGroupOfThirds(tournament Tournament) []KoMatch {
+func UpdateKoMatchesWithThirds(tournament Tournament) []KoMatch {
 	koMatches := tournament.KoMatches
 	groupRankings := tournament.GroupRankings
 
@@ -326,7 +319,7 @@ func UpdateFirstKoRoundWithGroupOfThirds(tournament Tournament) []KoMatch {
 			koMatch.GroupId2 = rankingOfThird.GroupId
 			updatedKoMatchIndex++
 		}
-		if koMatch.GroupId1 == firstKoGroupId {
+		if koMatch.GroupId == firstKoGroupId {
 			numberFirstKoGroupMatches++
 		}
 
@@ -364,7 +357,7 @@ func Best4WithRanking3Pattern(weight int) [4]int {
 
 func PlayKoRounds(tournament Tournament) Team {
 	koMatchMap := MapKoMatchesToGroups(tournament.KoMatches)
-	koGroups := filterByKoRound(tournament.Groups)
+	koGroups := FilterByKoRound(tournament.Groups)
 	for _, koGroup := range koGroups {
 		fmt.Println("Playing Ko Group", koGroup.Name)
 		koMatches := koMatchMap[koGroup.Id]
@@ -379,7 +372,7 @@ func PlayKoRounds(tournament Tournament) Team {
 		teamsInGroup := GetTeamsFromMatches(matches)
 		teamsMap := make(map[int][]Team)
 		teamsMap[koGroup.Id] = teamsInGroup
-		groupRankings := determineGroupRanking2(matchResults, teamsMap, []Group2{koGroup})
+		groupRankings := DetermineGroupRanking2(matchResults, teamsMap, []Group2{koGroup})
 		tournament.GroupRankings = append(tournament.GroupRankings, groupRankings...)
 	}
 
