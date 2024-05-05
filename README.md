@@ -1,6 +1,10 @@
 # iamtoolazytotip
 simulator to guess a tournaments outcome
 
+reference to the Tournament 2021
+- https://en.wikipedia.org/wiki/UEFA_Euro_2020
+- https://en.wikipedia.org/wiki/UEFA_Euro_2020_knockout_stage
+
 ## developer note
 
 To hot reload the application, a tool such as reflex can be used. The following explains hot to work with reflex

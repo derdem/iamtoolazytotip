@@ -71,25 +71,25 @@ func playGroupMatch(match GroupMatch, c chan GroupMatch) {
 	team2 := match.Team2
 	fmt.Println(team1.Name + " - " + team2.Name)
 	outcomeProbabilies := assignProbabilities(team1.Strength, team2.Strength)
-	winnerCode := determineWinner(outcomeProbabilies)
+	winnerCode := DetermineWinner(outcomeProbabilies)
 	var team1Score int
 	var team2Score int
 
 	switch winnerCode {
 	case 0:
-		team1Score, team2Score = setRemisScore()
+		team1Score, team2Score = SetRemisScore()
 		team1.Points = team1.Points + 1
 		team2.Points = team2.Points + 1
 		match.Winner = nil
 	case 1:
-		team1Score = randomResult()
-		team2Score = randomResultLoser(team1Score, team1.Strength-team2.Strength)
+		team1Score = RandomResult()
+		team2Score = RandomResultLoser(team1Score, team1.Strength-team2.Strength)
 		team1.Points = team1.Points + 3
 		team2.Points = team2.Points + 0
 		match.Winner = team1
 	case 2:
-		team2Score = randomResult()
-		team1Score = randomResultLoser(team2Score, team2.Strength-team1.Strength)
+		team2Score = RandomResult()
+		team1Score = RandomResultLoser(team2Score, team2.Strength-team1.Strength)
 		team1.Points = team1.Points + 0
 		team2.Points = team2.Points + 3
 		match.Winner = team2
@@ -161,13 +161,13 @@ func playEliminationMatch(match Match) Match {
 	var team2PenaltyScore int = 0
 	var winnerTeam *Country
 	outcomeProbabilies := assignProbabilities(team1.Strength, team2.Strength)
-	winnerCode := determineWinner(outcomeProbabilies)
+	winnerCode := DetermineWinner(outcomeProbabilies)
 
 	fmt.Println(team1.Name + " vs. " + team2.Name)
 	switch winnerCode {
 	case 0:
-		team1Score, team2Score = setRemisScore()
-		team1PenaltyScore, team2PenaltyScore = playPenalty(0, 0)
+		team1Score, team2Score = SetRemisScore()
+		team1PenaltyScore, team2PenaltyScore = PlayPenalty(0, 0)
 		resultString := fmt.Sprintf("%d (%d) - %d (%d)", team1Score, team1Score+team1PenaltyScore, team2Score, team1Score+team2PenaltyScore)
 		fmt.Println(resultString)
 		if team1Score+team1PenaltyScore > team2Score+team2PenaltyScore {
@@ -176,14 +176,14 @@ func playEliminationMatch(match Match) Match {
 			winnerTeam = team2
 		}
 	case 1:
-		team1Score = randomResult()
-		team2Score = randomResultLoser(team1Score, team1.Strength-team2.Strength)
+		team1Score = RandomResult()
+		team2Score = RandomResultLoser(team1Score, team1.Strength-team2.Strength)
 		resultString := fmt.Sprintf("%d - %d", team1Score, team2Score)
 		fmt.Println(resultString)
 		winnerTeam = team1
 	case 2:
-		team2Score = randomResult()
-		team1Score = randomResultLoser(team2Score, team2.Strength-team1.Strength)
+		team2Score = RandomResult()
+		team1Score = RandomResultLoser(team2Score, team2.Strength-team1.Strength)
 		resultString := fmt.Sprintf("%d - %d", team1Score, team2Score)
 		fmt.Println(resultString)
 		winnerTeam = team2
@@ -228,8 +228,8 @@ func convertStrengthToProbabilities(strength1 int, strength2 int) (float64, floa
 	}
 }
 
-func determineWinner(outcomeChanges OutcomeProbabilities) int {
-	rand.Seed(time.Now().UnixNano())
+func DetermineWinner_(outcomeChanges OutcomeProbabilities) int {
+	//rand.Seed(time.Now().UnixNano())
 	randomResult := rand.Float64()
 	if randomResult < outcomeChanges.Remis {
 		return 0 // remis
@@ -240,17 +240,23 @@ func determineWinner(outcomeChanges OutcomeProbabilities) int {
 	}
 }
 
-func setRemisScore() (int, int) {
-	result := randomResult()
+var DetermineWinner = DetermineWinner_
+
+func SetRemisScore_() (int, int) {
+	result := RandomResult()
 	return result, result
 }
 
-func randomResult() int {
+var SetRemisScore = SetRemisScore_
+
+func RandomResult_() int {
 	rand.Seed(time.Now().UnixNano())
 	probab := rand.Float64()
 	k := findK(probab, 0, lambda)
 	return k + 1
 }
+
+var RandomResult = RandomResult_
 
 func findK(probab float64, k int, lambda float64) int {
 	p := distuv.Poisson{Lambda: lambda}
@@ -270,7 +276,7 @@ func findK(probab float64, k int, lambda float64) int {
 	}
 }
 
-func randomResultLoser(resultWinner int, strengthDifference int) int {
+func RandomResultLoser_(resultWinner int, strengthDifference int) int {
 	if resultWinner == 1 {
 		return 0
 	}
@@ -305,18 +311,21 @@ func randomResultLoser(resultWinner int, strengthDifference int) int {
 	} else {
 		return 0
 	}
-
 }
 
-func playPenalty(score1, score2 int) (int, int) {
+var RandomResultLoser = RandomResultLoser_
+
+func PlayPenalty_(score1, score2 int) (int, int) {
 	score1Increment := randomScoreBetween0And5() + score1
 	score2Increment := randomScoreBetween0And5() + score2
 	if score1Increment == score2Increment {
-		return playPenalty(score1Increment, score2Increment)
+		return PlayPenalty_(score1Increment, score2Increment)
 	} else {
 		return score1Increment, score2Increment
 	}
 }
+
+var PlayPenalty = PlayPenalty_
 
 func randomScoreBetween0And5() int {
 	rand.Seed(time.Now().UnixNano())
