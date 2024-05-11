@@ -8,7 +8,6 @@ import (
 
 	"github.com/derdem/iamtoolazytotip/simulator"
 	customtournament "github.com/derdem/iamtoolazytotip/simulator/customTournament"
-	"github.com/derdem/iamtoolazytotip/simulator/em2021"
 	"github.com/derdem/iamtoolazytotip/simulator/readTournamentFromDb"
 )
 
@@ -40,8 +39,8 @@ func enableCors(handler http.Handler) http.Handler {
 
 func run2021Tournament() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		groups := readTournamentFromDb.LoadGroupFromDb(2)
-		matchOutcome := simulator.TournamentSimulator(groups)
+		groups := readTournamentFromDb.GetTournament(2)
+		matchOutcome := simulator.TournamentSimulator2(groups)
 
 		js, err := json.Marshal(matchOutcome)
 		if err != nil {
@@ -56,9 +55,10 @@ func run2021Tournament() http.HandlerFunc {
 
 func run2024Tournament() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		matchOutcome := em2021.Run2021Tournament()
+		tournament := readTournamentFromDb.GetTournament(3)
+		finishedTournament := simulator.TournamentSimulator2(tournament)
 
-		js, err := json.Marshal(matchOutcome)
+		js, err := json.Marshal(finishedTournament)
 		if err != nil {
 			log.Fatalf("Error happened in JSON marshal. Err: %s", err)
 		}
@@ -86,9 +86,9 @@ func runCustomTournament() http.HandlerFunc {
 
 func readTournament1() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		groups := readTournamentFromDb.LoadGroupFromDb(2)
-		matchOutcome := simulator.TournamentSimulator(groups)
-		js, err := json.Marshal(matchOutcome)
+		groups := readTournamentFromDb.GetTournament(1)
+		finishedTournament := simulator.TournamentSimulator2(groups)
+		js, err := json.Marshal(finishedTournament)
 
 		if err != nil {
 			log.Fatalf("Error happened in JSON marshal. Err: %s", err)
