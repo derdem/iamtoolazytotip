@@ -7,4 +7,5 @@ export type PlayedTournament = {
   matchResults: any[];
   groupRankings: any[];
   koMatches: any[];
+  winner: any;
 };

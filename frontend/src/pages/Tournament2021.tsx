@@ -51,7 +51,8 @@ const App: Component = () => {
     matches: [],
     matchResults: [],
     groupRankings: [],
-    koMatches: []
+    koMatches: [],
+    winner: {},
   });
 
   const groupPhaseGroups = createMemo(() => {
@@ -97,19 +98,7 @@ const App: Component = () => {
           </div>
         )}
       </For>
-
-      {/*
-      <div class="flex flex-row flex-wrap">
-        <KoRound matches={tournamentOutcome().sixteen} name="Round of 16" />
-        <KoRound matches={tournamentOutcome().eight} name="Round of 8" />
-        <KoRound matches={tournamentOutcome().four} name="Round of 4" />
-      </div>
-      <div class="flex justify-around">
-        <KoRound matches={tournamentOutcome().final} name="Final" />
-      </div>
-      <Show when={tournamentOutcome().final.length > 0} fallback={<h1 class="p-4 text-xl bg-sky-800 bg-opacity-25">No Winner yet</h1>}>
-        <h1 class="p-4 text-xl bg-sky-800 bg-opacity-25 text-center">Winner: {tournamentOutcome().final[0].winner.name}</h1>
-      </Show> */}
+      <h1 class="p-4 text-xl bg-sky-800 bg-opacity-25 text-center">Winner: {playedTournament().winner.name}</h1>
     </div>
   );
 };
