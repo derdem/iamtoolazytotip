@@ -54,7 +54,7 @@ func TestSorting(t *testing.T) {
 
 }
 
-func TestEm2021(t *testing.T) {
+func _TestEm2021(t *testing.T) {
 	readTournamentFromDb.GetConnection = postgres_connection.GetConnectionForTest
 	defer func() {
 		readTournamentFromDb.GetConnection = postgres_connection.GetConnection

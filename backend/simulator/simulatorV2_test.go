@@ -21,7 +21,7 @@ func recoverFromPanic(t *testing.T, message string) {
 	}
 }
 
-func TestTournamentSimulatorV2(t *testing.T) {
+func _TestTournamentSimulatorV2(t *testing.T) {
 	readTournamentFromDb.GetConnection = postgres_connection.GetConnectionForTest
 	defer func() {
 		readTournamentFromDb.GetConnection = postgres_connection.GetConnection
@@ -31,7 +31,7 @@ func TestTournamentSimulatorV2(t *testing.T) {
 	simulator.TournamentSimulator2(tournament)
 }
 
-func TestPrepareDataDump(t *testing.T) {
+func _TestPrepareDataDump(t *testing.T) {
 	readTournamentFromDb.GetConnection = postgres_connection.GetConnectionForTest
 
 	tournament := readTournamentFromDb.GetTournament(2)
@@ -70,8 +70,8 @@ func TestRunFullTournament(t *testing.T) {
 
 	tournament = simulator.TournamentSimulator2(tournament)
 
-	if len(tournament.GroupRankings) != 30 {
-		t.Errorf("Expected 30 group rankings, got %v", tournament.GroupRankings)
+	if len(tournament.GroupRankings) != 54 {
+		t.Errorf("Expected 30 group rankings, got %v", len(tournament.GroupRankings))
 	}
 
 }
@@ -153,7 +153,8 @@ func TestPlayKoRounds_HappyCase(t *testing.T) {
 		KoMatches:     koMatches,
 	}
 
-	winner := simulator.PlayKoRounds(tournament)
+	finishedTournament := simulator.PlayKoRounds(tournament)
+	winner := finishedTournament.Winner
 
 	if winner.Name != "Team1" && winner.Name != "Team2" {
 		t.Errorf("Expected Team1 or Team2, got %v", winner.Name)

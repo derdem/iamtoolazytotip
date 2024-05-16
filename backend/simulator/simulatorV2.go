@@ -29,10 +29,10 @@ func TournamentSimulator2(tournament Tournament) Tournament {
 
 	tournament.KoMatches = updatedKoMatches
 
-	winner := PlayKoRounds(tournament)
-	fmt.Println("Winner of the tournament is", winner.Name)
+	tournamentWithWinner := PlayKoRounds(tournament)
+	fmt.Println("Winner of the tournament is", tournamentWithWinner.Winner.Name)
 
-	return tournament
+	return tournamentWithWinner
 
 }
 
@@ -363,7 +363,7 @@ func Best4WithRanking3Pattern(weight int) [4]int {
 	return pattern[weight]
 }
 
-func PlayKoRounds(tournament Tournament) Team {
+func PlayKoRounds(tournament Tournament) Tournament {
 	koMatchMap := MapKoMatchesToGroups(tournament.KoMatches)
 	koGroups := FilterByKoRound(tournament.Groups)
 	for _, koGroup := range koGroups {
@@ -374,6 +374,7 @@ func PlayKoRounds(tournament Tournament) Team {
 		}
 		rankingsSortedIntoGroups := getRankingsSortedIntoGroups(tournament.GroupRankings)
 		matches := CreateMatchFromKoMatch(koMatches, rankingsSortedIntoGroups)
+		tournament.Matches = append(tournament.Matches, matches...)
 		matchResults := PlayKoGroupsMatches(matches)
 		tournament.MatchResults = append(tournament.MatchResults, matchResults...)
 
@@ -386,8 +387,9 @@ func PlayKoRounds(tournament Tournament) Team {
 
 	finalGroupId := koGroups[len(koGroups)-1].Id
 	winner := DetermineWinner2(finalGroupId, tournament.GroupRankings)
+	tournament.Winner = winner
 
-	return winner
+	return tournament
 }
 
 func MapKoMatchesToGroups(koMatches []KoMatch) map[int][]KoMatch {

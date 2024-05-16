@@ -9,6 +9,7 @@ type Tournament struct {
 	MatchResults  []MatchResult  `json:"matchResults"`
 	GroupRankings []GroupRanking `json:"groupRankings"`
 	KoMatches     []KoMatch      `json:"koMatches"`
+	Winner        Team           `json:"winner"`
 }
 
 type Group2 struct {
