@@ -1,8 +1,9 @@
-import { Component, Show, createEffect, createSignal, onMount } from "solid-js";
+import { Component, Show, createEffect, createMemo, createSignal, onMount } from "solid-js";
 
 import AllGroupMatches from "../AllGroupMatches";
 import KoRound from "../KoRound";
 import { A } from "@solidjs/router";
+import { PlayedTournament } from "../types";
 
 const sortGroupMatches = (groupMatches: any[]) => {
   const sortedMatches: any = {};
@@ -37,27 +38,29 @@ const sortGroupMatches = (groupMatches: any[]) => {
 const getNewSimulation = async () => {
   const response = await fetch("http://localhost:3000/api/2021");
   const data = await response.json();
-  data.final = [data.final];
   return data;
 }
 
+
 const App: Component = () => {
-  const [tournamentOutcome, setTournamentOutcome] = createSignal<{
-    group: any[];
-    sixteen: any[];
-    eight: any[];
-    four: any[];
-    final: any[];
-  }>({ group: [], sixteen: [], eight: [], four: [], final: [] });
-  const [groupOutcomes, setGroupOutcomes] = createSignal<any[]>([]);
-  createEffect(() =>
-    console.log("The latest groupOutcomes are", groupOutcomes())
-  );
+  const [playedTournament, setPlayedTournament] = createSignal<PlayedTournament>({
+    id: 0,
+    name: "",
+    groups: [],
+    teams: [],
+    matches: [],
+    matchResults: [],
+    groupRankings: [],
+    koMatches: []
+  });
+
+  const groupPhaseGroups = createMemo(() => {
+    return playedTournament().groups.filter((group) => group.groupType === "group_phase");
+  });
 
   const newSimulation = async () => {
-    const data = await getNewSimulation();
-    setTournamentOutcome(data);
-    setGroupOutcomes(sortGroupMatches(data.group));
+    const data = await getNewSimulation() as PlayedTournament;
+    setPlayedTournament(data);
   }
 
   onMount(async () => {
@@ -74,8 +77,9 @@ const App: Component = () => {
 
         <button onClick={newSimulation} class="bg-white text-black rounded-md px-4 py-2 mr-4">Run simulation</button>
       </header>
-      <AllGroupMatches groups={groupOutcomes()} />
+      <AllGroupMatches groups={groupPhaseGroups()} matchResults={playedTournament().matchResults} />
       <h1 class="p-4 text-xl bg-sky-800 bg-opacity-25">KO phase</h1>
+      {/*
       <div class="flex flex-row flex-wrap">
         <KoRound matches={tournamentOutcome().sixteen} name="Round of 16" />
         <KoRound matches={tournamentOutcome().eight} name="Round of 8" />
@@ -86,7 +90,7 @@ const App: Component = () => {
       </div>
       <Show when={tournamentOutcome().final.length > 0} fallback={<h1 class="p-4 text-xl bg-sky-800 bg-opacity-25">No Winner yet</h1>}>
         <h1 class="p-4 text-xl bg-sky-800 bg-opacity-25 text-center">Winner: {tournamentOutcome().final[0].winner.name}</h1>
-      </Show>
+      </Show> */}
     </div>
   );
 };
