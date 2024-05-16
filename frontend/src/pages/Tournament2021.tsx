@@ -1,4 +1,4 @@
-import { Component, Show, createEffect, createMemo, createSignal, onMount } from "solid-js";
+import { Component, For, Show, createEffect, createMemo, createSignal, onMount } from "solid-js";
 
 import AllGroupMatches from "../AllGroupMatches";
 import KoRound from "../KoRound";
@@ -57,9 +57,20 @@ const App: Component = () => {
   const groupPhaseGroups = createMemo(() => {
     return playedTournament().groups.filter((group) => group.groupType === "group_phase");
   });
+  const koPhaseGroups = createMemo(() => {
+    return playedTournament().groups.filter((group) => group.groupType === "knockout_phase");
+  });
+
+  const filterMatchResults = (groupId: number) => {
+    console.log(`groupId: ${groupId}`)
+    return playedTournament().matchResults.filter(
+      (matchResult) => matchResult.match.groupId === groupId
+    );
+  }
 
   const newSimulation = async () => {
     const data = await getNewSimulation() as PlayedTournament;
+    console.log(data);
     setPlayedTournament(data);
   }
 
@@ -79,6 +90,14 @@ const App: Component = () => {
       </header>
       <AllGroupMatches groups={groupPhaseGroups()} matchResults={playedTournament().matchResults} />
       <h1 class="p-4 text-xl bg-sky-800 bg-opacity-25">KO phase</h1>
+      <For each={koPhaseGroups()}>
+        {(group, i) => (
+          <div class="p-4">
+            <KoRound matchResults={filterMatchResults(group.id)} name={group.name} />
+          </div>
+        )}
+      </For>
+
       {/*
       <div class="flex flex-row flex-wrap">
         <KoRound matches={tournamentOutcome().sixteen} name="Round of 16" />
