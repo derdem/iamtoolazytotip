@@ -10,3 +10,7 @@ start:
 # stop docker compose
 stop:
     docker compose down
+
+# unittests backend
+testbackend:
+    go test ./...
