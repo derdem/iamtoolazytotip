@@ -3,8 +3,7 @@ import { render } from "solid-js/web";
 import "solid-devtools";
 
 import "./index.css";
-import Tournament2021 from "./pages/Tournament2021";
-import Tournament2024 from "./pages/Tournament2024";
+import Tournament from "./pages/Tournament";
 import { Router, Routes, Route } from "@solidjs/router";
 import Home from "./pages/Home";
 import TournamentCustomGroups from "./pages/TournamentCustomGroups";
@@ -22,9 +21,9 @@ render(
     <Router>
       <Routes>
         <Route path="/" component={Home}/>
-        <Route path="/new" component={TournamentCustomGroups}></Route>
-        <Route path="/2021" component={Tournament2021}/>
-        <Route path="/2024/" component={Tournament2024}/>
+        {/* <Route path="/new" component={TournamentCustomGroups}></Route> */}
+        <Route path="/2021" component={Tournament("http://localhost:3000/api/2021", "EM soccer tournament simulator 2021")}/>
+        <Route path="/2024/" component={Tournament("http://localhost:3000/api/2024", "EM soccer tournament simulator 2024")}/>
       </Routes>
     </Router>
   ),

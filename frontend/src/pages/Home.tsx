@@ -11,7 +11,7 @@ const Home: Component = () => {
       </header>
       <div class="container mx-auto">
         <div class="flex justify-between p-8">
-          <EnterTournamentCard name="New Tournament" url="/new" />
+          {/* <EnterTournamentCard name="New Tournament" url="/new" /> */}
           <EnterTournamentCard name="Tournament 2021" url="/2021" />
           <EnterTournamentCard name="Tournament 2024" url="/2024" />
         </div>

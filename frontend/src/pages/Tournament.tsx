@@ -35,14 +35,14 @@ const sortGroupMatches = (groupMatches: any[]) => {
   return sortedMatchesAsArray;
 };
 
-const getNewSimulation = async () => {
-  const response = await fetch("http://localhost:3000/api/2021");
+const getNewSimulation = async (url: string) => {
+  const response = await fetch(url);
   const data = await response.json();
   return data;
 }
 
 
-const App: Component = () => {
+const App: (u: string, n: string) => Component = (url: string, name: string) => () => {
   const [playedTournament, setPlayedTournament] = createSignal<PlayedTournament>({
     id: 0,
     name: "",
@@ -70,7 +70,7 @@ const App: Component = () => {
   }
 
   const newSimulation = async () => {
-    const data = await getNewSimulation() as PlayedTournament;
+    const data = await getNewSimulation(url) as PlayedTournament;
     console.log(data);
     setPlayedTournament(data);
   }
@@ -84,7 +84,7 @@ const App: Component = () => {
       <header class="bg-sky-800 text-center text-white flex justify-between items-center">
         <div class="flex text-2xl ml-4">
           <A href="/" class="no-underline"><i class="py-4 mr-4 fa-solid fa-house"></i></A>
-          <p class="py-4">EM soccer tournament simulator 2021</p>
+          <p class="py-4">{name}</p>
         </div>
 
         <button onClick={newSimulation} class="bg-white text-black rounded-md px-4 py-2 mr-4">Run simulation</button>
