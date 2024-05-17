@@ -1,14 +1,17 @@
 package readTournamentFromDb
 
-import "github.com/derdem/iamtoolazytotip/simulator"
+import (
+	"github.com/derdem/iamtoolazytotip/simulator"
+)
 
 type TournamentDb struct {
-	Id        int            `json:"id"`
-	Name      string         `json:"name"`
-	Groups    []GroupLightDb `json:"groups"`
-	Teams     []TeamDb       `json:"teams"`
-	Matches   []MatchDb      `json:"matches"`
-	KoMatches []KoMatchDb    `json:"ko_matches"`
+	Id                    int            `json:"id"`
+	Name                  string         `json:"name"`
+	Groups                []GroupLightDb `json:"groups"`
+	Teams                 []TeamDb       `json:"teams"`
+	Matches               []MatchDb      `json:"matches"`
+	KoMatches             []KoMatchDb    `json:"ko_matches"`
+	thirdsEvaluationRules []ThirdEvaluationRulesDb
 }
 
 type GroupDb struct {
@@ -47,4 +50,10 @@ type KoMatchDb struct {
 	GroupId2 int `json:"group_id2"`
 	Ranking1 int `json:"ranking1"`
 	Ranking2 int `json:"ranking2"`
+}
+
+type ThirdEvaluationRulesDb struct {
+	TournamentId             int   `json:"tournament_id"`
+	BestFourTeamsId          int   `json:"best_four_teams_id"`
+	BestFourTeamsArrangement []int `json:"best_four_teams_arrangement"`
 }

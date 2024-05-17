@@ -6,6 +6,7 @@ import (
 	"github.com/derdem/iamtoolazytotip/postgres_connection"
 	"github.com/derdem/iamtoolazytotip/simulator"
 	"github.com/jackc/pgx"
+	"github.com/jackc/pgx/pgtype"
 )
 
 var GetConnection = postgres_connection.GetConnection
@@ -122,15 +123,17 @@ func ReadTournament(tournament_id int) TournamentDb {
 	teams := readTeams(tx, group_ids[simulator.GroupPhaseGroupType])
 	matches := readMatches(tx, group_ids[simulator.GroupPhaseGroupType])
 	koMatches := readKoMatches(tx, group_ids[simulator.KoPhaseGroupType])
+	thirdsEvaluationRules := readThirdEvaluationRules(tx, tournament_id)
 	tx.Rollback()
 
 	return TournamentDb{
-		Id:        id,
-		Name:      name,
-		Groups:    groups,
-		Teams:     teams,
-		Matches:   matches,
-		KoMatches: koMatches,
+		Id:                    id,
+		Name:                  name,
+		Groups:                groups,
+		Teams:                 teams,
+		Matches:               matches,
+		KoMatches:             koMatches,
+		thirdsEvaluationRules: thirdsEvaluationRules,
 	}
 }
 
@@ -249,6 +252,43 @@ func readKoMatches(tx *pgx.Tx, group_ids []int) []KoMatchDb {
 	}
 
 	return matches
+}
+
+func readThirdEvaluationRules(tx *pgx.Tx, tournament_id int) []ThirdEvaluationRulesDb {
+	thirdsEvaluationRulesRows, err := tx.Query(`
+    SELECT tournament_id, best_four_teams_id, best_four_teams_arrangement
+    FROM thirds_evaluation_rules WHERE tournament_id = $1;
+    `, tournament_id)
+	PanicAtError(err)
+	defer thirdsEvaluationRulesRows.Close()
+
+	var thirdEvaluationRules []ThirdEvaluationRulesDb
+	var bestFourTeamsArrangementPgtype pgtype.Int4Array
+	for thirdsEvaluationRulesRows.Next() {
+		var thirdEvaluationRule ThirdEvaluationRulesDb
+		err := thirdsEvaluationRulesRows.Scan(
+			&thirdEvaluationRule.TournamentId,
+			&thirdEvaluationRule.BestFourTeamsId,
+			&bestFourTeamsArrangementPgtype,
+		)
+		PanicAtError(err)
+		bestFourTeamsArrangement32 := make([]int32, len(bestFourTeamsArrangementPgtype.Elements))
+		bestFourTeamsArrangement := make([]int, len(bestFourTeamsArrangementPgtype.Elements))
+		err = bestFourTeamsArrangementPgtype.AssignTo(&bestFourTeamsArrangement32)
+		if err != nil {
+			panic(err)
+		}
+		for i, v := range bestFourTeamsArrangement32 {
+			bestFourTeamsArrangement[i] = int(v)
+		}
+
+		thirdEvaluationRule.BestFourTeamsArrangement = bestFourTeamsArrangement
+		thirdEvaluationRules = append(thirdEvaluationRules, thirdEvaluationRule)
+	}
+
+	PanicAtError(err)
+
+	return thirdEvaluationRules
 }
 
 func LoadGroupFromDb(tournament_id int) []simulator.Group {
