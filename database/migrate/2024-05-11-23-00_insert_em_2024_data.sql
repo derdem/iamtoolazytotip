@@ -1,6 +1,23 @@
 -- Description: Insert data for the Euro 2024 tournament
 INSERT INTO tournaments (id, name) VALUES (3, 'EM 2024');
 
+INSERT INTO thirds_evaluation_rules (tournament_id, best_four_teams_id, best_four_teams_arrangement) VALUES
+    (3, 15, '{0, 3, 1, 4}'), -- X X X X 0 0  => 1 + 2 + 4  + 8  = 15
+    (3, 23, '{0, 4, 1, 2}'), -- X X X 0 X 0  => 1 + 2 + 4  + 16 = 23
+    (3, 39, '{0, 5, 1, 2}'), -- X X X 0 0 X  => 1 + 2 + 4  + 32 = 39
+    (3, 27, '{3, 4, 0, 1}'), -- X X 0 X X 0  => 1 + 2 + 8  + 16 = 27
+    (3, 43, '{3, 5, 0, 1}'), -- X X 0 X 0 X  => 1 + 2 + 8  + 32 = 43
+    (3, 51, '{4, 5, 1, 0}'), -- X X 0 0 X X  => 1 + 2 + 16 + 32 = 51
+    (3, 29, '{4, 3, 2, 0}'), -- X 0 X X X 0  => 1 + 4 + 8  + 16 = 29
+    (3, 45, '{5, 3, 2, 0}'), -- X 0 X X 0 X  => 1 + 4 + 8  + 32 = 45
+    (3, 53, '{4, 5, 2, 0}'), -- X 0 X 0 X X  => 1 + 4 + 16 + 32 = 53
+    (3, 57, '{4, 5, 3, 0}'), -- X 0 0 X X X  => 1 + 8 + 16 + 32 = 57
+    (3, 30, '{4, 3, 1, 2}'), -- 0 X X X X 0  => 2 + 4 + 8  + 16 = 30
+    (3, 46, '{5, 3, 2, 1}'), -- 0 X X X 0 X  => 2 + 4 + 8  + 32 = 46
+    (3, 54, '{5, 4, 2, 1}'), -- 0 X X 0 X X  => 2 + 4 + 16 + 32 = 54
+    (3, 58, '{5, 4, 3, 1}'), -- 0 X 0 X X X  => 2 + 8 + 16 + 32 = 58
+    (3, 60, '{5, 4, 3, 2}'); -- 0 0 X X X X  => 4 + 8 + 16 + 32 = 60
+
 INSERT INTO groups (id, name, tournament_id, group_type) VALUES (17, 'Group A', 3, 'group_phase');
 INSERT INTO groups (id, name, tournament_id, group_type) VALUES (18, 'Group B', 3, 'group_phase');
 INSERT INTO groups (id, name, tournament_id, group_type) VALUES (19, 'Group C', 3, 'group_phase');
