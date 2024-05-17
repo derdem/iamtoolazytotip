@@ -102,13 +102,23 @@ func ConvertTournamentDbToModel(tournamentDb TournamentDb) simulator.Tournament 
 		})
 	}
 
+	var thirdsEvaluationRules []simulator.ThirdsEvaluationRules
+	for _, thirdEvaluationRule := range tournamentDb.thirdsEvaluationRules {
+		thirdsEvaluationRules = append(thirdsEvaluationRules, simulator.ThirdsEvaluationRules{
+			TournamentId:             thirdEvaluationRule.TournamentId,
+			BestFourTeamsId:          thirdEvaluationRule.BestFourTeamsId,
+			BestFourTeamsArrangement: thirdEvaluationRule.BestFourTeamsArrangement,
+		})
+	}
+
 	return simulator.Tournament{
-		Id:        tournamentDb.Id,
-		Name:      tournamentDb.Name,
-		Groups:    groups,
-		Teams:     teams,
-		Matches:   matches,
-		KoMatches: koMatches,
+		Id:                    tournamentDb.Id,
+		Name:                  tournamentDb.Name,
+		Groups:                groups,
+		Teams:                 teams,
+		Matches:               matches,
+		KoMatches:             koMatches,
+		ThirdsEvaluationRules: thirdsEvaluationRules,
 	}
 
 }

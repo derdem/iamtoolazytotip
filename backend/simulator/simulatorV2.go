@@ -312,7 +312,14 @@ func UpdateKoMatchesWithThirds(tournament Tournament) []KoMatch {
 		totalWeight += groupIdWeight[GroupId(rankingOfThird.GroupId)]
 	}
 
-	rankingOfThirdPattern := Best4WithRanking3Pattern(totalWeight)
+	thirdsEvaluationRules := tournament.ThirdsEvaluationRules
+	var rankingOfThirdPattern []int
+	for _, rule := range thirdsEvaluationRules {
+		if rule.BestFourTeamsId == totalWeight {
+			rankingOfThirdPattern = rule.BestFourTeamsArrangement
+			break
+		}
+	}
 
 	updatesKoMatches := make([]KoMatch, 0)
 	updatedKoMatchIndex := 0
@@ -339,28 +346,6 @@ func UpdateKoMatchesWithThirds(tournament Tournament) []KoMatch {
 	}
 
 	return updatesKoMatches
-}
-
-func Best4WithRanking3Pattern(weight int) [4]int {
-	pattern := map[int][4]int{
-		15: {0, 3, 1, 2}, // X X X X 0 0  => 1 + 2 + 4  + 8  = 15
-		23: {0, 4, 1, 2}, // X X X 0 X 0  => 1 + 2 + 4  + 16 = 23
-		39: {0, 5, 1, 2}, // X X X 0 0 X  => 1 + 2 + 4  + 32 = 39
-		27: {3, 4, 0, 1}, // X X 0 X X 0  => 1 + 2 + 8  + 16 = 27
-		43: {3, 5, 0, 1}, // X X 0 X 0 X  => 1 + 2 + 8  + 32 = 43
-		51: {4, 5, 1, 0}, // X X 0 0 X X  => 1 + 2 + 16 + 32 = 51
-		29: {4, 3, 2, 0}, // X 0 X X X 0  => 1 + 4 + 8  + 16 = 29
-		45: {5, 3, 2, 0}, // X 0 X X 0 X  => 1 + 4 + 8  + 32 = 45
-		53: {4, 5, 2, 0}, // X 0 X 0 X X  => 1 + 4 + 16 + 32 = 53
-		57: {4, 5, 3, 0}, // X 0 0 X X X  => 1 + 8 + 16 + 32 = 57
-		30: {4, 3, 1, 2}, // 0 X X X X 0  => 2 + 4 + 8  + 16 = 30
-		46: {5, 3, 2, 1}, // 0 X X X 0 X  => 2 + 4 + 8  + 32 = 46
-		54: {5, 4, 2, 1}, // 0 X X 0 X X  => 2 + 4 + 16 + 32 = 54
-		58: {5, 4, 3, 1}, // 0 X 0 X X X  => 2 + 8 + 16 + 32 = 58
-		60: {5, 4, 3, 2}, // 0 0 X X X X  => 4 + 8 + 16 + 32 = 60
-	}
-
-	return pattern[weight]
 }
 
 func PlayKoRounds(tournament Tournament) Tournament {

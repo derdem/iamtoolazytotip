@@ -1,15 +1,16 @@
 package simulator
 
 type Tournament struct {
-	Id            int            `json:"id"`
-	Name          string         `json:"name"`
-	Groups        []Group2       `json:"groups"`
-	Teams         []Team         `json:"teams"`
-	Matches       []Match2       `json:"matches"`
-	MatchResults  []MatchResult  `json:"matchResults"`
-	GroupRankings []GroupRanking `json:"groupRankings"`
-	KoMatches     []KoMatch      `json:"koMatches"`
-	Winner        Team           `json:"winner"`
+	Id                    int                     `json:"id"`
+	Name                  string                  `json:"name"`
+	Groups                []Group2                `json:"groups"`
+	Teams                 []Team                  `json:"teams"`
+	Matches               []Match2                `json:"matches"`
+	MatchResults          []MatchResult           `json:"matchResults"`
+	GroupRankings         []GroupRanking          `json:"groupRankings"`
+	KoMatches             []KoMatch               `json:"koMatches"`
+	ThirdsEvaluationRules []ThirdsEvaluationRules `json:"thirdsEvaluationRules"`
+	Winner                Team                    `json:"winner"`
 }
 
 type Group2 struct {
@@ -59,4 +60,10 @@ type GroupRanking struct {
 	Ranking int  `json:"ranking"`
 	Points  int  `json:"points"`
 	Goals   int  `json:"goals"`
+}
+
+type ThirdsEvaluationRules struct {
+	TournamentId             int   `json:"tournament_id"`
+	BestFourTeamsId          int   `json:"best_four_teams_id"`
+	BestFourTeamsArrangement []int `json:"best_four_teams_arrangement"`
 }
