@@ -85,37 +85,56 @@ INSERT INTO matches (id, team1_id, team2_id, group_id) VALUES (36, 22, 23, 6);
 -- Description: Insert data for the Euro 2021 tournament
 INSERT INTO tournaments (id, name) VALUES (2, 'EM 2021');
 
-INSERT INTO groups (id, name, tournament_id, group_type) VALUES (7, 'Group A', 2, 'group_phase');
-INSERT INTO groups (id, name, tournament_id, group_type) VALUES (8, 'Group B', 2, 'group_phase');
-INSERT INTO groups (id, name, tournament_id, group_type) VALUES (9, 'Group C', 2, 'group_phase');
-INSERT INTO groups (id, name, tournament_id, group_type) VALUES (10, 'Group D', 2, 'group_phase');
-INSERT INTO groups (id, name, tournament_id, group_type) VALUES (11, 'Group E', 2, 'group_phase');
-INSERT INTO groups (id, name, tournament_id, group_type) VALUES (12, 'Group F', 2, 'group_phase');
+INSERT INTO thirds_evaluation_rules (tournament_id, best_four_teams_id, best_four_teams_arrangement) VALUES
+    (2, 15, '{0, 3, 1, 4}'), -- X X X X 0 0  => 1 + 2 + 4  + 8  = 15
+    (2, 23, '{0, 4, 1, 2}'), -- X X X 0 X 0  => 1 + 2 + 4  + 16 = 23
+    (2, 39, '{0, 5, 1, 2}'), -- X X X 0 0 X  => 1 + 2 + 4  + 32 = 39
+    (2, 27, '{3, 4, 0, 1}'), -- X X 0 X X 0  => 1 + 2 + 8  + 16 = 27
+    (2, 43, '{3, 5, 0, 1}'), -- X X 0 X 0 X  => 1 + 2 + 8  + 32 = 43
+    (2, 51, '{4, 5, 1, 0}'), -- X X 0 0 X X  => 1 + 2 + 16 + 32 = 51
+    (2, 29, '{4, 3, 2, 0}'), -- X 0 X X X 0  => 1 + 4 + 8  + 16 = 29
+    (2, 45, '{5, 3, 2, 0}'), -- X 0 X X 0 X  => 1 + 4 + 8  + 32 = 45
+    (2, 53, '{4, 5, 2, 0}'), -- X 0 X 0 X X  => 1 + 4 + 16 + 32 = 53
+    (2, 57, '{4, 5, 3, 0}'), -- X 0 0 X X X  => 1 + 8 + 16 + 32 = 57
+    (2, 30, '{4, 3, 1, 2}'), -- 0 X X X X 0  => 2 + 4 + 8  + 16 = 30
+    (2, 46, '{5, 3, 2, 1}'), -- 0 X X X 0 X  => 2 + 4 + 8  + 32 = 46
+    (2, 54, '{5, 4, 2, 1}'), -- 0 X X 0 X X  => 2 + 4 + 16 + 32 = 54
+    (2, 58, '{5, 4, 3, 1}'), -- 0 X 0 X X X  => 2 + 8 + 16 + 32 = 58
+    (2, 60, '{5, 4, 3, 2}'); -- 0 0 X X X X  => 4 + 8 + 16 + 32 = 60
 
-INSERT INTO teams (id, name, strength, group_id) VALUES (25, 'Turkey', 'medium', 7);
-INSERT INTO teams (id, name, strength, group_id) VALUES (26, 'Italy', 'high', 7);
-INSERT INTO teams (id, name, strength, group_id) VALUES (27, 'Wales', 'low', 7);
-INSERT INTO teams (id, name, strength, group_id) VALUES (28, 'Switzerland', 'medium', 7);
-INSERT INTO teams (id, name, strength, group_id) VALUES (29, 'Denmark', 'medium', 8);
-INSERT INTO teams (id, name, strength, group_id) VALUES (30, 'Finland', 'low', 8);
-INSERT INTO teams (id, name, strength, group_id) VALUES (31, 'Belgien', 'medium', 8);
-INSERT INTO teams (id, name, strength, group_id) VALUES (32, 'Russia', 'medium', 8);
-INSERT INTO teams (id, name, strength, group_id) VALUES (33, 'Netherlands', 'high', 9);
-INSERT INTO teams (id, name, strength, group_id) VALUES (34, 'Ukraine', 'low', 9);
-INSERT INTO teams (id, name, strength, group_id) VALUES (35, 'Austria', 'medium', 9);
-INSERT INTO teams (id, name, strength, group_id) VALUES (36, 'North Mazedonia', 'low', 9);
-INSERT INTO teams (id, name, strength, group_id) VALUES (37, 'England', 'high', 10);
-INSERT INTO teams (id, name, strength, group_id) VALUES (38, 'Croatia', 'medium', 10);
-INSERT INTO teams (id, name, strength, group_id) VALUES (39, 'Scotland', 'medium', 10);
-INSERT INTO teams (id, name, strength, group_id) VALUES (40, 'Czech Republic', 'medium', 10);
-INSERT INTO teams (id, name, strength, group_id) VALUES (41, 'Spain', 'high', 11);
-INSERT INTO teams (id, name, strength, group_id) VALUES (42, 'Sweden', 'medium', 11);
-INSERT INTO teams (id, name, strength, group_id) VALUES (43, 'Poland', 'medium', 11);
-INSERT INTO teams (id, name, strength, group_id) VALUES (44, 'Slovakia', 'medium', 11);
-INSERT INTO teams (id, name, strength, group_id) VALUES (45, 'Hungry', 'low', 12);
-INSERT INTO teams (id, name, strength, group_id) VALUES (46, 'Portugal', 'high', 12);
-INSERT INTO teams (id, name, strength, group_id) VALUES (47, 'France', 'high', 12);
-INSERT INTO teams (id, name, strength, group_id) VALUES (48, 'Germany', 'high', 12);
+INSERT INTO groups (id, name, tournament_id, group_type) VALUES
+    (7, 'Group A', 2, 'group_phase'),
+    (8, 'Group B', 2, 'group_phase'),
+    (9, 'Group C', 2, 'group_phase'),
+    (10, 'Group D', 2, 'group_phase'),
+    (11, 'Group E', 2, 'group_phase'),
+    (12, 'Group F', 2, 'group_phase');
+
+INSERT INTO teams (id, name, strength, group_id) VALUES
+    (25, 'Turkey', 'medium', 7),
+    (26, 'Italy', 'high', 7),
+    (27, 'Wales', 'low', 7),
+    (28, 'Switzerland', 'medium', 7),
+    (29, 'Denmark', 'medium', 8),
+    (30, 'Finland', 'low', 8),
+    (31, 'Belgien', 'medium', 8),
+    (32, 'Russia', 'medium', 8),
+    (33, 'Netherlands', 'high', 9),
+    (34, 'Ukraine', 'low', 9),
+    (35, 'Austria', 'medium', 9),
+    (36, 'North Mazedonia', 'low', 9),
+    (37, 'England', 'high', 10),
+    (38, 'Croatia', 'medium', 10),
+    (39, 'Scotland', 'medium', 10),
+    (40, 'Czech Republic', 'medium', 10),
+    (41, 'Spain', 'high', 11),
+    (42, 'Sweden', 'medium', 11),
+    (43, 'Poland', 'medium', 11),
+    (44, 'Slovakia', 'medium', 11),
+    (45, 'Hungry', 'low', 12),
+    (46, 'Portugal', 'high', 12),
+    (47, 'France', 'high', 12),
+    (48, 'Germany', 'high', 12);
 
 -- GROUP A matches
 INSERT INTO matches (id, team1_id, team2_id, group_id) VALUES (37, 25, 26, 7); -- Turkey vs Italy
