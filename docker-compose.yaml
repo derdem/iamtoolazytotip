@@ -31,7 +31,7 @@ services:
     # database-connection-test:
     #     container_name: database-connection-test
     #     image: postgres:16.2-alpine3.19
-    #     command: psql postgresql://iamtoolazytotip:iamtoolazytotip@database/tournaments -c 'SELECT * FROM players;'
+    #     command: psql postgresql://iamtoolazytotip:iamtoolazytotip@database/tournaments -c 'SELECT 1'
     #     working_dir: /app
     #     volumes:
     #         - type: bind
