@@ -81,7 +81,6 @@ const TournamentCustomGroups: Component = () => {
       body: JSON.stringify({ groups, matches: preprocessedMatches }),
     });
     const data = await response.json();
-    console.log("Request complete! response:", data);
   };
 
   const preprocessMatches = (rawMatches: MatchInStore[]) => {

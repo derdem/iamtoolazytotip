@@ -13,7 +13,6 @@ const sortGroupMatches = (groupMatches: any[]) => {
     }
     sortedMatches[match.groupName].push(match);
   });
-  console.log(sortedMatches);
 
   const compareGroupName = (a: any, b: any) => {
     if (a < b) {
@@ -63,7 +62,6 @@ const App: (u: string, n: string) => Component = (url: string, name: string) => 
   });
 
   const filterMatchResults = (groupId: number) => {
-    console.log(`groupId: ${groupId}`)
     return playedTournament().matchResults.filter(
       (matchResult) => matchResult.match.groupId === groupId
     );
