@@ -1,6 +1,7 @@
 package simulator
 
 import (
+	"errors"
 	"fmt"
 	"math"
 	"math/rand"
@@ -10,197 +11,468 @@ import (
 	"gonum.org/v1/gonum/stat/distuv"
 )
 
-const lambda = 1.3
+const (
+	NumberOfGroupsInGroupPhase    int     = 6
+	NumberOfMatchesInFirstKoRound int     = 8
+	lambda                        float64 = 1.3
+)
 
-func TournamentSimulator(groups []Group) TournamentMatches {
+func TournamentSimulator2(tournament Tournament) Tournament {
 	fmt.Println("Start")
 
-	allGroupMatches := make([]GroupMatch, 0)
+	// group matches are played and results are stored in matchResults
+	matchResults := PlayGroupMatches(tournament)
+	tournament.MatchResults = matchResults
 
-	numberMatchesInGroupPhase := CountAllGroupMatches(groups) // required to know when to close the channel
-	groupMatchChannel := make(chan GroupMatch, numberMatchesInGroupPhase)
+	// matchResults are evaluated and groupRankings are determined
+	groupPhaseGroups := FilterByGroupPhase(tournament.Groups)
+	teamsSortedIntoGroups := GroupsMapTeams(tournament.Teams)
+	groupRankings := DetermineGroupRanking(matchResults, teamsSortedIntoGroups, groupPhaseGroups)
+	tournament.GroupRankings = groupRankings
 
-	for _, group := range groups {
-		for _, match := range group.Matches {
-			go playGroupMatch(match, groupMatchChannel)
-		}
-	}
+	// update ko matches with the group of thirds
+	updatedKoMatches := UpdateKoMatchesWithThirds(tournament)
 
-	for i := 0; i < numberMatchesInGroupPhase; i++ {
-		allGroupMatches = append(allGroupMatches, <-groupMatchChannel)
-	}
+	tournament.KoMatches = updatedKoMatches
 
-	fmt.Println("Round of 16")
-	matches16 := getRoudOfSixteenMatches(groups)
-	playedMatches16 := make([]Match, 0)
-	for _, match := range matches16 {
-		playedMatches16 = append(playedMatches16, playEliminationMatch(match))
-	}
+	tournamentWithWinner := PlayKoRounds(tournament)
+	fmt.Println("Winner of the tournament is", tournamentWithWinner.Winner.Name)
 
-	fmt.Println("Round of 8")
-	matches8 := getRoundOfEightMatches(playedMatches16)
-	playedMatches8 := make([]Match, 0)
-	for _, match := range matches8 {
-		playedMatches8 = append(playedMatches8, playEliminationMatch(match))
-	}
-
-	fmt.Println("Round of 4")
-	matches4 := getRoundOfFourMatches(playedMatches8)
-	playedMatches4 := make([]Match, 0)
-	for _, match := range matches4 {
-		playedMatches4 = append(playedMatches4, playEliminationMatch(match))
-	}
-
-	fmt.Println("Final Match")
-	matchFinal := CreateMatch(playedMatches4[0].Winner, playedMatches4[1].Winner, time.Date(2021, 7, 11, 19, 0, 0, 0, time.UTC))
-	playedMatchFinal := playEliminationMatch(matchFinal)
-
-	tournamentMatches := TournamentMatches{
-		Group:   allGroupMatches,
-		Sixteen: playedMatches16,
-		Eight:   playedMatches8,
-		Four:    playedMatches4,
-		Final:   playedMatchFinal,
-	}
-
-	return tournamentMatches
+	return tournamentWithWinner
 }
 
-func playGroupMatch(match GroupMatch, c chan GroupMatch) {
-	team1 := match.Team1
-	team2 := match.Team2
-	fmt.Println(team1.Name + " - " + team2.Name)
-	outcomeProbabilies := assignProbabilities(team1.Strength, team2.Strength)
+func PlayGroupMatches(tournament Tournament) []MatchResult {
+	groupMatchResults := make([]MatchResult, 0)
+	matchResultChannel := make(chan MatchResult, len(tournament.Matches))
+
+	for _, match := range tournament.Matches {
+		go playGroupMatch(match, matchResultChannel)
+	}
+
+	for i := 0; i < len(tournament.Matches); i++ {
+		groupMatchResults = append(groupMatchResults, <-matchResultChannel)
+	}
+
+	return groupMatchResults
+}
+
+func playGroupMatch(match Match2, matchResultChannel chan MatchResult) {
+	fmt.Println("Playing match", match.Id)
+	outcomeProbabilies := assignProbabilities(match.Team1.Strength, match.Team2.Strength)
 	winnerCode := DetermineWinner(outcomeProbabilies)
-	var team1Score int
-	var team2Score int
+
+	var result MatchResult
 
 	switch winnerCode {
 	case 0:
-		team1Score, team2Score = SetRemisScore()
-		team1.Points = team1.Points + 1
-		team2.Points = team2.Points + 1
-		match.Winner = nil
+		team1Score, team2Score := SetRemisScore()
+		result = MatchResult{
+			Match:             match,
+			Team1Goals:        team1Score,
+			Team2Goals:        team2Score,
+			Team1PointsGained: 1,
+			Team2PointsGained: 1,
+		}
 	case 1:
-		team1Score = RandomResult()
-		team2Score = RandomResultLoser(team1Score, team1.Strength-team2.Strength)
-		team1.Points = team1.Points + 3
-		team2.Points = team2.Points + 0
-		match.Winner = team1
+		team1Score := RandomResult()
+		team2Score := RandomResultLoser(team1Score, match.Team1.Strength-match.Team2.Strength)
+		result = MatchResult{
+			Match:             match,
+			Team1Goals:        team1Score,
+			Team2Goals:        team2Score,
+			Team1PointsGained: 3,
+			Team2PointsGained: 0,
+			Winner:            match.Team1,
+		}
 	case 2:
-		team2Score = RandomResult()
-		team1Score = RandomResultLoser(team2Score, team2.Strength-team1.Strength)
-		team1.Points = team1.Points + 0
-		team2.Points = team2.Points + 3
-		match.Winner = team2
+		team2Score := RandomResult()
+		team1Score := RandomResultLoser(team2Score, match.Team1.Strength-match.Team2.Strength)
+		result = MatchResult{
+			Match:             match,
+			Team1Goals:        team1Score,
+			Team2Goals:        team2Score,
+			Team1PointsGained: 0,
+			Team2PointsGained: 3,
+			Winner:            match.Team2,
+		}
 	}
 
-	match.GoalsTeam1 = team1Score
-	match.GoalsTeam2 = team2Score
-
-	team1.Goals = team1.Goals + team1Score
-	team2.Goals = team2.Goals + team2Score
-
-	rand.Seed(time.Now().UnixNano())
-	multiplier := time.Duration(rand.Intn(100))
-	time.Sleep(time.Millisecond * multiplier)
-
-	c <- match
+	matchResultChannel <- result
 }
 
-func getRoudOfSixteenMatches(groups []Group) []Match {
-	rankedGroups := make([][4]*Country, 0)
+func DetermineGroupRanking(matchResults []MatchResult, teamsSortedIntoGroups map[int][]Team, groups []Group2) []GroupRanking {
+	var teamPoints = make(map[int]int) // teamId -> points
+	var teamGoals = make(map[int]int)  // teamId -> goals
+	var groupRankings = make([]GroupRanking, 0)
+
+	for _, matchResult := range matchResults {
+		teamPoints[matchResult.Match.Team1.Id] += matchResult.Team1PointsGained
+		teamPoints[matchResult.Match.Team2.Id] += matchResult.Team2PointsGained
+
+		teamGoals[matchResult.Match.Team1.Id] += matchResult.Team1Goals
+		teamGoals[matchResult.Match.Team2.Id] += matchResult.Team2Goals
+	}
+
 	for _, group := range groups {
-		rankedGroup := determineGroupRanking(group)
-		rankedGroups = append(rankedGroups, rankedGroup)
+		sortedTeams := determineRankingPerGroup(
+			group.Id,
+			teamsSortedIntoGroups[group.Id],
+			teamPoints,
+			teamGoals,
+		)
+		groupRankings = append(
+			groupRankings, sortedTeams...)
 	}
 
-	allThirds := make([]*Country, 0)
-	for _, rankedGroup := range rankedGroups {
-		allThirds = append(allThirds, rankedGroup[2])
+	return groupRankings
+}
+
+func determineRankingPerGroup(groupId int, teams []Team, teamPoints map[int]int, teamGoals map[int]int) []GroupRanking {
+	teams = sortTeamsByPointsAndGoals(teams, teamPoints, teamGoals)
+
+	var groupRankings []GroupRanking
+	for index, team := range teams {
+		groupRankings = append(groupRankings, GroupRanking{
+			GroupId: groupId,
+			Team:    team,
+			Points:  teamPoints[team.Id],
+			Goals:   teamGoals[team.Id],
+			Ranking: index + 1,
+		})
 	}
 
-	bestFourThirds := getBestFourThirds(allThirds)
+	return groupRankings
+}
 
-	matches := make([]Match, 0)
-	matches = append(matches, CreateMatch(rankedGroups[0][1], rankedGroups[1][1], time.Date(2021, 6, 26, 16, 0, 0, 0, time.UTC)))
-	matches = append(matches, CreateMatch(rankedGroups[0][0], rankedGroups[2][1], time.Date(2021, 6, 26, 19, 0, 0, 0, time.UTC)))
-	matches = append(matches, CreateMatch(rankedGroups[2][0], bestFourThirds[0], time.Date(2021, 6, 27, 16, 0, 0, 0, time.UTC)))
-	matches = append(matches, CreateMatch(rankedGroups[1][0], bestFourThirds[1], time.Date(2021, 6, 27, 19, 0, 0, 0, time.UTC)))
-	matches = append(matches, CreateMatch(rankedGroups[3][1], rankedGroups[4][1], time.Date(2021, 6, 28, 16, 0, 0, 0, time.UTC)))
-	matches = append(matches, CreateMatch(rankedGroups[5][0], bestFourThirds[2], time.Date(2021, 6, 28, 19, 0, 0, 0, time.UTC)))
-	matches = append(matches, CreateMatch(rankedGroups[3][0], rankedGroups[5][1], time.Date(2021, 6, 29, 16, 0, 0, 0, time.UTC)))
-	matches = append(matches, CreateMatch(rankedGroups[4][0], bestFourThirds[3], time.Date(2021, 6, 29, 19, 0, 0, 0, time.UTC)))
+func sortTeamsByPointsAndGoals(teams []Team, teamPoints map[int]int, teamGoals map[int]int) []Team {
+	sort.Slice(teams, func(i, j int) bool {
+		// If the points are equal, the team with the most goals scored is ranked higher
+		if teamPoints[teams[i].Id] == teamPoints[teams[j].Id] {
+			return teamGoals[teams[i].Id] > teamGoals[teams[j].Id]
+		}
+		// Otherwise, the team with the most points is ranked higher
+		return teamPoints[teams[i].Id] > teamPoints[teams[j].Id]
+	})
+
+	return teams
+}
+
+func sortRankingsByPointsAndGoals(rankings []GroupRanking) []GroupRanking {
+	sortedRankings := make([]GroupRanking, len(rankings))
+	copy(sortedRankings, rankings)
+	sort.Slice(sortedRankings, func(i, j int) bool {
+		if sortedRankings[i].Points == sortedRankings[j].Points {
+			return sortedRankings[i].Goals > sortedRankings[j].Goals
+		}
+		return sortedRankings[i].Points > sortedRankings[j].Points
+	})
+	return sortedRankings
+}
+
+func getHighestMatchId(matches []Match2) int {
+	highestMatchId := 0
+	for _, match := range matches {
+		if match.Id > highestMatchId {
+			highestMatchId = match.Id
+		}
+	}
+	return highestMatchId
+}
+
+func getNextMatchId(matches []Match2) int {
+	return getHighestMatchId(matches) + 1
+}
+
+func UpdateKoMatchesWithThirds(tournament Tournament) []KoMatch {
+	koMatches := tournament.KoMatches
+	groupRankings := tournament.GroupRankings
+
+	rankingThirds := FilterByThirdRank(groupRankings)
+	sortedRankingThirds := sortRankingsByPointsAndGoals(rankingThirds)
+
+	var firstKoGroupId int
+	for _, group := range tournament.Groups {
+		if group.GroupType == KoPhaseGroupType {
+			firstKoGroupId = group.Id
+			break
+		}
+	}
+
+	firstKoGroupMatches := make([]KoMatch, 0)
+	for _, koMatch := range koMatches {
+		if koMatch.GroupId == firstKoGroupId {
+			firstKoGroupMatches = append(firstKoGroupMatches, koMatch)
+		}
+	}
+	if len(firstKoGroupMatches) != NumberOfMatchesInFirstKoRound {
+		panic("Error: Expected " + fmt.Sprint(NumberOfMatchesInFirstKoRound) + " matches in first Ko round, instead found " + fmt.Sprint(len(firstKoGroupMatches)))
+	}
+
+	// Get a list of the group-phase Groups
+	type GroupId int
+	groupPhaseGroupIdsSet := make(map[GroupId]bool, 0)
+	for _, groupRanking := range groupRankings {
+		if groupRanking.Ranking == 3 {
+			groupPhaseGroupIdsSet[GroupId(groupRanking.GroupId)] = true
+		}
+	}
+
+	groupIds := make([]GroupId, len(groupPhaseGroupIdsSet))
+	i := 0
+	for k := range groupPhaseGroupIdsSet {
+		groupIds[i] = k
+		i++
+	}
+
+	if len(groupIds) != NumberOfGroupsInGroupPhase {
+		panic(
+			"Error: Expected " +
+				fmt.Sprint(NumberOfGroupsInGroupPhase) +
+				" groups in tournament, instead found " +
+				fmt.Sprint(len(groupIds)),
+		)
+	}
+
+	groupIdWeight := map[GroupId]int{}
+	weight := 1
+	for _, groupId := range groupIds {
+		groupIdWeight[groupId] = weight
+		weight *= 2
+	}
+
+	totalWeight := 0
+	for index, rankingOfThird := range sortedRankingThirds {
+		if index == 4 {
+			break
+		}
+		totalWeight += groupIdWeight[GroupId(rankingOfThird.GroupId)]
+	}
+
+	thirdsEvaluationRules := tournament.ThirdsEvaluationRules
+	var rankingOfThirdPattern []int
+	for _, rule := range thirdsEvaluationRules {
+		if rule.BestFourTeamsId == totalWeight {
+			rankingOfThirdPattern = rule.BestFourTeamsArrangement
+			break
+		}
+	}
+
+	updatesKoMatches := make([]KoMatch, 0)
+	updatedKoMatchIndex := 0
+	numberFirstKoGroupMatches := 0
+	for _, koMatch := range koMatches {
+		if koMatch.GroupId1 == 0 {
+			panic("Error: GroupId1 is unspecified for KoMatch with Id " + fmt.Sprint(koMatch.Id))
+		}
+		if koMatch.GroupId2 == 0 {
+			rankingOfThirdIndex := rankingOfThirdPattern[updatedKoMatchIndex]
+			rankingOfThird := rankingThirds[rankingOfThirdIndex]
+			koMatch.GroupId2 = rankingOfThird.GroupId
+			updatedKoMatchIndex++
+		}
+		if koMatch.GroupId == firstKoGroupId {
+			numberFirstKoGroupMatches++
+		}
+
+		updatesKoMatches = append(updatesKoMatches, koMatch)
+	}
+
+	if numberFirstKoGroupMatches != NumberOfMatchesInFirstKoRound {
+		panic("Error: Expected " + fmt.Sprint(NumberOfMatchesInFirstKoRound) + " matches in first Ko round, instead found " + fmt.Sprint(numberFirstKoGroupMatches))
+	}
+
+	return updatesKoMatches
+}
+
+func PlayKoRounds(tournament Tournament) Tournament {
+	koMatchMap := GroupsMapKoMatches(tournament.KoMatches)
+	koGroups := FilterByKoRound(tournament.Groups)
+	for _, koGroup := range koGroups {
+		fmt.Println("Playing Ko Group", koGroup.Name)
+		koMatches := koMatchMap[koGroup.Id]
+		if len(koMatches) == 0 {
+			panic("No matches found for Ko Group " + koGroup.Name + " with Id " + fmt.Sprint(koGroup.Id))
+		}
+		rankingsSortedIntoGroups := GroupsMapGroupRankings(tournament.GroupRankings)
+		matches := CreateMatchFromKoMatch(koMatches, rankingsSortedIntoGroups)
+		tournament.Matches = append(tournament.Matches, matches...)
+		matchResults := PlayKoGroupsMatches(matches)
+		tournament.MatchResults = append(tournament.MatchResults, matchResults...)
+
+		teamsInGroup := GetTeamsFromMatches(matches)
+		teamsMap := make(map[int][]Team)
+		teamsMap[koGroup.Id] = teamsInGroup
+		groupRankings := DetermineGroupRanking(matchResults, teamsMap, []Group2{koGroup})
+		tournament.GroupRankings = append(tournament.GroupRankings, groupRankings...)
+	}
+
+	finalGroupId := koGroups[len(koGroups)-1].Id
+	winner := DetermineTournamentWinner(finalGroupId, tournament.GroupRankings)
+	tournament.Winner = winner
+
+	return tournament
+}
+
+func CreateMatchFromKoMatch(koMatches []KoMatch, rankingsSortedIntoGroups map[int][]GroupRanking) []Match2 {
+	matches := make([]Match2, 0)
+	for _, koMatch := range koMatches {
+		group1GroupRankings := rankingsSortedIntoGroups[koMatch.GroupId1]
+		group2GroupRankings := rankingsSortedIntoGroups[koMatch.GroupId2]
+
+		team1, err1 := findTeamBasedOnRanking(group1GroupRankings, koMatch.Ranking1)
+		team2, err2 := findTeamBasedOnRanking(group2GroupRankings, koMatch.Ranking2)
+
+		if err1 != nil {
+			panic("Error: " + err1.Error() + " for GroupId: " + fmt.Sprint(koMatch.GroupId1))
+		}
+		if err2 != nil {
+			panic("Error: " + err2.Error() + " for GroupId: " + fmt.Sprint(koMatch.GroupId2))
+		}
+
+		match := Match2{
+			Id:      getNextMatchId(matches),
+			Team1:   team1,
+			Team2:   team2,
+			GroupId: koMatch.GroupId,
+		}
+		matches = append(matches, match)
+	}
 	return matches
 }
 
-func getRoundOfEightMatches(matches []Match) []Match {
-	nextMatches := make([]Match, 0)
-	nextMatches = append(nextMatches, CreateMatch(matches[5].Winner, matches[4].Winner, time.Date(2021, 7, 2, 16, 0, 0, 0, time.UTC)))
-	nextMatches = append(nextMatches, CreateMatch(matches[3].Winner, matches[1].Winner, time.Date(2021, 7, 2, 19, 0, 0, 0, time.UTC)))
-	nextMatches = append(nextMatches, CreateMatch(matches[2].Winner, matches[0].Winner, time.Date(2021, 7, 3, 16, 0, 0, 0, time.UTC)))
-	nextMatches = append(nextMatches, CreateMatch(matches[7].Winner, matches[6].Winner, time.Date(2021, 7, 3, 19, 0, 0, 0, time.UTC)))
-
-	return nextMatches
+func findTeamBasedOnRanking(rankings []GroupRanking, rankingNumber int) (Team, error) {
+	for _, ranking := range rankings {
+		if ranking.Ranking == rankingNumber {
+			return ranking.Team, nil
+		}
+	}
+	return Team{}, errors.New("Team with ranking " + fmt.Sprint(rankingNumber) + " not found in rankings")
 }
 
-func getRoundOfFourMatches(matches []Match) []Match {
-	nextMatches := make([]Match, 0)
-	nextMatches = append(nextMatches, CreateMatch(matches[0].Winner, matches[1].Winner, time.Date(2021, 7, 6, 19, 0, 0, 0, time.UTC)))
-	nextMatches = append(nextMatches, CreateMatch(matches[2].Winner, matches[3].Winner, time.Date(2021, 7, 7, 19, 0, 0, 0, time.UTC)))
+func PlayKoGroupsMatches_(matches []Match2) []MatchResult {
+	var matchResults []MatchResult
+	matchResultChannel := make(chan MatchResult, len(matches))
+	numberOfMatches := len(matches)
+	pointsForWinner := numberOfMatches // maybe not a good solution as it ignores the match setup defined in the DB, need to check
+	for _, match := range matches {
+		go PlayEliminationMatch2(match, pointsForWinner, matchResultChannel)
+		pointsForWinner--
+	}
 
-	return nextMatches
+	for i := 0; i < numberOfMatches; i++ {
+		matchResult := <-matchResultChannel
+		matchResults = append(matchResults, matchResult)
+	}
+
+	return matchResults
 }
 
-func playEliminationMatch(match Match) Match {
+var PlayKoGroupsMatches = PlayKoGroupsMatches_
+
+func PlayEliminationMatch2_(match Match2, pointsForWinner int, matchResultChannel chan MatchResult) {
 	var team1 = match.Team1
 	var team2 = match.Team2
 	var team1Score int
 	var team2Score int
 	var team1PenaltyScore int = 0
 	var team2PenaltyScore int = 0
-	var winnerTeam *Country
+	var result MatchResult
+
 	outcomeProbabilies := assignProbabilities(team1.Strength, team2.Strength)
 	winnerCode := DetermineWinner(outcomeProbabilies)
 
 	fmt.Println(team1.Name + " vs. " + team2.Name)
 	switch winnerCode {
 	case 0:
-		team1Score, team2Score = SetRemisScore()
-		team1PenaltyScore, team2PenaltyScore = PlayPenalty(0, 0)
+		result = ResolveDrawInEliminationMatch(match, pointsForWinner)
 		resultString := fmt.Sprintf("%d (%d) - %d (%d)", team1Score, team1Score+team1PenaltyScore, team2Score, team1Score+team2PenaltyScore)
 		fmt.Println(resultString)
-		if team1Score+team1PenaltyScore > team2Score+team2PenaltyScore {
-			winnerTeam = team1
-		} else {
-			winnerTeam = team2
-		}
+
 	case 1:
 		team1Score = RandomResult()
 		team2Score = RandomResultLoser(team1Score, team1.Strength-team2.Strength)
+		result = MatchResult{
+			Match:             match,
+			Team1Goals:        team1Score,
+			Team2Goals:        team2Score,
+			Team1PointsGained: pointsForWinner,
+			Team2PointsGained: 0,
+			Winner:            team1,
+		}
 		resultString := fmt.Sprintf("%d - %d", team1Score, team2Score)
 		fmt.Println(resultString)
-		winnerTeam = team1
 	case 2:
 		team2Score = RandomResult()
 		team1Score = RandomResultLoser(team2Score, team2.Strength-team1.Strength)
+		result = MatchResult{
+			Match:             match,
+			Team1Goals:        team1Score,
+			Team2Goals:        team2Score,
+			Team1PointsGained: 0,
+			Team2PointsGained: pointsForWinner,
+			Winner:            team2,
+		}
 		resultString := fmt.Sprintf("%d - %d", team1Score, team2Score)
 		fmt.Println(resultString)
-		winnerTeam = team2
 	}
 
-	match.GoalsTeam1 = team1Score
-	match.PenaltyScoreTeam1 = team1PenaltyScore
-	match.GoalsTeam2 = team2Score
-	match.PenaltyScoreTeam2 = team2PenaltyScore
-	match.Winner = winnerTeam
+	matchResultChannel <- result
+}
 
-	team1.Goals = team1.Goals + team1Score
-	team1.PenaltyGoals = team1.PenaltyGoals + team1PenaltyScore
-	team2.Goals = team2.Goals + team2Score
-	team2.PenaltyGoals = team2.PenaltyGoals + team2PenaltyScore
+var PlayEliminationMatch2 = PlayEliminationMatch2_
 
-	return match
+func ResolveDrawInEliminationMatch_(match Match2, pointsForWinner int) MatchResult {
+	team1 := match.Team1
+	team2 := match.Team2
+	var winnerTeam Team
+	var team1PointsGained int
+	var team2PointsGained int
+
+	team1Score, team2Score := SetRemisScore()
+	team1PenaltyScore, team2PenaltyScore := PlayPenalty(0, 0)
+	if team1Score+team1PenaltyScore > team2Score+team2PenaltyScore {
+		winnerTeam = team1
+		team1PointsGained = pointsForWinner
+		team2PointsGained = 0
+	} else {
+		winnerTeam = team2
+		team1PointsGained = 0
+		team2PointsGained = pointsForWinner
+	}
+	result := MatchResult{
+		Match:             match,
+		Team1Goals:        team1Score,
+		Team2Goals:        team2Score,
+		Team1PenaltyGoals: team1PenaltyScore,
+		Team2PenaltyGoals: team2PenaltyScore,
+		Team1PointsGained: team1PointsGained,
+		Team2PointsGained: team2PointsGained,
+		Winner:            winnerTeam,
+	}
+
+	return result
+}
+
+var ResolveDrawInEliminationMatch = ResolveDrawInEliminationMatch_
+
+func GetTeamsFromMatches(matches []Match2) []Team {
+	teams := make([]Team, 0)
+	for _, match := range matches {
+		teams = append(teams, match.Team1, match.Team2)
+	}
+	return teams
+}
+
+func DetermineTournamentWinner(finalGroupId int, groupRankings []GroupRanking) Team {
+	rankingsSortedIntoGroups := GroupsMapGroupRankings(groupRankings)
+	finalRankings := rankingsSortedIntoGroups[finalGroupId]
+
+	if len(finalRankings) != 2 {
+		panic("Error: Final group does not have 2 teams, instead has " + fmt.Sprint(len(finalRankings)) + " teams.")
+	}
+	winner := finalRankings[0].Team
+
+	return winner
 }
 
 func assignProbabilities(strength1 int, strength2 int) OutcomeProbabilities {
@@ -229,7 +501,6 @@ func convertStrengthToProbabilities(strength1 int, strength2 int) (float64, floa
 }
 
 func DetermineWinner_(outcomeChanges OutcomeProbabilities) int {
-	//rand.Seed(time.Now().UnixNano())
 	randomResult := rand.Float64()
 	if randomResult < outcomeChanges.Remis {
 		return 0 // remis
@@ -250,7 +521,6 @@ func SetRemisScore_() (int, int) {
 var SetRemisScore = SetRemisScore_
 
 func RandomResult_() int {
-	rand.Seed(time.Now().UnixNano())
 	probab := rand.Float64()
 	k := findK(probab, 0, lambda)
 	return k + 1
@@ -328,7 +598,6 @@ func PlayPenalty_(score1, score2 int) (int, int) {
 var PlayPenalty = PlayPenalty_
 
 func randomScoreBetween0And5() int {
-	rand.Seed(time.Now().UnixNano())
 	goals := 0
 	for i := 1; i <= 5; i++ {
 		randomResult := rand.Float64()
@@ -347,28 +616,4 @@ func CountAllGroupMatches(groups []Group) int {
 	}
 
 	return numberMatches
-}
-
-func determineGroupRanking(group Group) [4]*Country {
-	countries := group.Countries
-	sort.Slice(countries[:], func(i, j int) bool {
-		if countries[i].Points == countries[j].Points && countries[i].Goals > countries[j].Goals {
-			return true
-		}
-		return countries[i].Points > countries[j].Points
-	})
-
-	return countries
-}
-
-func getBestFourThirds(thirds []*Country) [4]*Country {
-	var thirdsSlice []*Country = thirds[:]
-	sort.Slice(thirdsSlice, func(i, j int) bool {
-		if thirdsSlice[i].Points == thirdsSlice[j].Points && thirdsSlice[i].Goals > thirdsSlice[j].Goals {
-			return true
-		}
-		return thirdsSlice[i].Points > thirdsSlice[j].Points
-	})
-	var bestFourThirds = [4]*Country{thirdsSlice[0], thirdsSlice[1], thirdsSlice[2], thirdsSlice[3]}
-	return bestFourThirds
 }

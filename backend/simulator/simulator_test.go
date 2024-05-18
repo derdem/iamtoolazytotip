@@ -84,8 +84,8 @@ func TestUpdateKoMatchesWithThirds(t *testing.T) {
 
 	// matchResults are evaluated and groupRankings are determined
 	groupPhaseGroups := simulator.FilterByGroupPhase(tournament.Groups)
-	teamsSortedIntoGroups := simulator.GetTeamsSortedIntoGroups(tournament.Teams)
-	groupRankings := simulator.DetermineGroupRanking2(matchResults, teamsSortedIntoGroups, groupPhaseGroups)
+	teamsSortedIntoGroups := simulator.GroupsMapTeams(tournament.Teams)
+	groupRankings := simulator.DetermineGroupRanking(matchResults, teamsSortedIntoGroups, groupPhaseGroups)
 	tournament.GroupRankings = groupRankings
 
 	// Ko matches are updated with the third placed teams
@@ -286,7 +286,7 @@ func TestPlayKoRounds_UnhappyCase_WrongRankingNumber(t *testing.T) {
 
 func TestMapKoMatchesToGroups(t *testing.T) {
 	koMatches := getKoMatches()
-	koMatchesMap := simulator.MapKoMatchesToGroups(koMatches)
+	koMatchesMap := simulator.GroupsMapKoMatches(koMatches)
 
 	if len(koMatchesMap[3]) != 2 {
 		t.Errorf("Expected 2, got %v", len(koMatchesMap[3]))
@@ -718,7 +718,7 @@ func getKoMatches() []simulator.KoMatch {
 func TestDetermineWinnerHappyCase(t *testing.T) {
 	finalGroupId := 3
 	groupRankings := getGroupRankings_DetermineWinnerHappyCase()
-	winner := simulator.DetermineWinner2(finalGroupId, groupRankings)
+	winner := simulator.DetermineTournamentWinner(finalGroupId, groupRankings)
 
 	if winner.Name != groupRankings[0].Team.Name {
 		t.Errorf("Expected %v, got %v", groupRankings[0].Team.Name, winner.Name)
@@ -750,7 +750,7 @@ func TestDetermineWinnerUnhappyCase(t *testing.T) {
 	finalGroupId := 3
 	groupRankings := getGroupRankings_DetermineWinnerUnhappyCase()
 
-	_ = simulator.DetermineWinner2(finalGroupId, groupRankings)
+	_ = simulator.DetermineTournamentWinner(finalGroupId, groupRankings)
 }
 
 func getGroupRankings_DetermineWinnerUnhappyCase() []simulator.GroupRanking {
