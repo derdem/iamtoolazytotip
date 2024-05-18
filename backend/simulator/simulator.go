@@ -12,10 +12,16 @@ const (
 	lambda                        float64 = 1.3
 )
 
-func TournamentSimulator2(tournament Tournament) Tournament {
+func TournamentSimulator(tournament Tournament) Tournament {
 	fmt.Println("Start")
+	tournamentAfterGroupPhase := PlayGroupRounds(tournament)
+	tournamentWithWinner := PlayKoRounds(tournamentAfterGroupPhase)
+	fmt.Println("Winner of the tournament is", tournamentWithWinner.Winner.Name)
 
-	// group matches are played and results are stored in matchResults
+	return tournamentWithWinner
+}
+
+func PlayGroupRounds(tournament Tournament) Tournament {
 	matchResults := PlayGroupMatches(tournament)
 	tournament.MatchResults = matchResults
 
@@ -30,10 +36,7 @@ func TournamentSimulator2(tournament Tournament) Tournament {
 
 	tournament.KoMatches = updatedKoMatches
 
-	tournamentWithWinner := PlayKoRounds(tournament)
-	fmt.Println("Winner of the tournament is", tournamentWithWinner.Winner.Name)
-
-	return tournamentWithWinner
+	return tournament
 }
 
 func PlayGroupMatches(tournament Tournament) []MatchResult {

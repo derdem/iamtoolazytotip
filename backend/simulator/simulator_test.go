@@ -28,7 +28,7 @@ func _TestTournamentSimulatorV2(t *testing.T) {
 	}()
 
 	tournament := readTournamentFromDb.GetTournament(2)
-	simulator.TournamentSimulator2(tournament)
+	simulator.TournamentSimulator(tournament)
 }
 
 func _TestPrepareDataDump(t *testing.T) {
@@ -68,7 +68,7 @@ func TestReadTournamentFromJson(t *testing.T) {
 func TestRunFullTournament(t *testing.T) {
 	tournament := simulator.ReadTournamentFromFile("../dumps/tournament2.json")
 
-	tournament = simulator.TournamentSimulator2(tournament)
+	tournament = simulator.TournamentSimulator(tournament)
 
 	if len(tournament.GroupRankings) != 54 {
 		t.Errorf("Expected 30 group rankings, got %v", len(tournament.GroupRankings))

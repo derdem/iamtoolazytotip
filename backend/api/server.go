@@ -40,7 +40,7 @@ func enableCors(handler http.Handler) http.Handler {
 func run2021Tournament() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		groups := readTournamentFromDb.GetTournament(2)
-		matchOutcome := simulator.TournamentSimulator2(groups)
+		matchOutcome := simulator.TournamentSimulator(groups)
 
 		js, err := json.Marshal(matchOutcome)
 		if err != nil {
@@ -56,7 +56,7 @@ func run2021Tournament() http.HandlerFunc {
 func run2024Tournament() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		tournament := readTournamentFromDb.GetTournament(3)
-		finishedTournament := simulator.TournamentSimulator2(tournament)
+		finishedTournament := simulator.TournamentSimulator(tournament)
 
 		js, err := json.Marshal(finishedTournament)
 		if err != nil {
@@ -87,7 +87,7 @@ func runCustomTournament() http.HandlerFunc {
 func readTournament1() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		groups := readTournamentFromDb.GetTournament(1)
-		finishedTournament := simulator.TournamentSimulator2(groups)
+		finishedTournament := simulator.TournamentSimulator(groups)
 		js, err := json.Marshal(finishedTournament)
 
 		if err != nil {
