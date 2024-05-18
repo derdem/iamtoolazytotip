@@ -5,8 +5,8 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/derdem/iamtoolazytotip/readTournamentFromDb"
 	"github.com/derdem/iamtoolazytotip/simulator"
-	"github.com/derdem/iamtoolazytotip/simulator/readTournamentFromDb"
 )
 
 func Start() *http.ServeMux {

@@ -8,8 +8,8 @@ import (
 	"testing"
 
 	"github.com/derdem/iamtoolazytotip/postgres_connection"
+	"github.com/derdem/iamtoolazytotip/readTournamentFromDb"
 	"github.com/derdem/iamtoolazytotip/simulator"
-	"github.com/derdem/iamtoolazytotip/simulator/readTournamentFromDb"
 )
 
 func ReadTournamentFromFile(path string) simulator.Tournament {

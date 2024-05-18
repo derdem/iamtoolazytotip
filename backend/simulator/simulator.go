@@ -123,20 +123,6 @@ func sortRankingsByPointsAndGoals(rankings []GroupRanking) []GroupRanking {
 	return sortedRankings
 }
 
-func getHighestMatchId(matches []Match) int {
-	highestMatchId := 0
-	for _, match := range matches {
-		if match.Id > highestMatchId {
-			highestMatchId = match.Id
-		}
-	}
-	return highestMatchId
-}
-
-func getNextMatchId(matches []Match) int {
-	return getHighestMatchId(matches) + 1
-}
-
 func UpdateKoMatchesWithThirds(tournament Tournament) []KoMatch {
 	koMatches := tournament.KoMatches
 	groupRankings := tournament.GroupRankings
@@ -294,6 +280,20 @@ func CreateMatchFromKoMatch(koMatches []KoMatch, rankingsSortedIntoGroups map[in
 	return matches
 }
 
+func getNextMatchId(matches []Match) int {
+	return getHighestMatchId(matches) + 1
+}
+
+func getHighestMatchId(matches []Match) int {
+	highestMatchId := 0
+	for _, match := range matches {
+		if match.Id > highestMatchId {
+			highestMatchId = match.Id
+		}
+	}
+	return highestMatchId
+}
+
 func findTeamBasedOnRanking(rankings []GroupRanking, rankingNumber int) (Team, error) {
 	for _, ranking := range rankings {
 		if ranking.Ranking == rankingNumber {
@@ -322,40 +322,6 @@ func PlayKoGroupsMatches_(matches []Match) []MatchResult {
 }
 
 var PlayKoGroupsMatches = PlayKoGroupsMatches_
-
-func ResolveDrawInEliminationMatch_(match Match, pointsForWinner int) MatchResult {
-	team1 := match.Team1
-	team2 := match.Team2
-	var winnerTeam Team
-	var team1PointsGained int
-	var team2PointsGained int
-
-	team1Score, team2Score := SetRemisScore()
-	team1PenaltyScore, team2PenaltyScore := PlayPenalty(0, 0)
-	if team1Score+team1PenaltyScore > team2Score+team2PenaltyScore {
-		winnerTeam = team1
-		team1PointsGained = pointsForWinner
-		team2PointsGained = 0
-	} else {
-		winnerTeam = team2
-		team1PointsGained = 0
-		team2PointsGained = pointsForWinner
-	}
-	result := MatchResult{
-		Match:             match,
-		Team1Goals:        team1Score,
-		Team2Goals:        team2Score,
-		Team1PenaltyGoals: team1PenaltyScore,
-		Team2PenaltyGoals: team2PenaltyScore,
-		Team1PointsGained: team1PointsGained,
-		Team2PointsGained: team2PointsGained,
-		Winner:            winnerTeam,
-	}
-
-	return result
-}
-
-var ResolveDrawInEliminationMatch = ResolveDrawInEliminationMatch_
 
 func GetTeamsFromMatches(matches []Match) []Team {
 	teams := make([]Team, 0)

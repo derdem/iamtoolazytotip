@@ -1,6 +1,6 @@
 package simulator
 
-func ConvertStrengthStringToInt(strength Strength) int {
+func StrengthToInt(strength Strength) int {
 	switch strength {
 	case LowStrength:
 		return 1

@@ -7,15 +7,20 @@ import (
 	"github.com/jackc/pgx"
 )
 
-func GetConnection() *pgx.Conn {
-	// Connect to the database
+func getConfig(host string) pgx.ConnConfig {
 	config := pgx.ConnConfig{
-		Host:     "database",
+		Host:     host,
 		Port:     5432,
 		User:     "iamtoolazytotip",
 		Password: "iamtoolazytotip",
 		Database: "tournaments",
 	}
+	return config
+}
+
+func GetConnection() *pgx.Conn {
+	// Connect to the database
+	config := getConfig("database")
 	conn, err := pgx.Connect(config)
 	if err != nil {
 		fmt.Println(err)
@@ -27,13 +32,7 @@ func GetConnection() *pgx.Conn {
 
 func GetConnectionForTest() *pgx.Conn {
 	// Connect to the database from localhost
-	config := pgx.ConnConfig{
-		Host:     "localhost",
-		Port:     5432,
-		User:     "iamtoolazytotip",
-		Password: "iamtoolazytotip",
-		Database: "tournaments",
-	}
+	config := getConfig("localhost")
 	conn, err := pgx.Connect(config)
 	if err != nil {
 		fmt.Println(err)

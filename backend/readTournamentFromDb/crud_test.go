@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/derdem/iamtoolazytotip/postgres_connection"
-	"github.com/derdem/iamtoolazytotip/simulator/readTournamentFromDb"
+	"github.com/derdem/iamtoolazytotip/readTournamentFromDb"
 )
 
 func TestReadTournament(t *testing.T) {

@@ -70,7 +70,7 @@ func ConvertTournamentDbToModel(tournamentDb TournamentDb) simulator.Tournament 
 			Id:       teamDb.Id,
 			Name:     teamDb.Name,
 			GroupId:  teamDb.GroupId,
-			Strength: simulator.ConvertStrengthStringToInt(teamDb.Strength),
+			Strength: simulator.StrengthToInt(teamDb.Strength),
 		}
 		teamMap[team.Id] = team
 		teams = append(teams, team)

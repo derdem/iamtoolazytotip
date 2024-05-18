@@ -215,6 +215,40 @@ func ScoreLooser_(resultWinner int, strengthDifference int) int {
 
 var ScoreLooser = ScoreLooser_
 
+func ResolveDrawInEliminationMatch_(match Match, pointsForWinner int) MatchResult {
+	team1 := match.Team1
+	team2 := match.Team2
+	var winnerTeam Team
+	var team1PointsGained int
+	var team2PointsGained int
+
+	team1Score, team2Score := SetRemisScore()
+	team1PenaltyScore, team2PenaltyScore := PlayPenalty(0, 0)
+	if team1Score+team1PenaltyScore > team2Score+team2PenaltyScore {
+		winnerTeam = team1
+		team1PointsGained = pointsForWinner
+		team2PointsGained = 0
+	} else {
+		winnerTeam = team2
+		team1PointsGained = 0
+		team2PointsGained = pointsForWinner
+	}
+	result := MatchResult{
+		Match:             match,
+		Team1Goals:        team1Score,
+		Team2Goals:        team2Score,
+		Team1PenaltyGoals: team1PenaltyScore,
+		Team2PenaltyGoals: team2PenaltyScore,
+		Team1PointsGained: team1PointsGained,
+		Team2PointsGained: team2PointsGained,
+		Winner:            winnerTeam,
+	}
+
+	return result
+}
+
+var ResolveDrawInEliminationMatch = ResolveDrawInEliminationMatch_
+
 func PlayPenalty_(score1, score2 int) (int, int) {
 	score1Increment := RandomScoreBetween0And5() + score1
 	score2Increment := RandomScoreBetween0And5() + score2
