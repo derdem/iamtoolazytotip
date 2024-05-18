@@ -365,7 +365,7 @@ func TestCreateMatchFromKoMatchUnhappyCase(t *testing.T) {
 func TestPlayKoGroupsMatches(t *testing.T) {
 	matches := getMatches()
 
-	simulator.PlayEliminationMatch2 = func(match simulator.Match2, pointsForWinner int, matchChannel chan simulator.MatchResult) {
+	simulator.PlayEliminationMatch = func(match simulator.Match2, pointsForWinner int, matchChannel chan simulator.MatchResult) {
 		matchChannel <- simulator.MatchResult{
 			Winner:            match.Team1,
 			Team1Goals:        1,
@@ -378,7 +378,7 @@ func TestPlayKoGroupsMatches(t *testing.T) {
 		}
 	}
 	defer func() {
-		simulator.PlayEliminationMatch2 = simulator.PlayEliminationMatch2_
+		simulator.PlayEliminationMatch = simulator.PlayEliminationMatch_
 	}()
 
 	results := simulator.PlayKoGroupsMatches(matches)
@@ -405,7 +405,7 @@ func TestPlayKoGroupsMatches(t *testing.T) {
 
 }
 
-func TestPlayEliminationMatch2_Penalty(t *testing.T) {
+func TestPlayEliminationMatch_Penalty(t *testing.T) {
 	match := getMatch()
 	matchChannel := make(chan simulator.MatchResult)
 	matchResult := simulator.MatchResult{
@@ -431,7 +431,7 @@ func TestPlayEliminationMatch2_Penalty(t *testing.T) {
 		simulator.ResolveDrawInEliminationMatch = simulator.ResolveDrawInEliminationMatch_
 	}()
 
-	go simulator.PlayEliminationMatch2(match, 1, matchChannel)
+	go simulator.PlayEliminationMatch(match, 1, matchChannel)
 
 	result := <-matchChannel
 
@@ -459,7 +459,7 @@ func TestPlayEliminationMatch2_Penalty(t *testing.T) {
 
 }
 
-func TestPlayEliminationMatch2_Team1Wins(t *testing.T) {
+func TestPlayEliminationMatch_Team1Wins(t *testing.T) {
 	match := getMatch()
 	matchChannel := make(chan simulator.MatchResult)
 
@@ -475,14 +475,14 @@ func TestPlayEliminationMatch2_Team1Wins(t *testing.T) {
 	defer func() {
 		simulator.RandomResult = simulator.RandomResult_
 	}()
-	simulator.RandomResultLoser = func(rw int, sd int) int {
+	simulator.ScoreLooser = func(rw int, sd int) int {
 		return 0
 	}
 	defer func() {
-		simulator.RandomResultLoser = simulator.RandomResultLoser_
+		simulator.ScoreLooser = simulator.ScoreLooser_
 	}()
 
-	go simulator.PlayEliminationMatch2(match, 1, matchChannel)
+	go simulator.PlayEliminationMatch(match, 1, matchChannel)
 
 	result := <-matchChannel
 
@@ -511,7 +511,7 @@ func TestPlayEliminationMatch2_Team1Wins(t *testing.T) {
 
 }
 
-func TestPlayEliminationMatch2_Team2Wins(t *testing.T) {
+func TestPlayEliminationMatch_Team2Wins(t *testing.T) {
 	match := getMatch()
 	matchChannel := make(chan simulator.MatchResult)
 
@@ -527,14 +527,14 @@ func TestPlayEliminationMatch2_Team2Wins(t *testing.T) {
 	defer func() {
 		simulator.RandomResult = simulator.RandomResult_
 	}()
-	simulator.RandomResultLoser = func(rw int, sd int) int {
+	simulator.ScoreLooser = func(rw int, sd int) int {
 		return 0
 	}
 	defer func() {
-		simulator.RandomResultLoser = simulator.RandomResultLoser_
+		simulator.ScoreLooser = simulator.ScoreLooser_
 	}()
 
-	go simulator.PlayEliminationMatch2(match, 1, matchChannel)
+	go simulator.PlayEliminationMatch(match, 1, matchChannel)
 
 	result := <-matchChannel
 
