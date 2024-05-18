@@ -8,7 +8,7 @@ import (
 	"gonum.org/v1/gonum/stat/distuv"
 )
 
-func PlayGroupMatch_(match Match2, matchResultChannel chan MatchResult) {
+func PlayGroupMatch_(match Match, matchResultChannel chan MatchResult) {
 	fmt.Println("Playing match", match.Id)
 	outcomeProbabilies := AssignProbabilities(match.Team1.Strength, match.Team2.Strength)
 	winnerCode := DetermineWinner(outcomeProbabilies)
@@ -54,7 +54,7 @@ func PlayGroupMatch_(match Match2, matchResultChannel chan MatchResult) {
 
 var PlayGroupMatch = PlayGroupMatch_
 
-func PlayEliminationMatch_(match Match2, pointsForWinner int, matchResultChannel chan MatchResult) {
+func PlayEliminationMatch_(match Match, pointsForWinner int, matchResultChannel chan MatchResult) {
 	var team1 = match.Team1
 	var team2 = match.Team2
 	var team1Score int

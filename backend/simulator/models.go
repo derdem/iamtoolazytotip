@@ -1,121 +1,77 @@
 package simulator
 
-import "time"
+type Tournament struct {
+	Id                    int                     `json:"id"`
+	Name                  string                  `json:"name"`
+	Groups                []Group                 `json:"groups"`
+	Teams                 []Team                  `json:"teams"`
+	Matches               []Match                 `json:"matches"`
+	MatchResults          []MatchResult           `json:"matchResults"`
+	GroupRankings         []GroupRanking          `json:"groupRankings"`
+	KoMatches             []KoMatch               `json:"koMatches"`
+	ThirdsEvaluationRules []ThirdsEvaluationRules `json:"thirdsEvaluationRules"`
+	Winner                Team                    `json:"winner"`
+}
+
+type Group struct {
+	Id           int       `json:"id"`
+	Name         string    `json:"name"`
+	TournamentId int       `json:"tournamentId"`
+	GroupType    GroupType `json:"groupType"`
+}
+
+type Team struct {
+	Id       int    `json:"id"`
+	Name     string `json:"name"`
+	GroupId  int    `json:"groupId"`
+	Strength int    `json:"strength"`
+}
+
+type Match struct {
+	Id      int  `json:"id"`
+	GroupId int  `json:"groupId"`
+	Team1   Team `json:"team1"`
+	Team2   Team `json:"team2"`
+}
+
+type KoMatch struct {
+	Id       int `json:"id"`
+	GroupId  int `json:"group_id"`
+	GroupId1 int `json:"group_id1"`
+	GroupId2 int `json:"group_id2"`
+	Ranking1 int `json:"ranking1"`
+	Ranking2 int `json:"ranking2"`
+}
+
+type MatchResult struct {
+	Match             Match `json:"match"`
+	Team1Goals        int   `json:"team1Goals"`
+	Team2Goals        int   `json:"team2Goals"`
+	Team1PenaltyGoals int   `json:"team1PenaltyGoals"`
+	Team2PenaltyGoals int   `json:"team2PenaltyGoals"`
+	Team1PointsGained int   `json:"team1PointsGained"`
+	Team2PointsGained int   `json:"team2PointsGained"`
+	Winner            Team  `json:"winner"`
+}
+
+type GroupRanking struct {
+	GroupId int  `json:"groupId"`
+	Team    Team `json:"team"`
+	Ranking int  `json:"ranking"`
+	Points  int  `json:"points"`
+	Goals   int  `json:"goals"`
+}
+
+type ThirdsEvaluationRules struct {
+	TournamentId             int   `json:"tournament_id"`
+	BestFourTeamsId          int   `json:"best_four_teams_id"`
+	BestFourTeamsArrangement []int `json:"best_four_teams_arrangement"`
+}
 
 type OutcomeProbabilities struct {
 	Team1 float64
 	Team2 float64
 	Remis float64
-}
-
-type MatchOutcome struct {
-	Team1      Country `json:"team1"`
-	Team1Score int     `json:"team1Score"`
-	Team2      Country `json:"team2"`
-	Team2Score int     `json:"team2Score"`
-}
-
-type Country struct {
-	Strength     int    `json:"strength"`
-	Name         string `json:"name"`
-	Points       int    `json:"points"`
-	Goals        int    `json:"goals"`
-	PenaltyGoals int    `json:"penaltyGoals"`
-}
-
-type Match struct {
-	Team1             *Country  `json:"team1"`
-	Team2             *Country  `json:"team2"`
-	Playtime          time.Time `json:"playtime"`
-	GoalsTeam1        int       `json:"goalsTeam1"`
-	PenaltyScoreTeam1 int       `json:"penaltyScoreTeam1"`
-	PenaltyScoreTeam2 int       `json:"penaltyScoreTeam2"`
-	GoalsTeam2        int       `json:"goalsTeam2"`
-	Winner            *Country  `json:"winner"`
-}
-
-type GroupMatch struct {
-	Match
-	GroupName string `json:"groupName"`
-}
-
-type MatchDeserialized struct {
-	Team1Index int       `json:"team1"`
-	Team2Index int       `json:"team2"`
-	Playtime   time.Time `json:"playtime"`
-}
-
-type TournamentMatches struct {
-	Group   []GroupMatch `json:"group"`
-	Sixteen []Match      `json:"sixteen"`
-	Eight   []Match      `json:"eight"`
-	Four    []Match      `json:"four"`
-	Final   Match        `json:"final"`
-}
-
-type PlaydayMatches []Match
-
-type Group struct {
-	Name      string
-	Countries [4]*Country
-	Matches   []GroupMatch
-	Ranking   []*Country
-}
-
-type GroupDeserialisation struct {
-	Name      string              `json:"name"`
-	Countries [4]*Country         `json:"countries"`
-	Matches   []MatchDeserialized `json:"matches"`
-}
-
-type Groups struct {
-	A Group
-	B Group
-	C Group
-	D Group
-	E Group
-	F Group
-}
-
-type RoundOf16 struct {
-	Member1  *Country
-	Member2  *Country
-	Member3  *Country
-	Member4  *Country
-	Member5  *Country
-	Member6  *Country
-	Member7  *Country
-	Member8  *Country
-	Member9  *Country
-	Member10 *Country
-	Member11 *Country
-	Member12 *Country
-	Member13 *Country
-	Member14 *Country
-	Member15 *Country
-	Member16 *Country
-}
-
-type CountryFrontend struct {
-	Name     string `json:"name"`
-	Strength int    `json:"strength"`
-}
-
-type GroupFrontend struct {
-	Name      string             `json:"groupName"`
-	Countries [4]CountryFrontend `json:"countries"`
-}
-
-type MatchFrontend struct {
-	GroupIndex int    `json:"groupIndex"`
-	MatchIndex int    `json:"matchIndex"`
-	Country1   string `json:"country1"`
-	Country2   string `json:"country2"`
-}
-
-type GroupsAndMatches struct {
-	Groups  []GroupFrontend `json:"groups"`
-	Matches []MatchFrontend `json:"matches"`
 }
 
 type Strength string

@@ -12,6 +12,27 @@ import (
 	"github.com/derdem/iamtoolazytotip/simulator/readTournamentFromDb"
 )
 
+func ReadTournamentFromFile(path string) simulator.Tournament {
+	jsonFile, err := os.Open(path)
+
+	if err != nil {
+		fmt.Printf("Error opening file: %v\n", err)
+		os.Exit(1)
+	}
+
+	defer jsonFile.Close()
+	jsonBytes, err := io.ReadAll(jsonFile)
+
+	if err != nil {
+		fmt.Printf("Error reading file: %v\n", err)
+		os.Exit(1)
+	}
+	var Tournament simulator.Tournament
+	json.Unmarshal(jsonBytes, &Tournament)
+
+	return Tournament
+}
+
 func recoverFromPanic(t *testing.T, message string) {
 	if message == "" {
 		message = "The code did not panic"
@@ -66,7 +87,7 @@ func TestReadTournamentFromJson(t *testing.T) {
 }
 
 func TestRunFullTournament(t *testing.T) {
-	tournament := simulator.ReadTournamentFromFile("../dumps/tournament2.json")
+	tournament := ReadTournamentFromFile("../dumps/tournament2.json")
 
 	tournament = simulator.TournamentSimulator(tournament)
 
@@ -77,7 +98,7 @@ func TestRunFullTournament(t *testing.T) {
 }
 
 func TestUpdateKoMatchesWithThirds(t *testing.T) {
-	tournament := simulator.ReadTournamentFromFile("../dumps/tournament2.json")
+	tournament := ReadTournamentFromFile("../dumps/tournament2.json")
 
 	matchResults := simulator.PlayGroupMatches(tournament)
 	tournament.MatchResults = matchResults
@@ -125,7 +146,7 @@ func TestPlayKoRounds_HappyCase(t *testing.T) {
 			Goals:   3,
 		},
 	}
-	groups := []simulator.Group2{
+	groups := []simulator.Group{
 		{
 			Id:           3,
 			Name:         "Group1",
@@ -165,7 +186,7 @@ func TestPlayKoRounds_UnhappyCase_NoKoMatches(t *testing.T) {
 	defer recoverFromPanic(t, "")
 
 	tournamentId := 1
-	groups := []simulator.Group2{
+	groups := []simulator.Group{
 		{
 			Id:           1,
 			Name:         "Group1",
@@ -198,7 +219,7 @@ func TestPlayKoRounds_UnhappyCase_WrongRankingGroupId(t *testing.T) {
 			Goals:   3,
 		},
 	}
-	groups := []simulator.Group2{
+	groups := []simulator.Group{
 		{
 			Id:           3,
 			Name:         "Group1",
@@ -253,7 +274,7 @@ func TestPlayKoRounds_UnhappyCase_WrongRankingNumber(t *testing.T) {
 			Goals:   3,
 		},
 	}
-	groups := []simulator.Group2{
+	groups := []simulator.Group{
 		{
 			Id:           3,
 			Name:         "Group1",
@@ -365,7 +386,7 @@ func TestCreateMatchFromKoMatchUnhappyCase(t *testing.T) {
 func TestPlayKoGroupsMatches(t *testing.T) {
 	matches := getMatches()
 
-	simulator.PlayEliminationMatch = func(match simulator.Match2, pointsForWinner int, matchChannel chan simulator.MatchResult) {
+	simulator.PlayEliminationMatch = func(match simulator.Match, pointsForWinner int, matchChannel chan simulator.MatchResult) {
 		matchChannel <- simulator.MatchResult{
 			Winner:            match.Team1,
 			Team1Goals:        1,
@@ -424,7 +445,7 @@ func TestPlayEliminationMatch_Penalty(t *testing.T) {
 	defer func() {
 		simulator.DetermineWinner = simulator.DetermineWinner_
 	}()
-	simulator.ResolveDrawInEliminationMatch = func(match simulator.Match2, pointsForWinner int) simulator.MatchResult {
+	simulator.ResolveDrawInEliminationMatch = func(match simulator.Match, pointsForWinner int) simulator.MatchResult {
 		return matchResult
 	}
 	defer func() {
@@ -660,8 +681,8 @@ func TestGetTeamsFromMatches(t *testing.T) {
 
 }
 
-func getMatch() simulator.Match2 {
-	return simulator.Match2{
+func getMatch() simulator.Match {
+	return simulator.Match{
 		Id:      1,
 		GroupId: 1,
 		Team1:   simulator.Team{Name: "Team1"},
@@ -669,8 +690,8 @@ func getMatch() simulator.Match2 {
 	}
 }
 
-func getMatches() []simulator.Match2 {
-	return []simulator.Match2{
+func getMatches() []simulator.Match {
+	return []simulator.Match{
 		{
 			Id:      1,
 			GroupId: 1,

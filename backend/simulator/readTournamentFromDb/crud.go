@@ -1,8 +1,6 @@
 package readTournamentFromDb
 
 import (
-	"time"
-
 	"github.com/derdem/iamtoolazytotip/postgres_connection"
 	"github.com/derdem/iamtoolazytotip/simulator"
 	"github.com/jackc/pgx"
@@ -55,9 +53,9 @@ func GetTournament(tournament_id int) simulator.Tournament {
 }
 
 func ConvertTournamentDbToModel(tournamentDb TournamentDb) simulator.Tournament {
-	var groups []simulator.Group2
+	var groups []simulator.Group
 	for _, groupDb := range tournamentDb.Groups {
-		groups = append(groups, simulator.Group2{
+		groups = append(groups, simulator.Group{
 			Id:           groupDb.Id,
 			Name:         groupDb.Name,
 			TournamentId: groupDb.TournamentId,
@@ -78,11 +76,11 @@ func ConvertTournamentDbToModel(tournamentDb TournamentDb) simulator.Tournament 
 		teams = append(teams, team)
 	}
 
-	var matches []simulator.Match2
+	var matches []simulator.Match
 	for _, match := range tournamentDb.Matches {
 		team1 := teamMap[match.Team1Id]
 		team2 := teamMap[match.Team2Id]
-		matches = append(matches, simulator.Match2{
+		matches = append(matches, simulator.Match{
 			Id:      match.Id,
 			Team1:   team1,
 			Team2:   team2,
@@ -301,86 +299,7 @@ func readThirdEvaluationRules(tx *pgx.Tx, tournament_id int) []ThirdEvaluationRu
 	return thirdEvaluationRules
 }
 
-func LoadGroupFromDb(tournament_id int) []simulator.Group {
-	groupsRaw := ReadTournamentGrouped(tournament_id)
-	groups := make([]simulator.Group, 0)
-	for _, groupRaw := range groupsRaw {
-		countries, countryIdIndexMap := getCountriesFromDbEntries(groupRaw.Teams)
-		matches := getMatchesFromDbEntries(groupRaw.Matches, countryIdIndexMap, countries, groupRaw.Name)
-
-		group := simulator.Group{
-			Name:      groupRaw.Name,
-			Countries: countries,
-			Matches:   matches,
-		}
-		groups = append(groups, group)
-	}
-	return groups
-}
-
 func LoadTournamentFromDb(tournament_id int) TournamentDb {
 	tournament := ReadTournament(tournament_id)
 	return tournament
-}
-
-func getCountriesFromDbEntries(teams []TeamDb) ([4]*simulator.Country, map[int]int) {
-	return [4]*simulator.Country{
-			{
-				Name:     teams[0].Name,
-				Strength: simulator.ConvertStrengthStringToInt(teams[0].Strength),
-				Points:   0,
-				Goals:    0,
-			},
-			{
-				Name:     teams[1].Name,
-				Strength: simulator.ConvertStrengthStringToInt(teams[1].Strength),
-				Points:   0,
-				Goals:    0,
-			},
-			{
-				Name:     teams[2].Name,
-				Strength: simulator.ConvertStrengthStringToInt(teams[2].Strength),
-				Points:   0,
-				Goals:    0,
-			},
-			{
-				Name:     teams[3].Name,
-				Strength: simulator.ConvertStrengthStringToInt(teams[3].Strength),
-				Points:   0,
-				Goals:    0,
-			},
-		},
-		map[int]int{
-			teams[0].Id: 0,
-			teams[1].Id: 1,
-			teams[2].Id: 2,
-			teams[3].Id: 3,
-		}
-}
-
-func getMatchesFromDbEntries(matches []MatchDb, countryIdIndexMap map[int]int, countries [4]*simulator.Country, groupName string) []simulator.GroupMatch {
-	groupMatches := make([]simulator.GroupMatch, 0)
-	for _, match := range matches {
-		country1Index := countryIdIndexMap[match.Team1Id]
-		country2Index := countryIdIndexMap[match.Team2Id]
-		country1 := countries[country1Index]
-		country2 := countries[country2Index]
-
-		groupMatch := simulator.GroupMatch{
-			Match: simulator.Match{
-				Team1:             country1,
-				Team2:             country2,
-				Playtime:          time.Now(),
-				GoalsTeam1:        0,
-				PenaltyScoreTeam1: 0,
-				GoalsTeam2:        0,
-				PenaltyScoreTeam2: 0,
-				Winner:            nil,
-			},
-			GroupName: groupName,
-		}
-		groupMatches = append(groupMatches, groupMatch)
-	}
-
-	return groupMatches
 }

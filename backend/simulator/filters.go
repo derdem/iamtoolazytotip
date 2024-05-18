@@ -1,8 +1,8 @@
 package simulator
 
-func FilterGroup(groupType GroupType) func(groups []Group2) []Group2 {
-	return func(groups []Group2) []Group2 {
-		filteredGroups := make([]Group2, 0)
+func FilterGroup(groupType GroupType) func(groups []Group) []Group {
+	return func(groups []Group) []Group {
+		filteredGroups := make([]Group, 0)
 		for _, group := range groups {
 			if group.GroupType == groupType {
 				filteredGroups = append(filteredGroups, group)

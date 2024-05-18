@@ -54,7 +54,7 @@ func PlayGroupMatches(tournament Tournament) []MatchResult {
 	return groupMatchResults
 }
 
-func DetermineGroupRanking(matchResults []MatchResult, teamsSortedIntoGroups map[int][]Team, groups []Group2) []GroupRanking {
+func DetermineGroupRanking(matchResults []MatchResult, teamsSortedIntoGroups map[int][]Team, groups []Group) []GroupRanking {
 	var teamPoints = make(map[int]int) // teamId -> points
 	var teamGoals = make(map[int]int)  // teamId -> goals
 	var groupRankings = make([]GroupRanking, 0)
@@ -123,7 +123,7 @@ func sortRankingsByPointsAndGoals(rankings []GroupRanking) []GroupRanking {
 	return sortedRankings
 }
 
-func getHighestMatchId(matches []Match2) int {
+func getHighestMatchId(matches []Match) int {
 	highestMatchId := 0
 	for _, match := range matches {
 		if match.Id > highestMatchId {
@@ -133,7 +133,7 @@ func getHighestMatchId(matches []Match2) int {
 	return highestMatchId
 }
 
-func getNextMatchId(matches []Match2) int {
+func getNextMatchId(matches []Match) int {
 	return getHighestMatchId(matches) + 1
 }
 
@@ -256,7 +256,7 @@ func PlayKoRounds(tournament Tournament) Tournament {
 		teamsInGroup := GetTeamsFromMatches(matches)
 		teamsMap := make(map[int][]Team)
 		teamsMap[koGroup.Id] = teamsInGroup
-		groupRankings := DetermineGroupRanking(matchResults, teamsMap, []Group2{koGroup})
+		groupRankings := DetermineGroupRanking(matchResults, teamsMap, []Group{koGroup})
 		tournament.GroupRankings = append(tournament.GroupRankings, groupRankings...)
 	}
 
@@ -267,8 +267,8 @@ func PlayKoRounds(tournament Tournament) Tournament {
 	return tournament
 }
 
-func CreateMatchFromKoMatch(koMatches []KoMatch, rankingsSortedIntoGroups map[int][]GroupRanking) []Match2 {
-	matches := make([]Match2, 0)
+func CreateMatchFromKoMatch(koMatches []KoMatch, rankingsSortedIntoGroups map[int][]GroupRanking) []Match {
+	matches := make([]Match, 0)
 	for _, koMatch := range koMatches {
 		group1GroupRankings := rankingsSortedIntoGroups[koMatch.GroupId1]
 		group2GroupRankings := rankingsSortedIntoGroups[koMatch.GroupId2]
@@ -283,7 +283,7 @@ func CreateMatchFromKoMatch(koMatches []KoMatch, rankingsSortedIntoGroups map[in
 			panic("Error: " + err2.Error() + " for GroupId: " + fmt.Sprint(koMatch.GroupId2))
 		}
 
-		match := Match2{
+		match := Match{
 			Id:      getNextMatchId(matches),
 			Team1:   team1,
 			Team2:   team2,
@@ -303,7 +303,7 @@ func findTeamBasedOnRanking(rankings []GroupRanking, rankingNumber int) (Team, e
 	return Team{}, errors.New("Team with ranking " + fmt.Sprint(rankingNumber) + " not found in rankings")
 }
 
-func PlayKoGroupsMatches_(matches []Match2) []MatchResult {
+func PlayKoGroupsMatches_(matches []Match) []MatchResult {
 	var matchResults []MatchResult
 	matchResultChannel := make(chan MatchResult, len(matches))
 	numberOfMatches := len(matches)
@@ -323,7 +323,7 @@ func PlayKoGroupsMatches_(matches []Match2) []MatchResult {
 
 var PlayKoGroupsMatches = PlayKoGroupsMatches_
 
-func ResolveDrawInEliminationMatch_(match Match2, pointsForWinner int) MatchResult {
+func ResolveDrawInEliminationMatch_(match Match, pointsForWinner int) MatchResult {
 	team1 := match.Team1
 	team2 := match.Team2
 	var winnerTeam Team
@@ -357,7 +357,7 @@ func ResolveDrawInEliminationMatch_(match Match2, pointsForWinner int) MatchResu
 
 var ResolveDrawInEliminationMatch = ResolveDrawInEliminationMatch_
 
-func GetTeamsFromMatches(matches []Match2) []Team {
+func GetTeamsFromMatches(matches []Match) []Team {
 	teams := make([]Team, 0)
 	for _, match := range matches {
 		teams = append(teams, match.Team1, match.Team2)
@@ -375,14 +375,4 @@ func DetermineTournamentWinner(finalGroupId int, groupRankings []GroupRanking) T
 	winner := finalRankings[0].Team
 
 	return winner
-}
-
-func CountAllGroupMatches(groups []Group) int {
-	var numberMatches int = 0
-
-	for _, group := range groups {
-		numberMatches += len(group.Matches)
-	}
-
-	return numberMatches
 }
