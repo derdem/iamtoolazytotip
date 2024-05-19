@@ -10,6 +10,7 @@ jobs:
         with:
           go-version-file: backend/go.mod
       - run: pwd
+      - run: ls
       - run: cd backend
       - run: pwd
 
