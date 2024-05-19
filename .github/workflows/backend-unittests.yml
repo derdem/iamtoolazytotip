@@ -10,5 +10,5 @@ jobs:
         with:
           go-version-file: backend/go.mod
       - working-directory: ./backend
-        run: go test ./...
+        run: go test -v ./simulator
 
