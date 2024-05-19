@@ -7,6 +7,8 @@ import (
 	"os"
 	"testing"
 
+	"github.com/derdem/iamtoolazytotip/postgres_connection"
+	"github.com/derdem/iamtoolazytotip/readTournamentFromDb"
 	"github.com/derdem/iamtoolazytotip/simulator"
 )
 
@@ -38,6 +40,30 @@ func recoverFromPanic(t *testing.T, message string) {
 	if r := recover(); r == nil {
 		t.Errorf(message)
 	}
+}
+
+func _TestTournamentSimulatorV2(t *testing.T) {
+	readTournamentFromDb.GetConnection = postgres_connection.GetConnectionForTest
+	defer func() {
+		readTournamentFromDb.GetConnection = postgres_connection.GetConnection
+	}()
+
+	tournament := readTournamentFromDb.GetTournament(2)
+	simulator.TournamentSimulator(tournament)
+}
+
+func _TestPrepareDataDump(t *testing.T) {
+	readTournamentFromDb.GetConnection = postgres_connection.GetConnectionForTest
+
+	tournament := readTournamentFromDb.GetTournament(2)
+	jsonString, err := json.Marshal(tournament)
+	if err != nil {
+		t.Errorf("Error marshalling tournament: %v", err)
+	}
+	fmt.Println(string(jsonString))
+
+	os.WriteFile("../dumps/tournament2.json", jsonString, 0644)
+
 }
 
 func TestReadTournamentFromJson(t *testing.T) {
