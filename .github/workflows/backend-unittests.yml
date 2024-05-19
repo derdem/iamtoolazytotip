@@ -9,6 +9,7 @@ jobs:
       - uses: actions/setup-go@v5.0.1
         with:
           go-version-file: backend/go.mod
+          cache-dependency-path: backend/go.sum
       - working-directory: ./backend
         run: go test -v ./simulator
 
