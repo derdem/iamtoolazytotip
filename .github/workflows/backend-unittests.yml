@@ -9,8 +9,6 @@ jobs:
       - uses: actions/setup-go@v5.0.1
         with:
           go-version-file: backend/go.mod
-      - run: pwd
-      - run: ls
-      - run: cd backend
-      - run: pwd
+      - working-directory: ./backend
+        run: go test ./...
 
