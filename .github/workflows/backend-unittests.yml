@@ -1,0 +1,14 @@
+name: GitHub Actions Demo
+run-name: ${{ github.actor }} runs unittests for the simulator backend 🚀
+on: [push]
+jobs:
+  simulator-backend-unittests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5.0.1
+        with:
+          go-version-file: backend/go.mod
+      - working-directory: ./backend
+        run: go test -v ./simulator
+
