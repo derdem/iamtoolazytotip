@@ -8,7 +8,7 @@ RUN go mod download
 
 COPY backend/ ./
 
-RUN CGO_ENABLED=0 GOOS=linux go build -o /iamtoolazytotip
+RUN CGO_ENABLED=0 GOOS=linux go build -o /build
 
 # Run the tests in the container
 FROM build-stage AS run-test-stage
@@ -19,7 +19,9 @@ FROM gcr.io/distroless/base-debian11 AS build-release-stage
 
 WORKDIR /
 
-COPY --from=build-stage /iamtoolazytotip /iamtoolazytotip
+COPY --from=build-stage /build /iamtoolazytotip
+
+COPY backend/dumps /app/dumps
 
 EXPOSE 8080
 

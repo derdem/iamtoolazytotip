@@ -30,9 +30,9 @@ services:
 
     api-server:
         container_name: go-api-server
-        # build:
-        #     context: .
-        #     dockerfile: ./docker/api.prod.dockerfile
+        build:
+            context: .
+            dockerfile: ./docker/api.prod.dockerfile
         image: simulator-prod # iamtoolazytotip-api-prod
         networks:
             - simulator-network

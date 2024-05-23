@@ -1,1 +1,1 @@
-GET http://localhost:8080/api/2024
+GET http://localhost:8080/api/2024-from-json
