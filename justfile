@@ -14,3 +14,8 @@ stop:
 # unittests backend
 testbackend:
     go test ./...
+
+# build a simulator webserver production image
+build-simulator tag:
+    docker build -t {{tag}} -f docker/api.prod.dockerfile .
+
