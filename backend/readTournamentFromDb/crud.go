@@ -1,6 +1,11 @@
 package readTournamentFromDb
 
 import (
+	"encoding/json"
+	"fmt"
+	"io"
+	"os"
+
 	"github.com/derdem/iamtoolazytotip/postgres_connection"
 	"github.com/derdem/iamtoolazytotip/simulator"
 	"github.com/jackc/pgx"
@@ -302,4 +307,25 @@ func readThirdEvaluationRules(tx *pgx.Tx, tournament_id int) []ThirdEvaluationRu
 func LoadTournamentFromDb(tournament_id int) TournamentDb {
 	tournament := ReadTournament(tournament_id)
 	return tournament
+}
+
+func ReadTournamentFromFile(path string) simulator.Tournament {
+	jsonFile, err := os.Open(path)
+
+	if err != nil {
+		fmt.Printf("Error opening file: %v\n", err)
+		os.Exit(1)
+	}
+
+	defer jsonFile.Close()
+	jsonBytes, err := io.ReadAll(jsonFile)
+
+	if err != nil {
+		fmt.Printf("Error reading file: %v\n", err)
+		os.Exit(1)
+	}
+	var Tournament simulator.Tournament
+	json.Unmarshal(jsonBytes, &Tournament)
+
+	return Tournament
 }
