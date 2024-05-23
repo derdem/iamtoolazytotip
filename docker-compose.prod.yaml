@@ -1,14 +1,43 @@
 services:
-    api-server:
-        container_name: go-api-server
-        build:
-            context: .
-            dockerfile: ./docker/api.prod.dockerfile
-        image: iamtoolazytotip-api-prod
+    database:
+        container_name: database
+        image: postgres:16.2-alpine3.19
+        environment:
+            POSTGRES_USER: iamtoolazytotip
+            POSTGRES_PASSWORD: iamtoolazytotip
+            POSTGRES_DB: tournaments
+        shm_size: 256mb
+        ports:
+            - "5432:5432"
         networks:
             - simulator-network
-        # ports:
-        #     - "8080:8080"
+        volumes:
+            - type: bind
+              source: ./database/migrate
+              target: /docker-entrypoint-initdb.d/01_migrate
+            - type: bind
+              source: ./database/dev_setup
+              target: /docker-entrypoint-initdb.d/02_dev_setup
+            - type: bind
+              source: ./database/initdb.sh
+              target: /docker-entrypoint-initdb.d/initdb.sh
+
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U iamtoolazytotip -d tournaments"]
+            interval: 3s
+            timeout: 5s
+            retries: 5
+
+    api-server:
+        container_name: go-api-server
+        # build:
+        #     context: .
+        #     dockerfile: ./docker/api.prod.dockerfile
+        image: simulator-prod # iamtoolazytotip-api-prod
+        networks:
+            - simulator-network
+        ports:
+            - "8080:8080"
 
     nginx_local_dev_proxy:
         container_name: nginx-local-proxy
